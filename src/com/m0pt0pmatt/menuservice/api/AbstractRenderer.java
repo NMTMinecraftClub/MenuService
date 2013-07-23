@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.plugin.Plugin;
 
@@ -66,6 +67,16 @@ public abstract class AbstractRenderer implements Renderer{
 			this.players.remove(player);
 		}
 		menuService.removeMenuInstance(instance);
+		
+	}
+	
+	@Override
+	public void closeAll() {
+		for (Entry<MenuInstance, List<String>> entry: this.getInstances().entrySet()){
+			for (String player: entry.getValue()){
+				this.closeMenu(player);
+			}
+		}
 		
 	}
 	

@@ -67,7 +67,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		loadConfig();
 		log(1, Level.INFO, "Loaded " + configFileName);
 		
-		//load all menus
+		//load all menus in the MenuService folder
 		loadMenus();
 		
 		//register the plugin so it can listen to open menus
@@ -110,36 +110,55 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 	}
 	
+	/**
+	 * Loads menus stored in MenuService
+	 */
 	private void loadMenus() {
+		
 		//load menus in the MenuService folder
-		for (File file: this.getDataFolder().listFiles(new FileFilter(){
-
-			@Override
-			public boolean accept(File file) {
-				if (file.getName().equals("config.yml")){
-					return false;
-				}
-				if (!file.getName().endsWith(".yml")){
-					return false;
-				}
-				return true;
+		for (File file: this.getDataFolder().listFiles()){
+			
+			//make sure the file is not the config file and has the .yml extension
+			if ((!file.getName().equalsIgnoreCase("config.yml")) && file.getName().endsWith(".yml")){
+				
+				//load the menu
+				Menu menu = menuService.loadMenu(this, file.getName());
+				
+				//attach the default renderer
+				Renderer renderer = menuService.getRenderer("inventory");
+				menu.addRenderer(renderer);
+				
+				log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
 			}
 			
-		})){
-			Menu menu = menuService.loadMenu(this, file.getName());
-			Renderer renderer = menuService.getRenderer("inventory");
-			menu.addRenderer(renderer);
 		}
+		
 	}
 
+	/**
+	 * Ran when the plugin is disabled.
+	 * Saves menus to file.
+	 * Closes all menuInstances
+	 */
 	@Override
 	public void onDisable(){
+		
+		//save all the menus to file
+		log(1, Level.INFO, "Saving all menus to file");
 		menuService.saveAll();
+		
+		//close all menuinstances
+		log(1, Level.INFO, "Closing all menus");
+		menuService.closeAll();
+		
+		//save the config file
 		try {
 			config.save(new File(this.getDataFolder(), "config.yml"));
+			log(1, Level.INFO, "Saved " + configFileName);
 		} catch (IOException e) {
-			getLogger().severe("Unable to save config file");
+			log(1, Level.SEVERE, "Unable to save " + configFileName);
 		}
+		
 	}
 	
 	/**
@@ -165,7 +184,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		
 		//make sure the command is for MenuService
-		if (!cmd.getName().equalsIgnoreCase("menuservice")){
+		if (!cmd.getName().equalsIgnoreCase(this.getName())){
 			return false;
 		}
 		
@@ -174,6 +193,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			showHelp(sender);
 			return true;
 		}
+		
 		
 		//check if the command is an "open" command
 		if (args[0].equalsIgnoreCase("open")){
@@ -186,7 +206,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check if player and menuName were specified
 			if (args.length == 3){
-				if(openMenu("MenuService", args[1], args[2])){
+				if(openMenu(this.getName(), args[1], args[2])){
 					sender.sendMessage("Menu opened");
 				} else{
 					sender.sendMessage("Could not open menu");
@@ -259,7 +279,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//load a MenuService menu
 			if (args.length == 2){
-				if(loadMenu("MenuService", args[1])){
+				if(loadMenu(this.getName(), args[1])){
 					sender.sendMessage("Menu loaded");
 				} else{
 					sender.sendMessage("Menu not loaded");
@@ -293,7 +313,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//save a MenuService menu to MenuService
 			if (args.length == 3){
-				if(saveMenu(args[1], "MenuService", args[2])){
+				if(saveMenu(args[1], this.getName(), args[2])){
 					sender.sendMessage("Menu saved");
 				} else{
 					sender.sendMessage("Menu not saved");
@@ -370,7 +390,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 					}
 					
 					//bind the item
-					if(bindMenu(((Player)sender).getItemInHand(), "MenuService", args[2])){
+					if(bindMenu(((Player)sender).getItemInHand(), this.getName(), args[2])){
 						sender.sendMessage("Item Binded");
 					} else{
 						sender.sendMessage("Item not Binded");
@@ -414,7 +434,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 					}
 
 					//bind the material
-					if (bindMenu(((Player)sender).getItemInHand().getType(), "MenuService", args[2])){
+					if (bindMenu(((Player)sender).getItemInHand().getType(), this.getName(), args[2])){
 						sender.sendMessage("Material Binded");
 					} else{
 						sender.sendMessage("Material not Binded");
@@ -539,88 +559,152 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	}
 	
 	
+	/**
+	 * Closes a menu for a given player
+	 * @param playerName the name of the player
+	 */
 	private void closeMenu(String playerName) {
+		
+		//close the menu
 		menuService.closeMenuInstance(playerName);
 	}
 
+	/**
+	 * Saves a Menu to file
+	 * @param menuName the name of the menu
+	 * @param pluginName the name of the plugin which holds the menu
+	 * @param fileName the name to save the menu to
+	 * @return true if successful, false if unsuccessful 
+	 */
 	private boolean saveMenu(String menuName, String pluginName, String fileName) {
+		
+		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			this.getLogger().warning("Plugin was null.");
-			this.getLogger().warning("Could not save Menu.");
+			log(2, Level.SEVERE, "Plugin was null.");
+			log(2, Level.SEVERE, "Could not save Menu.");
 			return false;
 		}
 		
+		//check the filename
 		if (fileName == null){
-			this.getLogger().warning("Filename was null.");
-			this.getLogger().warning("Could not save Menu.");
+			log(2, Level.SEVERE, "Filename was null.");
+			log(2, Level.SEVERE, "Could not save Menu.");
 			return false;
 		}
 		
+		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			this.getLogger().warning("Menu was null.");
-			this.getLogger().warning("Could not Save Menu.");
+			log(2, Level.SEVERE, "Menu was null.");
+			log(2, Level.SEVERE, "Could not save Menu.");
 			return false;
 		}
 		
+		//save the menu
 		return menuService.saveMenu(plugin, menu, fileName);
 	}
 
+	/**
+	 * Loads a menu from a file
+	 * @param pluginName the name of the plugin which holds the menu
+	 * @param fileName the name of the file of the menu
+	 * @return true if successful, false if unsuccessful 
+	 */
 	private boolean loadMenu(String pluginName, String menuName) {
 		
+		//get the Plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			this.getLogger().warning("Plugin was null.");
-			this.getLogger().warning("Could not load Menu.");
+			log(2, Level.SEVERE, "Plugin was null.");
+			log(2, Level.SEVERE, "Could not load Menu.");
 			return false;
 		}
 		
+		//load the menu
 		if (menuService.loadMenu(plugin, menuName) == null){
+			
+			//failed.
 			return false;
 		}
+		
+		//successful
 		return true;
 	}
 
+	/**
+	 * unbinds all materials and items from a menu
+	 * @param menuName the name of the menu
+	 * @return true if successful, false if unsuccessful
+	 */
 	private boolean unbindMenu(String menuName) {
-		return unbindMenu("MenuService", menuName);
+		
+		//unbind the menu
+		return unbindMenu(this.getName(), menuName);
 	}
 	
 	private boolean unbindMenu(String pluginName, String menuName) {
+		
+		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			this.getLogger().warning("Plugin was null.");
-			this.getLogger().warning("Could not unbind Menu.");
+			log(2, Level.SEVERE, "Plugin was null.");
+			log(2, Level.SEVERE, "Could not unbind Menu.");
 			return false;
 		}
 		
+		//check the menuname
+		if (menuName == null){
+			log(2, Level.SEVERE, "menuName was null");
+			log(2, Level.SEVERE, "Could not unbind menu");
+			return false;
+		}
+		
+		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			this.getLogger().warning("Menu was null.");
-			this.getLogger().warning("Could not unbind Menu.");
+			log(2, Level.SEVERE, "Menu was null.");
+			log(2, Level.SEVERE, "Could not unbind Menu.");
 			return false;
 		}
 		
+		//unbind the menu
 		return menuService.unbindMenu(menu);	
 	}
 
+	/**
+	 * unbinds an Item from a Menu if it is binded
+	 * @param itemInHand the item
+	 * @return true if successful, false if unsuccessful
+	 */
 	private boolean unbindItem(ItemStack itemInHand) {
+		
+		//check if the item is null
 		if (itemInHand == null){
-			this.getLogger().warning("item was null.");
-			this.getLogger().warning("Could not unbind Menus from Item.");
+			log(2, Level.SEVERE, "item was null.");
+			log(2, Level.SEVERE, "Could not unbind Menus from Item.");
 			return false;
 		}
 		
+		//unbind the item
 		return menuService.unbindMenu(itemInHand);		
 	}
 
+	/**
+	 * Unbinds a Material from a Menu if it is binded
+	 * @param type the Material
+	 * @return true if successful, false if unseuccessful
+	 */
 	private boolean unbindMaterial(Material type) {
+		
+		//check for null
 		if (type == null){
-			this.getLogger().warning("Material was null.");
-			this.getLogger().warning("Could not unbind Menus from Material.");
+			log(2, Level.SEVERE, "Material was null.");
+			log(2, Level.SEVERE, "Could not unbind Menus from Material.");
 			return false;
 		}
 		
+		//unbind the material
 		return menuService.unbindMenu(type);	
 	}
 
@@ -635,22 +719,24 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			this.getLogger().warning("Plugin was null.");
-			this.getLogger().warning("Could not open Menu.");
+			log(2, Level.SEVERE, "Plugin was null.");
+			log(2, Level.SEVERE, "Could not open Menu.");
 			return false;
 		}
 		
 		//get the Menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			this.getLogger().warning("Menu " + menuName + " is not loaded in MenuService.");
-			this.getLogger().warning("Could not open Menu.");
+			log(2, Level.SEVERE, "Menu " + menuName + " is not loaded in MenuService.");
+			log(2, Level.SEVERE, "Could not open Menu.");
 			return false;
 		}
 		
 		//get the instance
 		MenuInstance instance = menuService.createMenuInstance(menu, menuName + ": " + playerName);
 		if (instance == null){
+			log(2, Level.SEVERE, "a MenuInstance could not be created for the menu " + menuName);
+			log(2, Level.SEVERE, "Could not open Menu.");
 			return false;
 		}
 		
@@ -669,16 +755,16 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			this.getLogger().warning("Plugin was null.");
-			this.getLogger().warning("Could not bind Menu.");
+			log(2, Level.SEVERE, "Plugin was null.");
+			log(2, Level.SEVERE, "Could not bind Menu.");
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			this.getLogger().warning("Menu was null.");
-			this.getLogger().warning("Could not bind Menu.");
+			log(2, Level.SEVERE, "Menu was null.");
+			log(2, Level.SEVERE, "Could not bind Menu.");
 			return false;
 		}
 		
@@ -697,16 +783,16 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			this.getLogger().warning("Plugin was null.");
-			this.getLogger().warning("Could not bind Menu.");
+			log(2, Level.SEVERE, "Plugin was null.");
+			log(2, Level.SEVERE, "Could not bind Menu.");
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			this.getLogger().warning("Plugin was null.");
-			this.getLogger().warning("Could not bind Menu.");
+			log(2, Level.SEVERE, "Plugin was null.");
+			log(2, Level.SEVERE, "Could not bind Menu.");
 			return false;
 		}
 		

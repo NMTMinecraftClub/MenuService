@@ -142,4 +142,5 @@ public interface MenuService {
 	
 	public void saveAll();
 	
+	public void closeAll();
 }

@@ -504,5 +504,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		return cSender;
 	}
+
+	
 	
 }

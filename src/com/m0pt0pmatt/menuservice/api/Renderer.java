@@ -38,4 +38,6 @@ public interface Renderer {
 	 */
 	public void closeMenu(String playerName);
 	
+	public void closeAll();
+	
 }

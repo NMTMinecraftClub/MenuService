@@ -673,6 +673,15 @@ public class MenuServiceProvider implements MenuService, Listener{
 	}
 
 
+	@Override
+	public void closeAll() {
+		for (Renderer renderer: renderersByName.values()){
+			renderer.closeAll();
+		}
+		
+	}
+
+
 	
 
 }
