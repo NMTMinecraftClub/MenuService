@@ -179,6 +179,23 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	}
 	
 	/**
+	 * Logs messages if the verbose level is high enough.
+	 * This method should be used plugin wide as the only way to log messages.
+	 * @param verboseLevel The verbose level of the message being logged
+	 * @param level the Bukkit level of the message
+	 * @param msg the LogMessage
+	 */
+	public void log(int verboseLevel, Level level, LogMessage msg){
+		
+		//If the verbose level is high enough
+		if (verboseLevel <= verbose){
+			
+			//log the message
+			getLogger().log(level, msg.getMessage());;
+		}
+	}
+	
+	/**
 	 * Executed when a command is ran.
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
@@ -578,26 +595,33 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	private boolean saveMenu(String menuName, String pluginName, String fileName) {
 		
+		//check the plugin
+		if (pluginName == null){
+			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME);
+			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU);
+			return false;
+		}
+		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, "Plugin was null.");
-			log(2, Level.SEVERE, "Could not save Menu.");
+			log(2, Level.SEVERE, LogMessage.NULLPLUGIN);
+			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU);
 			return false;
 		}
 		
 		//check the filename
 		if (fileName == null){
-			log(2, Level.SEVERE, "Filename was null.");
-			log(2, Level.SEVERE, "Could not save Menu.");
+			log(2, Level.SEVERE, LogMessage.NULLFILENAME);
+			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, "Menu was null.");
-			log(2, Level.SEVERE, "Could not save Menu.");
+			log(2, Level.SEVERE, LogMessage.NOSUCHMENU);
+			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU);
 			return false;
 		}
 		
@@ -613,11 +637,17 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	private boolean loadMenu(String pluginName, String menuName) {
 		
+		//check the pluginName
+		if (pluginName == null){
+			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME);
+			log(2, Level.SEVERE, LogMessage.CANTLOADMENU);
+		}
+		
 		//get the Plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, "Plugin was null.");
-			log(2, Level.SEVERE, "Could not load Menu.");
+			log(2, Level.SEVERE, LogMessage.NULLPLUGIN);
+			log(2, Level.SEVERE, LogMessage.CANTLOADMENU);
 			return false;
 		}
 		
@@ -648,23 +678,23 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, "Plugin was null.");
-			log(2, Level.SEVERE, "Could not unbind Menu.");
+			log(2, Level.SEVERE, LogMessage.NULLMENUNAME);
+			log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU);
 			return false;
 		}
 		
 		//check the menuname
 		if (menuName == null){
-			log(2, Level.SEVERE, "menuName was null");
-			log(2, Level.SEVERE, "Could not unbind menu");
+			log(2, Level.SEVERE, LogMessage.NULLMENUNAME);
+			log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, "Menu was null.");
-			log(2, Level.SEVERE, "Could not unbind Menu.");
+			log(2, Level.SEVERE, LogMessage.NOSUCHMENU);
+			log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU);
 			return false;
 		}
 		
@@ -681,8 +711,8 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check if the item is null
 		if (itemInHand == null){
-			log(2, Level.SEVERE, "item was null.");
-			log(2, Level.SEVERE, "Could not unbind Menus from Item.");
+			log(2, Level.SEVERE, LogMessage.NULLITEMSTACK);
+			log(2, Level.SEVERE, LogMessage.CANTUNBINDITEM);
 			return false;
 		}
 		
@@ -699,8 +729,8 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check for null
 		if (type == null){
-			log(2, Level.SEVERE, "Material was null.");
-			log(2, Level.SEVERE, "Could not unbind Menus from Material.");
+			log(2, Level.SEVERE, LogMessage.NULLMATERIAL);
+			log(2, Level.SEVERE, LogMessage.CANTUNBINDMATERIAL);
 			return false;
 		}
 		
@@ -716,27 +746,34 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	private boolean openMenu(String pluginName, String menuName, String playerName){
 		
+		//check pluginName
+		if (pluginName == null){
+			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME);
+			log(2, Level.SEVERE, LogMessage.CANTOPENMENU);
+			return false;
+		}
+		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, "Plugin was null.");
-			log(2, Level.SEVERE, "Could not open Menu.");
+			log(2, Level.SEVERE, LogMessage.NULLPLUGIN);
+			log(2, Level.SEVERE, LogMessage.CANTOPENMENU);
 			return false;
 		}
 		
 		//get the Menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, "Menu " + menuName + " is not loaded in MenuService.");
-			log(2, Level.SEVERE, "Could not open Menu.");
+			log(2, Level.SEVERE, LogMessage.NOSUCHMENU);
+			log(2, Level.SEVERE, LogMessage.CANTOPENMENU);
 			return false;
 		}
 		
 		//get the instance
 		MenuInstance instance = menuService.createMenuInstance(menu, menuName + ": " + playerName);
 		if (instance == null){
-			log(2, Level.SEVERE, "a MenuInstance could not be created for the menu " + menuName);
-			log(2, Level.SEVERE, "Could not open Menu.");
+			log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE);
+			log(2, Level.SEVERE, LogMessage.CANTOPENMENU);
 			return false;
 		}
 		
@@ -752,19 +789,40 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	private boolean bindMenu(ItemStack item, String pluginName, String menuName){
 		
+		//check item
+		if (item == null){
+			log(2, Level.SEVERE, LogMessage.NULLITEMSTACK);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM);
+			return false;
+		}
+		
+		//check pluginName
+		if (pluginName == null){
+			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM);
+			return false;
+		}
+		
+		//check menuName
+		if (menuName == null){
+			log(2, Level.SEVERE, LogMessage.NULLMENUNAME);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM);
+			return false;
+		}
+		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, "Plugin was null.");
-			log(2, Level.SEVERE, "Could not bind Menu.");
+			log(2, Level.SEVERE, LogMessage.NULLPLUGIN);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, "Menu was null.");
-			log(2, Level.SEVERE, "Could not bind Menu.");
+			log(2, Level.SEVERE, LogMessage.NOSUCHMENU);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM);
 			return false;
 		}
 		
@@ -780,19 +838,33 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	private boolean bindMenu(Material material, String pluginName, String menuName){
 		
+		//check material
+		if (material == null){
+			log(2, Level.SEVERE, LogMessage.NULLMATERIAL);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL);
+			return false;
+		}
+		
+		//check pluginName
+		if (pluginName == null){
+			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL);
+			return false;
+		}
+		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, "Plugin was null.");
-			log(2, Level.SEVERE, "Could not bind Menu.");
+			log(2, Level.SEVERE, LogMessage.NULLPLUGIN);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, "Plugin was null.");
-			log(2, Level.SEVERE, "Could not bind Menu.");
+			log(2, Level.SEVERE, LogMessage.NOSUCHMENU);
+			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL);
 			return false;
 		}
 		

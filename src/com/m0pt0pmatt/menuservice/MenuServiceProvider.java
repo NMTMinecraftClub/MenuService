@@ -61,6 +61,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	//the Yaml File loader/saver
 	private YAMLBuilder yamlBuilder;
 	
+	
+	
 	/**
 	 * Creates the MenuServiceProvider.
 	 * The plugin of it's creator is needed so the MenuServiceProvider can register events.
@@ -226,7 +228,10 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 */
 	@Override
 	public void addMenu(Plugin plugin, Menu menu) {
+		
+		//check Plugin
 		if (plugin == null){
+			this.plugin.log(3, Level.SEVERE, "plugin was null");
 			return;
 		} else if (menu == null){
 			return;
