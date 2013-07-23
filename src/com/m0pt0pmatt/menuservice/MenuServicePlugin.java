@@ -37,8 +37,16 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public static MenuServiceProvider menuService;
 	
+	private static String configFileName = "config.yml";
+	
+	/**
+	 * The config file for the plugin
+	 */
 	private YamlConfiguration config;
 	
+	/**
+	 * the verbosity level of the plugin. The higher the level, the more messages will be logged to the terminal.
+	 */
 	public int verbose = 2;
 	
 	/**
@@ -49,28 +57,60 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 				
 		//setup the MenuService Provider
 		menuService = new MenuServiceProvider(this);
+		log(3, Level.INFO, "MenuService initialized");
+		
+		//register the MenuServiceProvider as the provider for the MenuService
 		Bukkit.getServicesManager().register(MenuService.class, menuService, this, ServicePriority.Normal);
+		log(3, Level.INFO, "MenuService registered for the server");
+		
+		//load the config file
+		loadConfig();
+		log(1, Level.INFO, "Loaded " + configFileName);
+		
+		//load all menus
+		loadMenus();
+		
+		//register the plugin so it can listen to open menus
+		Bukkit.getPluginManager().registerEvents(this, this);	
+		
+	}
 
-		//check for data folder
+	/**
+	 * Loads the config.yml file and all of its settings
+	 */
+	private void loadConfig() {
+		
+		//create data folder if needed
 		if (!this.getDataFolder().exists()){
-			getLogger().info("Creating Data Folder");
+			log(2, Level.INFO, "Creating Data Folder");
 			this.getDataFolder().mkdir();
 		}
 		
-		//load config file
-		File configFile = new File(this.getDataFolder(), "config.yml");
+		//create configuration file if needed
+		File configFile = new File(this.getDataFolder(), configFileName);
 		if (!configFile.exists()){
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				getLogger().warning("Unable to create config file!");
+				log(1, Level.SEVERE, "Unable to create config file!");
 			}
 		}
+		
+		//load the configuration file
 		config = YamlConfiguration.loadConfiguration(configFile);
 		if (config == null){
-			getLogger().warning("Unable to load config file!");
+			log(1, Level.SEVERE, "Unable to load config file!");
 		}
 		
+		//check for verbose level
+		if (config.contains("verbose")){
+			verbose = config.getInt("verbose");
+			log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
+		}
+		
+	}
+	
+	private void loadMenus() {
 		//load menus in the MenuService folder
 		for (File file: this.getDataFolder().listFiles(new FileFilter(){
 
@@ -90,24 +130,31 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			Renderer renderer = menuService.getRenderer("inventory");
 			menu.addRenderer(renderer);
 		}
-		
-		Bukkit.getPluginManager().registerEvents(this, this);
-		
 	}
-	
+
 	@Override
 	public void onDisable(){
 		menuService.saveAll();
 		try {
 			config.save(new File(this.getDataFolder(), "config.yml"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			getLogger().severe("Unable to save config file");
 		}
 	}
 	
+	/**
+	 * Logs messages if the verbose level is high enough.
+	 * This method should be used plugin wide as the only way to log messages.
+	 * @param verboseLevel The verbose level of the message being logged
+	 * @param level the Bukkit level of the message
+	 * @param msg The message
+	 */
 	public void log(int verboseLevel, Level level, String msg){
+		
+		//If the verbose level is high enough
 		if (verboseLevel <= verbose){
+			
+			//log the message
 			getLogger().log(level, msg);;
 		}
 	}
