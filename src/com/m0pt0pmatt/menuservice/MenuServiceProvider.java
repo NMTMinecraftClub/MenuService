@@ -61,8 +61,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 	//the Yaml File loader/saver
 	private YAMLBuilder yamlBuilder;
 	
-	
-	
 	/**
 	 * Creates the MenuServiceProvider.
 	 * The plugin of it's creator is needed so the MenuServiceProvider can register events.
@@ -157,25 +155,27 @@ public class MenuServiceProvider implements MenuService, Listener{
 	@Override
 	public Menu loadMenu(Plugin plugin, String fileName) {
 		
+		//check the filename
+		if (fileName == null){
+			this.plugin.log(2, Level.SEVERE, LogMessage.NULLFILENAME, null);
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, null);
+			return null;
+		}
+				
 		//check the plugin
 		if (plugin == null){
-			this.plugin.log(2, Level.SEVERE, "plugin was null");
-			this.plugin.log(2, Level.SEVERE, "could not load menu");
+			this.plugin.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, fileName);
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, fileName);
 			return null;
 		}
 		
-		//check the filename
-		if (fileName == null){
-			this.plugin.log(2, Level.SEVERE, "filename was null");
-			this.plugin.log(2, Level.SEVERE, "could not load menu");
-			return null;
-		}
+		
 		
 		//load the file
 		Menu menu = yamlBuilder.loadYAML(plugin, fileName);
 		if (menu == null){
-			this.plugin.log(2, Level.SEVERE, "Menu " + fileName + " is not loaded");
-			this.plugin.log(2, Level.SEVERE, "could not load menu");
+			this.plugin.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, fileName);
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, fileName);
 			return null;
 		}
 		
@@ -196,24 +196,24 @@ public class MenuServiceProvider implements MenuService, Listener{
 	@Override
 	public boolean saveMenu(Plugin plugin, Menu menu, String fileName) {
 		
-		//check the plugin
-		if (plugin == null){
-			this.plugin.getLogger().warning("Plugin was null.");
-			this.plugin.getLogger().warning("Could not save Menu.");
+		//check the menu
+		if (menu == null){
+			this.plugin.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, null);
 			return false;
 		}
 		
-		//check the menu
-		if (menu == null){
-			this.plugin.getLogger().warning("menuName was null.");
-			this.plugin.getLogger().warning("Could not save Menu.");
+		//check the plugin
+		if (plugin == null){
+			this.plugin.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menu.getName());
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menu.getName());
 			return false;
 		}
 		
 		//check the fileName
 		if (fileName == null){
-			this.plugin.getLogger().warning("filename was null.");
-			this.plugin.getLogger().warning("Could not save Menu " + menu.getName());
+			this.plugin.log(2, Level.SEVERE, LogMessage.NULLFILENAME, menu.getName());
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menu.getName());
 			return false;
 		}
 		
@@ -229,13 +229,17 @@ public class MenuServiceProvider implements MenuService, Listener{
 	@Override
 	public void addMenu(Plugin plugin, Menu menu) {
 		
-		//check Plugin
-		if (plugin == null){
-			this.plugin.log(3, Level.SEVERE, "plugin was null");
-			return;
-		} else if (menu == null){
+		if (menu == null){
 			return;
 		}
+		
+		//check Plugin
+		if (plugin == null){
+			this.plugin.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menu.getName());
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTADDMENU, menu.getName());
+			return;
+		}
+		
 		
 		if (menusByName.containsKey(menu.getName())){
 			plugin.getLogger().warning("Menu " + menu.getName() + " is already added");
