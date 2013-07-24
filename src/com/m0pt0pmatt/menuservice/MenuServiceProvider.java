@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -447,7 +448,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			if (permissions != null){
 				for (String permission: permissions){
 					if (!player.hasPermission(permission)){
-						player.sendMessage("¤cYou do not have permission to open the menu");
+						player.sendMessage(ChatColor.RED + "You do not have permission to open the menu");
 						return false;
 					}
 				}

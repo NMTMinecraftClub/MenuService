@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -130,7 +131,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		if (component.hasAttribute("text")){
 			text = (String) component.getAttribute("text");
 		}
-		meta.setDisplayName("¤r¤f" + text);
+		meta.setDisplayName(ChatColor.RESET.toString() + ChatColor.WHITE.toString() + text);
 		
 		//set the lore
 		if (meta.hasLore()){
@@ -140,7 +141,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		List<String> newLore = new LinkedList<String>();
 		if (lore != null){
 			for (String l: lore){
-				l = "¤r¤7" + l;
+				l = ChatColor.RESET.toString() + ChatColor.GRAY.toString() + l;
 				newLore.add(l);
 			}
 		}
@@ -347,13 +348,13 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		//check if the player has permission to interact with the component
 		if (!hasPermissions(player, component)){
-			player.sendMessage("¤cYou do not have permission to do that.");
+			player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
 			return;
 		}
 		
 		//check if the player has permission to activate the action
 		if (!hasPermissions(player, action)){
-			player.sendMessage("¤cYou do not have permission to do that.");
+			player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
 			return;
 		}
 		
