@@ -14,23 +14,30 @@ permissions:
       menuservice.reload: true
       menuservice.save: true
       menuservice.help: true
+      menuservice.list: true
   menuservice.open:
     description: Opens a Menu for a player
     default: false
   menuservice.close:
     description: Closes the Menu for a player
     default: false
+  menuservice.list:
+    description: List all currently loaded Menus
+    default: false
   menuservice.bind:
     description: Binds a Menu to an item or a material
     default: false
   menuservice.unbind:
-    description: Unbinds Menus from an item or a meterial
+    description: Unbinds Menus from an item or a material
     default: false
   menuservice.load:
     description: loads a Menu from file
     default: false
   menuservice.reload:
     description: reloads a Menu from file
+    default: false
+  menuservice.unload:
+    description: unloads a Menu from MenuService
     default: false
   menuservice.save:
     description: saves a Menu to file

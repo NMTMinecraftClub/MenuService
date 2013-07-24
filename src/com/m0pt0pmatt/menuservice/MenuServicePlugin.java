@@ -8,6 +8,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -36,14 +37,30 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public static MenuServiceProvider menuService;
 	
+	/**
+	 * The commandHandler handles all commands for the plugin
+	 */
 	private static CommandHandler commandHandler;
 	
+	/**
+	 * The config file for the plugin
+	 */
 	private static String configFileName = "config.yml";
+	
+	/**
+	 * The config file which stores all of the bind to menus
+	 */
+	private static String bindsFileName = "binds.yml";
 	
 	/**
 	 * The config file for the plugin
 	 */
 	private YamlConfiguration config;
+	
+	/**
+	 * The config file that holds all the menu binds
+	 */
+	private YamlConfiguration binds;
 	
 	/**
 	 * the verbosity level of the plugin. The higher the level, the more messages will be logged to the terminal.
@@ -71,6 +88,8 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//load all menus in the MenuService folder
 		loadMenus();
+		
+		loadBinds();
 		
 		//register the plugin so it can listen to open menus
 		Bukkit.getPluginManager().registerEvents(this, this);	
@@ -110,6 +129,61 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
 		}
 		
+	}
+	
+	private void loadBinds() {
+		//create data folder if needed
+		if (!this.getDataFolder().exists()){
+			log(2, Level.INFO, "Creating Data Folder");
+			this.getDataFolder().mkdir();
+		}
+		
+		//create configuration file if needed
+		File configFile = new File(this.getDataFolder(), bindsFileName);
+		if (!configFile.exists()){
+			try {
+				configFile.createNewFile();
+			} catch (IOException e) {
+				log(1, Level.SEVERE, "Unable to create binds file!");
+			}
+		}
+		
+		//load the configuration file
+		binds = YamlConfiguration.loadConfiguration(configFile);
+		if (binds == null){
+			log(1, Level.SEVERE, "Unable to load binds file!");
+		}
+		
+		if (binds.contains("materials")){
+			MemorySection materialSection = (MemorySection) binds.get("materials");
+			for (String m: materialSection.getKeys(false)){
+				MemorySection s = (MemorySection) materialSection.get(m);
+				Material material = null;
+				try{
+					material = Material.getMaterial(Integer.parseInt(s.getName()));						
+				} catch (NumberFormatException e){
+					material = Material.getMaterial(s.getName());
+				}
+				
+				if (material == null){
+					continue;
+				}
+				
+				if ((!s.contains("menu")) || (!s.contains("plugin"))){
+					continue;
+				}
+				
+				Object menu = s.get("menu");
+				Object plugin = s.get("plugin");
+				
+				if (!(menu instanceof String) || !(plugin instanceof String)){
+					continue;
+				}
+					
+				this.bindMenu(material, (String) plugin, (String) menu);
+
+			}
+		}
 	}
 	
 	/**

@@ -5,14 +5,34 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+/**
+ * Handles Commands for MenuServicePlugin
+ * This handles commands that are MenuServicePlugin commands. Dynamic Menu commands are handles by MenuServicePlugin
+ * @author mbroomfield
+ *
+ */
 public class CommandHandler {
 	
+	//The MenuServicePlugin
 	private MenuServicePlugin plugin;
 	
-	public CommandHandler(MenuServicePlugin plugin){
+	/**
+	 * Creates the CommandHandler
+	 * @param plugin the MenuServicePlugin this CommandHandler belongs to
+	 */
+	protected CommandHandler(MenuServicePlugin plugin){
 		this.plugin = plugin;
 	}
 	
+	/**
+	 * Executed when a command is run.
+	 * Handles all commands for MenuServicePlugin
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		
 		//make sure the command is for MenuService
@@ -86,14 +106,31 @@ public class CommandHandler {
 			return handleHelp(sender, cmd, label, args);
 		}
 		
+		//incorrect command
 		sender.sendMessage("Incorrect use of /menuservice");
 		return false;
 	}
 	
+	/**
+	 * Handles the "help" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleHelp(CommandSender sender, Command cmd, String label, String[] args){
 		return notImplemented(sender, cmd, label, args, "menuservice.help");
 	}
 	
+	/**
+	 * Handles the "list" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleList(CommandSender sender, Command cmd, String label, String[] args){
 		
 		//check permission
@@ -111,6 +148,14 @@ public class CommandHandler {
 		return false;
 	}
 	
+	/**
+	 * Handles the "load" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleLoad(CommandSender sender, Command cmd, String label, String[] args){ 
 
 		//check permission
@@ -143,6 +188,15 @@ public class CommandHandler {
 		sender.sendMessage("Incorrect use of /menuservice load");
 		return false;
 	}
+	
+	/**
+	 * Handles the save command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleSave(CommandSender sender, Command cmd, String label, String[] args){
 		
 		//check permission
@@ -176,9 +230,26 @@ public class CommandHandler {
 		return false;
 	}
 	
+	/**
+	 * Handles the "reload" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleReload(CommandSender sender, Command cmd, String label, String[] args){
 		return notImplemented(sender, cmd, label, args, "menuservice.reload");
 	}
+	
+	/**
+	 * Handles the "open" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleOpen(CommandSender sender, Command cmd, String label, String[] args){
 		//check permission
 		if (!sender.hasPermission("menuservice.open")){
@@ -210,6 +281,15 @@ public class CommandHandler {
 		sender.sendMessage("Incorrect use of /menuservice open");
 		return false;
 	}
+	
+	/**
+	 * Handles the "close" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleClose(CommandSender sender, Command cmd, String label, String[] args){
 		//check permission
 		if (!sender.hasPermission("menuservice.close")){
@@ -234,6 +314,14 @@ public class CommandHandler {
 		return false;
 	}
 	
+	/**
+	 * Handles the "bind" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleBind(CommandSender sender, Command cmd, String label, String[] args){ 
 		
 		//check permission
@@ -341,6 +429,15 @@ public class CommandHandler {
 		return false;
 		
 	}
+	
+	/**
+	 * handles the "unbind" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleUnbind(CommandSender sender, Command cmd, String label, String[] args){ 
 
 		//check permission
@@ -410,18 +507,51 @@ public class CommandHandler {
 		return false;
 	}
 	
+	/**
+	 * handles the "edit" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleEdit(CommandSender sender, Command cmd, String label, String[] args){
 		return notImplemented(sender, cmd, label, args, "menuservice.edit");
 	}
 	
+	/**
+	 * handles the "delete" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleDelete(CommandSender sender, Command cmd, String label, String[] args){ 
 		return notImplemented(sender, cmd, label, args, "menuservice.delete");
 	}
 	
+	/**
+	 * handles the "unload" command
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @return true if a successful command is ran, false otherwise
+	 */
 	private boolean handleUnload(CommandSender sender, Command cmd, String label, String[] args){
 		return notImplemented(sender, cmd, label, args, "menuservice.unload");
 	}
 
+	/**
+	 * This method can be called for any command which is not yet implemented.
+	 * @param sender the CommandSender
+	 * @param cmd the Command
+	 * @param label the used Alias for the Command
+	 * @param args the Arguments
+	 * @param permission The permission for the Command
+	 * @return true unless the player does not have permission
+	 */
 	private boolean notImplemented(CommandSender sender, Command cmd, String label, String[] args, String permission){
 		//check permission
 		if (!sender.hasPermission(permission)){
