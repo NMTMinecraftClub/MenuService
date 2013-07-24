@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -216,7 +217,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.open")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -250,7 +251,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.close")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -276,7 +277,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.reload")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -289,7 +290,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.load")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -323,7 +324,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.save")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -357,7 +358,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.edit")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -370,7 +371,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.delete")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -383,7 +384,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.bind")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -401,7 +402,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 					
 					//make sure a Player is executing the command
 					if (!(sender instanceof Player)){
-						sender.sendMessage("¤cYou must be a player to execute this command");
+						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
 						return true;
 					}
 					
@@ -419,7 +420,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 					
 					//make sure a Player is executing the command
 					if (!(sender instanceof Player)){
-						sender.sendMessage("¤cYou must be a player to execute this command");
+						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
 						return true;
 					}
 					//bind the item
@@ -445,7 +446,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 					
 					//make sure a Player is executing the command
 					if (!(sender instanceof Player)){
-						sender.sendMessage("¤cYou must be a player to execute this command");
+						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
 						return true;
 					}
 
@@ -463,7 +464,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 					
 					//make sure a Player is executing the command
 					if (!(sender instanceof Player)){
-						sender.sendMessage("¤cYou must be a player to execute this command");
+						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
 						return true;
 					}
 					
@@ -492,7 +493,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.unbind")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
@@ -501,7 +502,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 				
 				//make sure a Player is executing the command
 				if (!(sender instanceof Player)){
-					sender.sendMessage("¤cYou must be a player to execute this command");
+					sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
 					return true;
 				}
 				
@@ -518,7 +519,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 				
 				//make sure a Player is executing the command
 				if (!(sender instanceof Player)){
-					sender.sendMessage("¤cYou must be a player to execute this command");
+					sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
 					return true;
 				}
 				
@@ -562,7 +563,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			
 			//check permission
 			if (!sender.hasPermission("menuservice.help")){
-				sender.sendMessage("¤cYou do not have permission to do that");
+				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
 				return false;
 			}
 			
