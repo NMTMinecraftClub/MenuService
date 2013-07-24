@@ -1,12 +1,10 @@
 package com.m0pt0pmatt.menuservice;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.IOException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -38,6 +36,8 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public static MenuServiceProvider menuService;
 	
+	private static CommandHandler commandHandler;
+	
 	private static String configFileName = "config.yml";
 	
 	/**
@@ -48,7 +48,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	/**
 	 * the verbosity level of the plugin. The higher the level, the more messages will be logged to the terminal.
 	 */
-	public int verbose = 2;
+	public int verbose = 3;
 	
 	/**
 	 * Executed when the plugin is enabled.
@@ -58,6 +58,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 				
 		//setup the MenuService Provider
 		menuService = new MenuServiceProvider(this);
+		commandHandler = new CommandHandler(this);
 		log(3, Level.INFO, "MenuService initialized");
 		
 		//register the MenuServiceProvider as the provider for the MenuService
@@ -199,388 +200,21 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * Executed when a command is ran.
 	 */
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-		
-		//make sure the command is for MenuService
-		if (!cmd.getName().equalsIgnoreCase(this.getName())){
-			return false;
-		}
-		
-		//if there are no args, print out the help menu
-		if (args.length == 0){
-			showHelp(sender);
-			return true;
-		}
-		
-		
-		//check if the command is an "open" command
-		if (args[0].equalsIgnoreCase("open")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.open")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			//check if player and menuName were specified
-			if (args.length == 3){
-				if(openMenu(this.getName(), args[1], args[2])){
-					sender.sendMessage("Menu opened");
-				} else{
-					sender.sendMessage("Could not open menu");
-				}
-				return true;
-			}
-			
-			//check if player, plugin, and menuName were specified
-			if (args.length == 4){
-				if(openMenu(args[1], args[2], args[3])){
-					sender.sendMessage("Menu opened");
-				} else{
-					sender.sendMessage("Could not open menu");
-				}
-				return true;
-			}
-			
-			//incorrect use of open
-			sender.sendMessage("Incorrect use of /menuservice open");
-			return false;
-		}
-		
-		//check if the command is an "close" command
-		if (args[0].equalsIgnoreCase("close")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.close")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			//check if nothing was specified
-			if (args.length == 1){
-				closeMenu(sender.getName());
-				return true;
-			}
-			
-			//check if player was specified
-			if (args.length == 2){
-				closeMenu(args[1]);
-				return true;
-			}
-			
-			//incorrect use of open
-			sender.sendMessage("Incorrect use of /menuservice close");
-			return false;
-		}
-		
-		//check if the command is a "reload" command
-		else if (args[0].equalsIgnoreCase("reload")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.reload")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			sender.sendMessage("This is not implemented yet. Sorry!");
-			return true;
-		}
-		
-		//check if the command is a "load" command
-		else if (args[0].equalsIgnoreCase("load")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.load")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			//load a MenuService menu
-			if (args.length == 2){
-				if(loadMenu(this.getName(), args[1])){
-					sender.sendMessage("Menu loaded");
-				} else{
-					sender.sendMessage("Menu not loaded");
-				}
-				return true;
-			}
-			
-			//load a menu from another plugin
-			else if (args.length == 3){
-				if(loadMenu(args[1], args[2])){
-					sender.sendMessage("Menu loaded");
-				} else{
-					sender.sendMessage("Menu not loaded");
-				}
-				return true;
-			}
-			
-			//incorrect use of load
-			sender.sendMessage("Incorrect use of /menuservice load");
-			return false;
-		}
-		
-		//check if the command is a "save" command
-		else if (args[0].equalsIgnoreCase("save")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.save")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			//save a MenuService menu to MenuService
-			if (args.length == 3){
-				if(saveMenu(args[1], this.getName(), args[2])){
-					sender.sendMessage("Menu saved");
-				} else{
-					sender.sendMessage("Menu not saved");
-				}
-				return true;
-			}
-			
-			//save a menu to another plugin
-			else if (args.length == 4){
-				if(saveMenu(args[1], args[2], args[3])){
-					sender.sendMessage("Menu saved");
-				} else{
-					sender.sendMessage("Menu not saved");
-				}
-				return true;
-			}
-			
-			//incorrect use of save
-			sender.sendMessage("Incorrect use of /menuservice save");
-			return false;
-		}
-		
-		//check if the command is an "edit" command
-		else if (args[0].equalsIgnoreCase("edit")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.edit")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			sender.sendMessage("This is not implemented yet. Sorry!");
-			return true;
-		}
-		
-		//check if the command is a "delete" command
-		else if (args[0].equalsIgnoreCase("delete")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.delete")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			sender.sendMessage("This is not implemented yet. Sorry!");
-			return true;
-		}
-		
-		//check if the command is a "bind" command
-		else if (args[0].equalsIgnoreCase("bind")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.bind")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			//make sure there are enough arguments
-			if (args.length < 3){
-				sender.sendMessage("Not enough arguments to /menuservice bind");
-				return false;
-			}
-			
-			//check if the bind will bind a single item to a menu
-			if (args[1].equalsIgnoreCase("item")){
-				
-				//check if the player specified just the menu
-				if (args.length == 3){
-					
-					//make sure a Player is executing the command
-					if (!(sender instanceof Player)){
-						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
-						return true;
-					}
-					
-					//bind the item
-					if(bindMenu(((Player)sender).getItemInHand(), this.getName(), args[2])){
-						sender.sendMessage("Item Binded");
-					} else{
-						sender.sendMessage("Item not Binded");
-					}
-					return true;
-				}
-				
-				//check if the player specified the plugin and the menu
-				else if (args.length == 4){
-					
-					//make sure a Player is executing the command
-					if (!(sender instanceof Player)){
-						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
-						return true;
-					}
-					//bind the item
-					if(bindMenu(((Player)sender).getItemInHand(), args[3], args[2])){
-						sender.sendMessage("Item Binded");
-					} else{
-						sender.sendMessage("Item not Binded");
-					}
-					return true;
-				}
-				
-				//incorrect use of bind item
-				sender.sendMessage("Incorrect use of /menuservice bind item");
-				return false;
-			}
-			
-			
-			//check if the bind will bind the material of an item to a menu
-			else if (args[1].equalsIgnoreCase("material")){
-				
-				//check if the player specified just the menu
-				if (args.length == 3){
-					
-					//make sure a Player is executing the command
-					if (!(sender instanceof Player)){
-						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
-						return true;
-					}
-
-					//bind the material
-					if (bindMenu(((Player)sender).getItemInHand().getType(), this.getName(), args[2])){
-						sender.sendMessage("Material Binded");
-					} else{
-						sender.sendMessage("Material not Binded");
-					}
-					return true;
-				}
-				
-				//check if the player specified the plugin and the menu
-				else if (args.length == 4){
-					
-					//make sure a Player is executing the command
-					if (!(sender instanceof Player)){
-						sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
-						return true;
-					}
-					
-					//bind the material
-					if(bindMenu(((Player)sender).getItemInHand().getType(), args[3], args[2])){
-						sender.sendMessage("Material Binded");
-					} else{
-						sender.sendMessage("Material not Binded");
-					}
-					return true;
-				}
-				
-				//incorrect use of bind material
-				sender.sendMessage("Incorrect use of /menuservice bind material");
-				return false;
-			}
-			
-			//incorrect use of bind
-			sender.sendMessage("Incorrect use of /menuservice bind");
-			return false;
-			
-		}
-		
-		//check if the command is a "unbind" command
-		else if (args[0].equalsIgnoreCase("unbind")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.unbind")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			//check if material was specified
-			if (args.length == 2 && args[1].equalsIgnoreCase("material")){
-				
-				//make sure a Player is executing the command
-				if (!(sender instanceof Player)){
-					sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
-					return true;
-				}
-				
-				if(unbindMaterial(((Player)sender).getItemInHand().getType())){
-					sender.sendMessage("Material unbinded");
-				} else{
-					sender.sendMessage("Material not unbinded");
-				}
-				return true;
-			}
-			
-			//check if material was specified
-			else if (args.length == 2 && args[1].equalsIgnoreCase("item")){
-				
-				//make sure a Player is executing the command
-				if (!(sender instanceof Player)){
-					sender.sendMessage(ChatColor.RED + "You must be a player to execute this command");
-					return true;
-				}
-				
-				if(unbindItem(((Player)sender).getItemInHand())){
-					sender.sendMessage("Item unbinded");
-				} else{
-					sender.sendMessage("Item not unbinded");
-				}
-				return true;
-			}
-			
-			//check if material was specified
-			if (args.length == 3 && args[1].equalsIgnoreCase("menu")){
-				
-				if(unbindMenu(args[2])){
-					sender.sendMessage("Menu unbinded");
-				} else{
-					sender.sendMessage("Menu not unbinded");
-				}
-				return true;
-			}
-			
-			//check if material was specified
-			if (args.length == 4 && args[1].equalsIgnoreCase("menu")){
-				
-				if(unbindMenu(args[2], args[3])){
-					sender.sendMessage("Menu unbinded");
-				} else{
-					sender.sendMessage("Menu not unbinded");
-				}
-				return true;
-			}
-			
-			//incorrect use
-			sender.sendMessage("Incorrect use of /menuservice unbind");
-			return false;
-		}
-		
-		//check if the command is a "help" command
-		else if (args[0].equalsIgnoreCase("help")){
-			
-			//check permission
-			if (!sender.hasPermission("menuservice.help")){
-				sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
-				return false;
-			}
-			
-			sender.sendMessage("This is not implemented yet. Sorry!");
-			return true;
-		}
-		
-		sender.sendMessage("Incorrect use of /menuservice");
-		return false;
+		return commandHandler.onCommand(sender, cmd, label, args);
 	}
 	
 	
+	protected void listMenus(CommandSender sender) {
+		for (Menu menu: menuService.getMenus()){
+			sender.sendMessage(menu.getName() + ": " + menu.getPlugin());
+		}
+	}
+
 	/**
 	 * Closes a menu for a given player
 	 * @param playerName the name of the player
 	 */
-	private void closeMenu(String playerName) {
+	protected void closeMenu(String playerName) {
 		
 		//close the menu
 		menuService.closeMenuInstance(playerName);
@@ -593,7 +227,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param fileName the name to save the menu to
 	 * @return true if successful, false if unsuccessful 
 	 */
-	private boolean saveMenu(String menuName, String pluginName, String fileName) {
+	protected boolean saveMenu(String menuName, String pluginName, String fileName) {
 		
 		//check menuName
 		if (menuName == null){
@@ -642,7 +276,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param fileName the name of the file of the menu
 	 * @return true if successful, false if unsuccessful 
 	 */
-	private boolean loadMenu(String pluginName, String menuName) {
+	protected boolean loadMenu(String pluginName, String menuName) {
 		
 		if (menuName == null){
 			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
@@ -680,13 +314,13 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param menuName the name of the menu
 	 * @return true if successful, false if unsuccessful
 	 */
-	private boolean unbindMenu(String menuName) {
+	protected boolean unbindMenu(String menuName) {
 		
 		//unbind the menu
 		return unbindMenu(this.getName(), menuName);
 	}
 	
-	private boolean unbindMenu(String pluginName, String menuName) {
+	protected boolean unbindMenu(String pluginName, String menuName) {
 		
 		//check the menuname
 		if (menuName == null){
@@ -720,7 +354,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param itemInHand the item
 	 * @return true if successful, false if unsuccessful
 	 */
-	private boolean unbindItem(ItemStack itemInHand) {
+	protected boolean unbindItem(ItemStack itemInHand) {
 		
 		//check if the item is null
 		if (itemInHand == null){
@@ -738,7 +372,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param type the Material
 	 * @return true if successful, false if unseuccessful
 	 */
-	private boolean unbindMaterial(Material type) {
+	protected boolean unbindMaterial(Material type) {
 		
 		//check for null
 		if (type == null){
@@ -757,7 +391,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param menuName the name of the menu
 	 * @param playerName the name of the player to open the Menu for
 	 */
-	private boolean openMenu(String pluginName, String menuName, String playerName){
+	protected boolean openMenu(String pluginName, String menuName, String playerName){
 		
 		if (menuName == null){
 			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
@@ -806,7 +440,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param pluginName the name of the plugin which the Menu belongs to
 	 * @param menuName the name of the menu
 	 */
-	private boolean bindMenu(ItemStack item, String pluginName, String menuName){
+	protected boolean bindMenu(ItemStack item, String pluginName, String menuName){
 		
 		//check menuName
 		if (menuName == null){
@@ -855,7 +489,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * @param pluginName the name of the Plugin that the Menu belongs to
 	 * @param menuName the name of the Menu
 	 */
-	private boolean bindMenu(Material material, String pluginName, String menuName){
+	protected boolean bindMenu(Material material, String pluginName, String menuName){
 		
 		//check menuName
 		if (menuName == null){
@@ -902,7 +536,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * Shows the CommandSender a help menu
 	 * @param sender
 	 */
-	private void showHelp(CommandSender sender) {
+	protected void showHelp(CommandSender sender) {
 		sender.sendMessage("Good luck!");
 	}
 	

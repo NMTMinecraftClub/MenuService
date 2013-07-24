@@ -133,7 +133,7 @@ class YAMLBuilder {
 			return null;
 		}
 		
-		plugin.getLogger().warning(fileName + " was found. Could not load menu.");
+		plugin.getLogger().warning(fileName + " was found.");
 				
 		//create the yaml Object
 		YamlConfiguration yamlConfig = YamlConfiguration.loadConfiguration(menuFile);

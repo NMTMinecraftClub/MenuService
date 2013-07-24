@@ -1,5 +1,6 @@
 package com.m0pt0pmatt.menuservice.api;
 
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
@@ -49,7 +50,7 @@ public interface MenuService {
 	 * @param plugin the Plugin which owns the Menu
 	 * @param menu the Menu
 	 */
-	public void addMenu(Plugin plugin, Menu menu);
+	public boolean addMenu(Plugin plugin, Menu menu);
 	
 	/**
 	 * Returns a Menu from the MenuService
@@ -81,6 +82,12 @@ public interface MenuService {
 	 * @return The Menu if it exists, null otherwise
 	 */
 	public Menu removeMenu(Plugin plugin, String menuName);
+	
+	/**
+	 * Returns a List of the Menus that are currently loaded in the MenuService
+	 * @return all currently loaded Menus
+	 */
+	public List<Menu> getMenus();
 	
 	/**
 	 * Creates a MenuInstance from the given Menu.

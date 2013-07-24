@@ -179,9 +179,12 @@ public class MenuServiceProvider implements MenuService, Listener{
 		}
 		
 		//add the menu
-		this.addMenu(plugin, menu);
+		if (this.addMenu(plugin, menu)){
+			this.plugin.log(2, Level.INFO, "Menu " + menu.getName() + " loaded"); 
+			return menu;
+		}
 		
-		this.plugin.log(2, Level.INFO, "Menu " + menu.getName() + " loaded"); 
+		this.plugin.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, fileName);
 		return menu;
 	}
 	
@@ -226,39 +229,40 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @param menu the Menu
 	 */
 	@Override
-	public void addMenu(Plugin plugin, Menu menu) {
+	public boolean addMenu(Plugin plugin, Menu menu) {
 		
 		//check menu
 		if (menu == null){
 			this.plugin.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			this.plugin.log(2, Level.SEVERE, LogMessage.CANTADDMENU, menu.getName());
-			return;
+			this.plugin.log(2, Level.SEVERE, LogMessage.CANTADDMENU, null);
+			return false;
 		}
 		
 		//check Plugin
 		if (plugin == null){
 			this.plugin.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menu.getName());
 			this.plugin.log(2, Level.SEVERE, LogMessage.CANTADDMENU, menu.getName());
-			return;
+			return false;
 		}
 		
 		//check if menu exists
 		if (menusByName.containsKey(menu.getName())){
-			this.plugin.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menu.getName());
+			this.plugin.log(2, Level.SEVERE, LogMessage.MENUALREADYEXISTS, menu.getName());
 			this.plugin.log(2, Level.SEVERE, LogMessage.CANTADDMENU, menu.getName());
-			return;
+			return false;
 		}
 		
 		menusByName.put(menu.getName(), menu);
 		menusToInstances.put(menu, new LinkedList<MenuInstance>());
-		plugin.getLogger().info("Menu " + menu.getName() + " was created and added");
+		this.plugin.log(2, Level.INFO, "Menu " + menu.getName() + " was created and added");
 		
 		String command = (String) menu.getAttribute("openCommand");
 		if (command != null){
 			commandsToMenus.put(command, menu);
-			plugin.getLogger().info("Run " + menu.getName() + " with the command: /" + command);
+			this.plugin.log(2, Level.INFO, "Run " + menu.getName() + " with the command: /" + command);
 		}
 		
+		return true;
 	}
 
 	/**
@@ -1048,6 +1052,16 @@ public class MenuServiceProvider implements MenuService, Listener{
 			this.openMenuInstance(this.createMenuInstance(menu, menu.getName() + ": " + event.getPlayer().getName()), event.getPlayer().getName());
 			return;
 		}
+	}
+
+	/**
+	 * Returns a List of the Menus that are currently loaded in the MenuService
+	 * @return all currently loaded Menus
+	 */
+	@Override
+	public List<Menu> getMenus() {
+		
+		return new LinkedList<Menu>(menusByName.values());
 	}
 
 }
