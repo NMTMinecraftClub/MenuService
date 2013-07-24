@@ -20,11 +20,19 @@ public enum LogMessage {
 	NULLMENUINSTANCENAME ("Error: The specified name for the MenuInstance was null"),
 	NULLITEMSTACK ("Error: The specified ItemStack was null"),
 	NULLMATERIAL ("Error: The specified Material was null"),
+	NULLPARAMETERS ("Error: The specified Parameters were null"),
+	NULLMENUINSTANCES ("Error: There are no MenuInstances for the Menu"),
+	NULLPLAYERNAME ("Error: The specified name for the Player was null"),
+	NULLPLAYER ("Error: The specified Player was null"),
+	NULLCOMMAND ("Error: The specified command was null"),
 	
 	//no such object
 	NOSUCHMENU ("Error: The specified Menu is not loaded in the MenuService"),
 	NOSUCHRENDERER ("Error: The specified Renderer is not loaded in the MenuService"),
 	NOSUCHMENUINSTANCE ("Error: The specified MenuInstance is not loaded in the MenuService"),
+	NOSUCHPLAYER ("Error: The specified Player does not exist"),
+	
+	WRONGMENU ("Error: The Menu is loaded but under a different plugin"),
 	
 	//error running method
 	CANTLOADMENU ("Error: Could not load Menu"),
@@ -40,7 +48,22 @@ public enum LogMessage {
 	CANTUNBINDITEM ("Error: Could not unbind the Material"),
 	CANTUNBINDMATERIAL ("Error: Could not unbind Material"),
 	CANTUNBINDMENU ("Error: Could not unbind Material"),
-	CANTADDMENU ("Error: Could not add Menu");
+	CANTADDMENU ("Error: Could not add Menu"),
+	CANTGETMENU ("Error: Could not get Menu"),
+	CANTHASMENU ("Error: Could not check if Menu exists"),
+	CANTREMOVEMENU ("Error: Could not remove Menu"),
+	CANTREMOVEMENUINSTANCE ("Error: Could not remove MenuInstance"),
+	CANTGETMENUINSTANCE ("Error: Could not get MenuInstance"),
+	CANTHASMENUINSTANCE ("Error: Could not check if MenuInstance exists"),
+	CANTADDRENDERER ("Error: Could not add Renderer"),
+	CANTREMOVERENDERER ("Error: Could not remove Renderer"),
+	CANTGETRENDERER ("Error: Could not get Renderer"),
+	CANTHASRENDERER ("Error: Could not check if Renderer exists"),
+	CANTEXECUTECOMMAND ("Error: Could not execute a command to open a Menu"),
+	
+	//cast exceptions
+	CANTCASTATTRIBUTE ("Error: Could not cast the Attribute"),
+	RENDERERNOTABSTRACTRENDERER ("Error: Renderer did not extend the type AbstractRenderer");
 	
 	private final String message;
 	
