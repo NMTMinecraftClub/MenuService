@@ -369,7 +369,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 		}
 		
 		//remove the menu
-		menusByName.remove(menu);
+		menusByName.remove(menu.getName());
 		
 		//remove all of the MenuInstances for the Menu
 		List<MenuInstance> instances = menusToInstances.remove(menu);
