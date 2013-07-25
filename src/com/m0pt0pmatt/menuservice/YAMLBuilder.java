@@ -143,7 +143,11 @@ class YAMLBuilder {
 		}
 		
 		//from the configuration, gather the menu
-		return (Menu) loadMenuComponent(yamlConfig, plugin);
+		Component menu = loadMenuComponent(yamlConfig, plugin);
+		if (menu instanceof Menu){
+			return (Menu) menu;
+		}
+		return null;
 	}
 	
 	/**

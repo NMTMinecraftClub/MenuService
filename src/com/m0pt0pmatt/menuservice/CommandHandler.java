@@ -120,7 +120,23 @@ public class CommandHandler {
 	 * @return true if a successful command is ran, false otherwise
 	 */
 	private boolean handleHelp(CommandSender sender, Command cmd, String label, String[] args){
-		return notImplemented(sender, cmd, label, args, "menuservice.help");
+		sender.sendMessage("MenuService commands:");
+		sender.sendMessage("/menuservice help");
+		sender.sendMessage("/menuservice open [menu]");
+		sender.sendMessage("/menuservice open [menu] -p [plugin]");
+		sender.sendMessage("/menuservice open [menu] [player] ");
+		sender.sendMessage("/menuservice open [menu] [player] -p [plugin]");
+		sender.sendMessage("/menuservice close [player]");
+		sender.sendMessage("/menuservice closeall [menu]");
+		sender.sendMessage("/menuservice closeall [menu] -p [plugin]");
+		sender.sendMessage("/menuservice load [filename]");
+		sender.sendMessage("/menuservice load [filename] -p [plugin]");
+		sender.sendMessage("/menuservice save [menu] [filename]");
+		sender.sendMessage("/menuservice save [menu] [filename] -p [plugin]");
+		sender.sendMessage("/menuservice reload [menu]");
+		sender.sendMessage("/menuservice reload [menu] -p [plugin]");
+
+		return true;
 	}
 	
 	/**
