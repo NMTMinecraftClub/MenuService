@@ -25,6 +25,7 @@ public enum LogMessage {
 	NULLPLAYERNAME ("Error: The specified name for the Player was null"),
 	NULLPLAYER ("Error: The specified Player was null"),
 	NULLCOMMAND ("Error: The specified command was null"),
+	NULLINVENTORY("Error: The specified Inventory was null"),
 	
 	//no such object
 	NOSUCHMENU ("Error: The specified Menu is not loaded in the MenuService"),
@@ -60,6 +61,12 @@ public enum LogMessage {
 	CANTGETRENDERER ("Error: Could not get Renderer"),
 	CANTHASRENDERER ("Error: Could not check if Renderer exists"),
 	CANTEXECUTECOMMAND ("Error: Could not execute a command to open a Menu"),
+	CANTRENDERINSTANCEPLAYER ("Error: Could not Render the MenuInstance"),
+	
+	CANTCREATEINVENTORY ("Error: Could not create an Inventory"),
+	
+	EMPTYMENUFORINSTANCE ("Error: The MenuInstance has no Menu"),
+	
 	
 	//cast exceptions
 	CANTCASTATTRIBUTE ("Error: Could not cast the Attribute"),

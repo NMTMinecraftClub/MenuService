@@ -25,11 +25,17 @@ public abstract class AbstractRenderer implements Renderer{
 	
 	//the MenuService
 	private MenuService menuService;
+	
+	private Plugin plugin;
 
 	public AbstractRenderer(MenuService menuService, Plugin plugin){
 		players = new HashMap<String, MenuInstance>();
 		instances = new HashMap<MenuInstance, List<String>>();
 		this.menuService = menuService;
+	}
+	
+	protected Plugin getPlugin() {
+		return plugin;
 	}
 	
 	protected Map<String, MenuInstance> getPlayers() {
