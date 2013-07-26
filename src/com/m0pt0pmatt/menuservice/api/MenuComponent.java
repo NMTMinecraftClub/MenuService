@@ -23,6 +23,7 @@ public class MenuComponent extends AbstractComponent implements Menu{
 		super();
 		this.addAttribute("components", new HashMap<String, Component>());
 		renderers = new HashMap<String, Renderer>();
+		this.setType("menu");
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -130,77 +131,7 @@ public class MenuComponent extends AbstractComponent implements Menu{
 		return false;
 	}
 
-	@Override
-	public void addAction(String type, List<Integer> tags) {
-		addAction(type, tags, new LinkedList<String>(), "<player>", new LinkedList<String>());
-		
-	}
 	
-	@Override
-	public void addAction(String type, List<Integer> tags, List<String> permissions) {
-		addAction(type, tags, new LinkedList<String>(), "<player>", permissions);
-		
-	}
-
-	@Override
-	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender) {
-		addAction(type, tags, commands, commandSender, new LinkedList<String>());
-	}
-
-	@Override
-	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender, List<String> permissions) {
-		
-		if (!this.hasAttribute("actions")){
-			addAttribute("actions", new ContainerAttribute("actions", new HashMap<String, Object>()));
-		}
-		
-		ContainerAttribute actions = (ContainerAttribute) getAttribute("actions");
-		
-		HashMap<String, Object> typeMap = new HashMap<String, Object>();                                            
-		typeMap.put("tags", tags);
-		typeMap.put("commands", commands);
-		typeMap.put("sender", commandSender);
-		typeMap.put("permissions", permissions);
-		actions.getAttributes().put("leftClick", new ContainerAttribute(type, typeMap));                   
-		
-		
-	}
-
-	@Override
-	public boolean hasAction(String type) {
-		if (!this.hasAttribute("actions")){
-			return false;
-		}
-		
-		ContainerAttribute actions = this.getConatinerAttribute("actions");
-		if (actions == null){
-			return false;
-		}
-		
-		if (actions.hasAttribute(type)){
-			return true;
-		}
-		
-		return false;
-	}
-
-	@Override
-	public ContainerAttribute getAction(String type) {
-		if (!this.hasAttribute("actions")){
-			return null;
-		}
-		
-		ContainerAttribute actions = this.getConatinerAttribute("actions");
-		if (actions == null){
-			return null;
-		}
-		
-		if (actions.hasAttribute(type)){
-			return (ContainerAttribute) actions.getAttribute(type);
-		}
-		
-		return null;
-	}
 
 	
 

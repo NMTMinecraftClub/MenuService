@@ -112,5 +112,17 @@ public interface Component {
 	 * @return
 	 */
 	public boolean hasAttribute(String name);
+	
+	public void addAction(String type, List<Integer> tags);
+	
+	public void addAction(String type, List<Integer> tags, List<String> permissions);
+	
+	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender);
+	
+	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender, List<String> permissions);
+	
+	public boolean hasAction(String type);
+	
+	public ContainerAttribute getAction(String type);
 
 }
