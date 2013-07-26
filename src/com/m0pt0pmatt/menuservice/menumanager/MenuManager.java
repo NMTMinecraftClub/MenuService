@@ -1,4 +1,4 @@
-package com.m0pt0pmatt.menuservice;
+package com.m0pt0pmatt.menuservice.menumanager;
 
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
@@ -23,63 +24,37 @@ import com.m0pt0pmatt.menuservice.api.Renderer;
  * @author mbroomfield
  *
  */
-public class MenuManager implements ActionListener{
-
-	private enum MenuType{
-		
-		MAINMENU(0),
-		LISTMENU(1),
-		EDITMENU(2),
-		OPENMENU(3),
-		CLOSEMENU(4),
-		LOADMENU(5),
-		SAVEMENU(6),
-		RELOADMENU(7),
-		UNLOADMENU(8),
-		HELPMENU(9);
-		
-		private static final Map<Integer, MenuType> lookup = new HashMap<Integer, MenuType>();
-		
-		private int type;
-		
-		static {
-	          for(MenuType s : EnumSet.allOf(MenuType.class))
-	               lookup.put(s.getType(), s);
-	     }
-		
-		MenuType(int type){
-			this.type = type;
-		}
-		
-		public int getType(){
-			return type;
-		}
-
-		public static MenuType getMenuType(int tag) {
-			return lookup.get(tag);
-		}
-		
-	} 
+public class MenuManager {
 	
 	private MenuService menuService;
 	
+	private Map<String, Menu> menus;
+	private Map<String, MenuInstance> instances;
+	
 	public MenuManager(MenuService menuService){
 		this.menuService = menuService;
+		menus = new HashMap<String, Menu>();
+		instances = new HashMap<String, MenuInstance>();
+		menus.put("mainMenu", buildMainMenu());
+
 	}
+
+
 	
-	
+
+
 	public Menu buildMainMenu(){
 		
-		MenuComponent mainMenu = new MenuComponent();
+		MenuComponent menu = new MenuComponent();
 		
 		Renderer renderer = menuService.getRenderer("inventory");
 		if (renderer == null){
 			return null;
 		}
 		
-		mainMenu.addRenderer(renderer);
-		mainMenu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
-		mainMenu.addAttribute("size", 2);
+		menu.addRenderer(renderer);
+		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
+		menu.addAttribute("size", 6);
 		
 		Component component;
 		List<Integer> actionTags;
@@ -88,9 +63,9 @@ public class MenuManager implements ActionListener{
 		component = new AbstractComponent();
 		component.addAttribute("title", "List Menus");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.LISTMENU.type);
+		actionTags.add(MenuType.LISTMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "edit" component
 		component = new AbstractComponent();
@@ -98,9 +73,9 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Edit a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.EDITMENU.type);
+		actionTags.add(MenuType.EDITMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "open" component
 		component = new AbstractComponent();
@@ -108,9 +83,9 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Open a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.OPENMENU.type);
+		actionTags.add(MenuType.OPENMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "close" component
 		component = new AbstractComponent();
@@ -118,9 +93,9 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Close a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.CLOSEMENU.type);
+		actionTags.add(MenuType.CLOSEMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "load" component
 		component = new AbstractComponent();
@@ -128,9 +103,9 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Load a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.LOADMENU.type);
+		actionTags.add(MenuType.LOADMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "save" component
 		component = new AbstractComponent();
@@ -138,9 +113,9 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Save a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.SAVEMENU.type);
+		actionTags.add(MenuType.SAVEMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "reload" component
 		component = new AbstractComponent();
@@ -148,9 +123,9 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Reload a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.RELOADMENU.type);
+		actionTags.add(MenuType.RELOADMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "unload" component
 		component = new AbstractComponent();
@@ -158,9 +133,9 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Unload a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.UNLOADMENU.type);
+		actionTags.add(MenuType.UNLOADMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
 		//add "help" component
 		component = new AbstractComponent();
@@ -168,74 +143,48 @@ public class MenuManager implements ActionListener{
 		component.setType("button");
 		component.addAttribute("title", "Help");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.HELPMENU.type);
+		actionTags.add(MenuType.HELPMENU.getType());
 		component.addAction("leftClick", actionTags);
-		mainMenu.addComponent(component);
+		menu.addComponent(component);
 		
-		return mainMenu;
-	}
-
-	@Override
-	public void handleAction(ActionEvent event) {
-		int tag = event.getAction().getTag();
-		
-		if (tag >= 0 && tag < 10){
-			handleMainMenu(event);
-		}
-		
-		
+		return menu;
 	}
 	
-	private void handleMainMenu(ActionEvent event){
-		int tag = event.getAction().getTag();
-		MenuType menuType = MenuType.getMenuType(tag);
+	private Menu buildInstancesMenu() {
+		MenuComponent menu = new MenuComponent();
 		
-		switch (menuType){
-		case LISTMENU:
-			//open list menu
-			break;
-		case EDITMENU:
-			//open edit menu
-			break;
-		case OPENMENU:
-			//
-			break;
-		case CLOSEMENU:
-			break;
-		case LOADMENU:
-			break;
-		case SAVEMENU:
-			break;
-		case RELOADMENU:
-			break;
-		case UNLOADMENU:
-			break;
-		case HELPMENU:
-			break;
-		default:
-			break;
+		Renderer renderer = menuService.getRenderer("inventory");
+		if (renderer == null){
+			return null;
 		}
 		
+		menu.addRenderer(renderer);
+		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
+		menu.addAttribute("size", 6);
 		
+		Component component;
+		List<Integer> actionTags;
+		
+		return menu;
 	}
 	
-
-	@Override
-	public void playerAdded(MenuInstance instance, String playerName) {}
-
-	@Override
-	public void playerRemoved(MenuInstance instance, String playerName) {}
-
-	@Override
-	public void playerCountZero(MenuInstance instance, String playerName) {}
-
-	@Override
-	public String getName() {
-		return "MenuManager";
+	private Menu buildPlayerMenu() {
+		MenuComponent menu = new MenuComponent();
+		
+		Renderer renderer = menuService.getRenderer("inventory");
+		if (renderer == null){
+			return null;
+		}
+		
+		menu.addRenderer(renderer);
+		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
+		menu.addAttribute("size", 6);
+		
+		Component component;
+		List<Integer> actionTags;
+		
+		return menu;
 	}
 
-	@Override
-	public String getPlugin() {
-		return "MenuService";
-	}
+	
 }
