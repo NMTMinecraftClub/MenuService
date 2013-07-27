@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
@@ -28,20 +29,25 @@ public class MenuManager {
 	
 	private MenuService menuService;
 	
-	private Map<String, Menu> menus;
-	private Map<String, MenuInstance> instances;
+	private static Map<String, Menu> menus;
+	private static Map<String, MenuInstance> instances;
 	
-	public MenuManager(MenuService menuService){
+	private static MainMenuRenderer mainMenuRenderer;
+	private static MenuMenuRenderer menuMenuRenderer;
+	
+	public MenuManager(MenuService menuService, Plugin plugin){
 		this.menuService = menuService;
 		menus = new HashMap<String, Menu>();
 		instances = new HashMap<String, MenuInstance>();
+		
+		mainMenuRenderer = new MainMenuRenderer(menuService, plugin);
+		menuMenuRenderer = new MenuMenuRenderer(menuService, plugin);
+		
 		menus.put("mainMenu", buildMainMenu());
+		menus.put("instancesMenu", buildMenuMenu());
+		menus.put("playerMenu", buildInstanceMenu());
 
 	}
-
-
-	
-
 
 	public Menu buildMainMenu(){
 		
@@ -55,6 +61,8 @@ public class MenuManager {
 		menu.addRenderer(renderer);
 		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
 		menu.addAttribute("size", 6);
+		menu.setTag("MenuService-MenuManager-MainMenu");
+		menu.addAttribute("title", "MenuService Menu Manager: Main Menu");
 		
 		Component component;
 		List<Integer> actionTags;
@@ -150,7 +158,7 @@ public class MenuManager {
 		return menu;
 	}
 	
-	private Menu buildInstancesMenu() {
+	private Menu buildMenuMenu() {
 		MenuComponent menu = new MenuComponent();
 		
 		Renderer renderer = menuService.getRenderer("inventory");
@@ -161,6 +169,8 @@ public class MenuManager {
 		menu.addRenderer(renderer);
 		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
 		menu.addAttribute("size", 6);
+		menu.setTag("MenuService-MenuManager-MenuMenu");
+		menu.addAttribute("title", "MenuService Menu Manager: Menus");
 		
 		Component component;
 		List<Integer> actionTags;
@@ -168,7 +178,7 @@ public class MenuManager {
 		return menu;
 	}
 	
-	private Menu buildPlayerMenu() {
+	private Menu buildInstanceMenu() {
 		MenuComponent menu = new MenuComponent();
 		
 		Renderer renderer = menuService.getRenderer("inventory");
@@ -179,6 +189,8 @@ public class MenuManager {
 		menu.addRenderer(renderer);
 		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
 		menu.addAttribute("size", 6);
+		menu.setTag("MenuService-MenuManager-InstanceMenu");
+		menu.addAttribute("title", "MenuService Menu Manager: Menus");
 		
 		Component component;
 		List<Integer> actionTags;
