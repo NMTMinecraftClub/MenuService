@@ -15,6 +15,7 @@ permissions:
       menuservice.save: true
       menuservice.help: true
       menuservice.list: true
+      menuservice.edit: true
   menuservice.open:
     description: Opens a Menu for a player
     default: false
@@ -41,6 +42,9 @@ permissions:
     default: false
   menuservice.save:
     description: saves a Menu to file
+    default: false
+  menuservice.edit:
+    description: Opens the Menu Manager
     default: false
   menuservice.help:
     description: Get the help menu for MenuService

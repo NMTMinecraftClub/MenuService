@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
@@ -42,6 +43,10 @@ public class MenuManager {
 		menus.put("mainMenu", buildMainMenu());
 		menus.put("instancesMenu", buildMenuMenu());
 		menus.put("playerMenu", buildInstanceMenu());
+		
+		for (Menu menu: menus.values()){
+			menuService.addMenu(plugin, menu);
+		}
 
 	}
 
@@ -55,10 +60,12 @@ public class MenuManager {
 		}
 		
 		menu.addRenderer(renderer);
-		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
+		menu.addRenderer(mainMenuRenderer);
+		
+		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService").getName());
 		menu.addAttribute("size", 6);
 		menu.setTag("MenuService-MenuManager-MainMenu");
-		menu.addAttribute("title", "MenuService Menu Manager: Main Menu");
+		menu.addAttribute("title", "Menu Manager: Main Menu");
 		
 		Component component;
 		List<Integer> actionTags;
@@ -163,7 +170,10 @@ public class MenuManager {
 		}
 		
 		menu.addRenderer(renderer);
-		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
+		
+		
+		
+		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService").getName());
 		menu.addAttribute("size", 6);
 		menu.setTag("MenuService-MenuManager-MenuMenu");
 		menu.addAttribute("title", "MenuService Menu Manager: Menus");
@@ -183,7 +193,7 @@ public class MenuManager {
 		}
 		
 		menu.addRenderer(renderer);
-		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService"));
+		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService").getName());
 		menu.addAttribute("size", 6);
 		menu.setTag("MenuService-MenuManager-InstanceMenu");
 		menu.addAttribute("title", "MenuService Menu Manager: Menus");
@@ -192,6 +202,19 @@ public class MenuManager {
 		List<Integer> actionTags;
 		
 		return menu;
+	}
+
+	public boolean showMainMenu(Player player) {
+		if (player == null){
+			return false;
+		}
+		
+		MenuInstance instance = menuService.createMenuInstance(menus.get("mainMenu"), "MenuService-MainMenu-" + player.getName());
+		if (instance == null){
+			return false;
+		}
+		
+		return menuService.openMenuInstance(instance, player.getName());
 	}
 
 	

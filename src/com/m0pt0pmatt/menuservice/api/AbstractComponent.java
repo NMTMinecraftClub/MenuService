@@ -26,7 +26,6 @@ public class AbstractComponent implements Component{
 		this.attributes = new TreeMap<String, Object>();
 		attributes.put("type", "no-type");
 		attributes.put("tag", "no-tag");
-		attributes.put("actions", new LinkedList<Integer>());
 		attributes.put("lore", new LinkedList<String>());
 	}
 	

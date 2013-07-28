@@ -532,7 +532,19 @@ public class CommandHandler {
 	 * @return true if a successful command is ran, false otherwise
 	 */
 	private boolean handleEdit(CommandSender sender, Command cmd, String label, String[] args){
-		return notImplemented(sender, cmd, label, args, "menuservice.edit");
+		
+		//check permission
+		if (!sender.hasPermission("menuservice.edit")){
+			sender.sendMessage(ChatColor.RED + "You do not have permission to do that");
+			return false;
+		}
+		
+		if (!(sender instanceof Player)){
+			return false;
+		}
+		
+		
+		return MenuServicePlugin.menuManager.showMainMenu((Player)sender);
 	}
 	
 	/**

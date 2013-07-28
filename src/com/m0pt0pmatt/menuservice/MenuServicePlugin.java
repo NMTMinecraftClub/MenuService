@@ -82,6 +82,9 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		menuService = new MenuServiceProvider(this);
 		commandHandler = new CommandHandler(this);
 		menuManager = new MenuManager(menuService, this);
+		System.out.println("oijoijfoisjfoiesjfoisejf" + menuManager);
+		
+		
 		Logger.log(3, Level.INFO, "MenuService initialized");
 		
 		//register the MenuServiceProvider as the provider for the MenuService
@@ -205,6 +208,9 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 				
 				//load the menu
 				Menu menu = menuService.loadMenu(this, file.getName());
+				if (menu == null){
+					continue;
+				}
 				
 				//attach the default renderer
 				Renderer renderer = menuService.getRenderer("inventory");
