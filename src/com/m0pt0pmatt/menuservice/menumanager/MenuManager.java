@@ -1,18 +1,14 @@
 package com.m0pt0pmatt.menuservice.menumanager;
 
-import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
-import com.m0pt0pmatt.menuservice.api.ActionEvent;
-import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuComponent;
