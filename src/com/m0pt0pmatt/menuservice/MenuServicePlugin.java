@@ -23,6 +23,7 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Renderer;
+import com.m0pt0pmatt.menuservice.menumanager.MenuManager;
 
 /**
  * MenuService is a plugin that allows other plugins to implement abstract menu
@@ -41,6 +42,8 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * The commandHandler handles all commands for the plugin
 	 */
 	private static CommandHandler commandHandler;
+	
+	protected static MenuManager menuManager;
 	
 	/**
 	 * The config file for the plugin
@@ -73,18 +76,21 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public void onEnable(){
 				
+		Logger.setPlugin(this);
+		
 		//setup the MenuService Provider
 		menuService = new MenuServiceProvider(this);
 		commandHandler = new CommandHandler(this);
-		log(3, Level.INFO, "MenuService initialized");
+		menuManager = new MenuManager(menuService, this);
+		Logger.log(3, Level.INFO, "MenuService initialized");
 		
 		//register the MenuServiceProvider as the provider for the MenuService
 		Bukkit.getServicesManager().register(MenuService.class, menuService, this, ServicePriority.Normal);
-		log(3, Level.INFO, "MenuService registered for the server");
+		Logger.log(3, Level.INFO, "MenuService registered for the server");
 		
 		//load the config file
 		loadConfig();
-		log(1, Level.INFO, "Loaded " + configFileName);
+		Logger.log(1, Level.INFO, "Loaded " + configFileName);
 		
 		//load all menus in the MenuService folder
 		loadMenus();
@@ -103,7 +109,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//create data folder if needed
 		if (!this.getDataFolder().exists()){
-			log(2, Level.INFO, "Creating Data Folder");
+			Logger.log(2, Level.INFO, "Creating Data Folder");
 			this.getDataFolder().mkdir();
 		}
 		
@@ -113,20 +119,20 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				log(1, Level.SEVERE, "Unable to create config file!");
+				Logger.log(1, Level.SEVERE, "Unable to create config file!");
 			}
 		}
 		
 		//load the configuration file
 		config = YamlConfiguration.loadConfiguration(configFile);
 		if (config == null){
-			log(1, Level.SEVERE, "Unable to load config file!");
+			Logger.log(1, Level.SEVERE, "Unable to load config file!");
 		}
 		
 		//check for verbose level
 		if (config.contains("verbose")){
 			verbose = config.getInt("verbose");
-			log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
+			Logger.log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
 		}
 		
 	}
@@ -134,7 +140,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	private void loadBinds() {
 		//create data folder if needed
 		if (!this.getDataFolder().exists()){
-			log(2, Level.INFO, "Creating Data Folder");
+			Logger.log(2, Level.INFO, "Creating Data Folder");
 			this.getDataFolder().mkdir();
 		}
 		
@@ -144,14 +150,14 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				log(1, Level.SEVERE, "Unable to create binds file!");
+				Logger.log(1, Level.SEVERE, "Unable to create binds file!");
 			}
 		}
 		
 		//load the configuration file
 		binds = YamlConfiguration.loadConfiguration(configFile);
 		if (binds == null){
-			log(1, Level.SEVERE, "Unable to load binds file!");
+			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
 		}
 		
 		if (binds.contains("materials")){
@@ -204,7 +210,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 				Renderer renderer = menuService.getRenderer("inventory");
 				menu.addRenderer(renderer);
 				
-				log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
+				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
 			}
 			
 		}
@@ -220,55 +226,26 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	public void onDisable(){
 		
 		//save all the menus to file
-		log(1, Level.INFO, "Saving all menus to file");
+		Logger.log(1, Level.INFO, "Saving all menus to file");
 		menuService.saveAll();
 		
 		//close all menuinstances
-		log(1, Level.INFO, "Closing all menus");
+		Logger.log(1, Level.INFO, "Closing all menus");
 		menuService.closeAll();
 		
 		//save the config file
 		try {
 			config.save(new File(this.getDataFolder(), "config.yml"));
-			log(1, Level.INFO, "Saved " + configFileName);
+			Logger.log(1, Level.INFO, "Saved " + configFileName);
 		} catch (IOException e) {
-			log(1, Level.SEVERE, "Unable to save " + configFileName);
+			Logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
 		}
 		
 	}
 	
-	/**
-	 * Logs messages if the verbose level is high enough.
-	 * This method should be used plugin wide as the only way to log messages.
-	 * @param verboseLevel The verbose level of the message being logged
-	 * @param level the Bukkit level of the message
-	 * @param msg The message
-	 */
-	public void log(int verboseLevel, Level level, String msg){
-		
-		//If the verbose level is high enough
-		if (verboseLevel <= verbose){
-			
-			//log the message
-			getLogger().log(level, msg);;
-		}
-	}
 	
-	/**
-	 * Logs messages if the verbose level is high enough.
-	 * This method should be used plugin wide as the only way to log messages.
-	 * @param verboseLevel The verbose level of the message being logged
-	 * @param level the Bukkit level of the message
-	 * @param msg the LogMessage
-	 */
-	public void log(int verboseLevel, Level level, LogMessage msg, Object object){
-		String m = msg.getMessage();
-		if (object != null){
-			m = m + ": " + object.toString();
-		}
-		
-		log(verboseLevel, level, m);
-	}
+	
+	
 	
 	/**
 	 * Executed when a command is ran.
@@ -305,38 +282,38 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check menuName
 		if (menuName == null){
-			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, null);
 			return false;
 		}
 		
 		//check the plugin
 		if (pluginName == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
 			return false;
 		}
 		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
 			return false;
 		}
 		
 		//check the filename
 		if (fileName == null){
-			log(2, Level.SEVERE, LogMessage.NULLFILENAME, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLFILENAME, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
 			return false;
 		}
 		
@@ -353,22 +330,22 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	protected boolean loadMenu(String pluginName, String menuName) {
 		
 		if (menuName == null){
-			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			log(2, Level.SEVERE, LogMessage.CANTLOADMENU, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, null);
 			return false;
 		}
 		
 		//check the pluginName
 		if (pluginName == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTLOADMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, menuName);
 		}
 		
 		//get the Plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTLOADMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, menuName);
 			return false;
 		}
 		
@@ -398,24 +375,24 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check the menuname
 		if (menuName == null){
-			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, null);
 			return false;
 		}
 		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, menuName);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, menuName);
 			return false;
 		}
 		
@@ -432,8 +409,8 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check if the item is null
 		if (itemInHand == null){
-			log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, null);
-			log(2, Level.SEVERE, LogMessage.CANTUNBINDITEM, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDITEM, null);
 			return false;
 		}
 		
@@ -450,8 +427,8 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check for null
 		if (type == null){
-			log(2, Level.SEVERE, LogMessage.NULLMATERIAL, null);
-			log(2, Level.SEVERE, LogMessage.CANTUNBINDMATERIAL, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMATERIAL, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMATERIAL, null);
 			return false;
 		}
 		
@@ -468,39 +445,39 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	protected boolean openMenu(String pluginName, String menuName, String playerName){
 		
 		if (menuName == null){
-			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			log(2, Level.SEVERE, LogMessage.CANTOPENMENU, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, null);
 			return false;
 		}
 		
 		//check pluginName
 		if (pluginName == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
 			return false;
 		}
 		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
 			return false;
 		}
 		
 		//get the Menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
 			return false;
 		}
 		
 		//get the instance
 		MenuInstance instance = menuService.createMenuInstance(menu, menuName + ": " + playerName);
 		if (instance == null){
-			log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
 			return false;
 		}
 		
@@ -518,38 +495,38 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check menuName
 		if (menuName == null){
-			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, null);
 			return false;
 		}
 		
 		//check item
 		if (item == null){
-			log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
 			return false;
 		}
 		
 		//check pluginName
 		if (pluginName == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
 			return false;
 		}
 		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
 			return false;
 		}
 		
@@ -567,38 +544,38 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//check menuName
 		if (menuName == null){
-			log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, null);
 			return false;
 		}
 		
 		//check material
 		if (material == null){
-			log(2, Level.SEVERE, LogMessage.NULLMATERIAL, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMATERIAL, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
 			return false;
 		}
 		
 		//check pluginName
 		if (pluginName == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
 			return false;
 		}
 		
 		//get the plugin
 		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
 		if (plugin == null){
-			log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
 			return false;
 		}
 		
 		//get the menu
 		Menu menu = menuService.getMenu(plugin, menuName);
 		if (menu == null){
-			log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
 			return false;
 		}
 		

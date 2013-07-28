@@ -56,15 +56,15 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	private Inventory createInventory(MenuInstance instance){
 		
 		if (instance == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, null);
 			return null;
 		}
 		
 		Menu menu = instance.getMenu();
 		if (menu == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.EMPTYMENUFORINSTANCE, instance.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, instance.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.EMPTYMENUFORINSTANCE, instance.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, instance.getName());
 			return null;
 		}
 		
@@ -94,7 +94,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//create the inventory
 		Inventory inventory = Bukkit.createInventory(null, size, title);
 		if (inventory == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, instance.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, instance.getName());
 			return null;
 		}
 		
@@ -209,16 +209,16 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void renderAllPlayers(MenuInstance instance) {
 		
 		if (instance == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, this.getName());
 			return;
 		}
 		
 		//create the inventory
 		Inventory inv = createInventory(instance);
 		if (inv == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLINVENTORY, this.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.NULLINVENTORY, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, this.getName());
 			return;
 		}
 		
@@ -239,21 +239,21 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void renderPlayer(MenuInstance instance, String playerName) {
 		
 		if (instance == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, this.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, null);
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, null);
 			return;
 		}
 		
 		if (playerName == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLPLAYERNAME, this.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLAYERNAME, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
 			return;
 		}
 		
 		Inventory inv = createInventory(instance);
 		if (inv == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLINVENTORY, this.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.NULLINVENTORY, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
 			return;
 		}
 		
@@ -282,24 +282,24 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void closeMenu(String playerName) {
 		
 		if (playerName == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLPLAYERNAME, this.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.NULLPLAYERNAME, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
 			return;
 		}
 		
 		//get the MenuInstance
 		MenuInstance instance = this.getPlayers().get(playerName);
 		if (instance == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, this.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
 			return;
 		}
 
 		//get the player
 		Player player = Bukkit.getPlayer(playerName);
 		if (player == null){
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.NOSUCHPLAYER, this.getName());
-			((MenuServicePlugin) this.getPlugin()).log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHPLAYER, this.getName());
+			Logger.log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
 			return;
 		}
 		
