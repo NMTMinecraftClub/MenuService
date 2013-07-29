@@ -16,7 +16,7 @@ import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Renderer;
 
 public class MenuMenuRenderer extends AbstractRenderer implements Renderer{
-
+	
 	public MenuMenuRenderer(MenuService menuService, Plugin plugin) {
 		super(menuService, plugin);
 		// TODO Auto-generated constructor stub
@@ -27,10 +27,12 @@ public class MenuMenuRenderer extends AbstractRenderer implements Renderer{
 		
 		Inventory inv = (Inventory) menuInstance.getParameter("inventory");
 		
-		for (String player: menuInstance.getPlayers()){
+		Menu menu = menuInstance.getMenu();
+		
+		for (MenuInstance instance: this.getMenuService().getMenuInstances(menu)){
 			ItemStack item = new ItemStack(Material.WOOL);
 			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName(player);
+			meta.setDisplayName(instance.getName());
 			item.setItemMeta(meta);
 			inv.addItem(item);
 		}

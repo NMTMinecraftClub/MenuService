@@ -1,7 +1,10 @@
 package com.m0pt0pmatt.menuservice.menumanager;
 
+import java.util.Map;
+
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
+import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 
@@ -24,48 +27,51 @@ public class ManagerListener implements ActionListener{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
 	private void handleMainMenu(ActionEvent event){
 		int tag = event.getAction().getTag();
 		MenuType menuType = MenuType.getMenuType(tag);
 		String playerName = event.getAction().getPlayerName();
+		MenuInstance instance = event.getAction().getInstance();
+		
+		Map<Integer, Menu> menuSpots;
 		
 		switch (menuType){
-		case EDITMENU:
+		case MAIN_MENUCLICKED:
+			menuSpots = (Map<Integer, Menu>) instance.getParameter("menuSpots");
+			int spot = (Integer) instance.getParameter("menuSpot");
+			Menu menu = menuSpots.get(spot);
 			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+			MenuInstance newInstance = menuService.createMenuInstance(menu, "MenuManager-MenuMenu-" + playerName);
+			menuService.openMenuInstance(newInstance, playerName);
 			break;
-		case OPENMENU:
-			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+		case MAIN_EDITMENU:
+			System.out.println("EDIT");
 			break;
-		case CLOSEMENU:
-			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+		case MAIN_OPENMENU:
+			System.out.println("OPEN");
 			break;
-		case LOADMENU:
-			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+		case MAIN_CLOSEMENU:
+			System.out.println("CLOSE");
 			break;
-		case SAVEMENU:
-			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+		case MAIN_LOADMENU:
+			System.out.println("LOAD");
 			break;
-		case RELOADMENU:
-			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+		case MAIN_SAVEMENU:
+			System.out.println("SAVE");
 			break;
-		case UNLOADMENU:
-			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+		case MAIN_RELOADMENU:
+			System.out.println("RELOAD");
 			break;
-		case HELPMENU:
-			menuService.closeMenuInstance(playerName);
-			//menuService.openMenuInstance(, playerName);
+		case MAIN_UNLOADMENU:
+			System.out.println("UNLOAD");
+			break;
+		case MAIN_HELP:
+			System.out.println("HELP");
 			break;
 		default:
-			break;
+			
 		}
-		
 		
 	}
 	

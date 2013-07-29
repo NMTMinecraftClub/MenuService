@@ -72,7 +72,11 @@ public enum LogMessage {
 	CANTCASTATTRIBUTE ("Error: Could not cast the Attribute"),
 	RENDERERNOTABSTRACTRENDERER ("Error: Renderer did not extend the type AbstractRenderer"),
 	
-	MENUALREADYEXISTS ("Error: MenuService arleady has a Menu with the same name");
+	MENUALREADYEXISTS ("Error: MenuService arleady has a Menu with the same name"),
+	
+	
+	//MenuManager Error Messages
+	CANTSHOWMAINMENU ("Error: Could not show the Main Menu of the Menu Manager");
 	
 	private final String message;
 	

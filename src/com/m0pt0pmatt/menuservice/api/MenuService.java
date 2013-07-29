@@ -129,6 +129,9 @@ public interface MenuService {
 	 */
 	public boolean openMenuInstance(MenuInstance instance, String playerName);
 	
+	
+	public List<MenuInstance> getMenuInstances(Menu menu);
+	
 	/**
 	 * Removes a MenuInstance from the MenuService
 	 * @param instance the MenuInstance to be removed

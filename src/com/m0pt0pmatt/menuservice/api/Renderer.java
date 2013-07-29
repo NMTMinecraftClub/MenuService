@@ -27,7 +27,7 @@ public interface Renderer {
 	
 	/**
 	 * Returns the name of the Renderer.
-	 * No two Renderers can share the same name/
+	 * No two Renderers can share the same name
 	 * @return the name of the Renderer
 	 */
 	public String getName();

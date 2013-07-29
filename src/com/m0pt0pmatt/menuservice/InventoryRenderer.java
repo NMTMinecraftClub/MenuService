@@ -78,7 +78,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 					title = menu.getTag();
 				}
 				else{
-					title = "Menu";
+					title = "";
 				}
 			}
 		}
@@ -127,6 +127,15 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			y = (Integer) component.getAttribute("y");
 		}
 		
+		
+		//create the itemstack
+		ItemStack item;
+		if (component.hasAttribute("item") && component.getAttribute("material") instanceof ItemStack){
+			item = (ItemStack) component.getAttribute("item");
+		} else{
+			item = new ItemStack(Material.WOOL);
+		}
+		
 		//create the correct material
 		Material material;
 		if (component.hasAttribute("material") && component.getAttribute("material") instanceof Integer){
@@ -135,9 +144,10 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		else{
 			material = Material.WOOL;
 		}
+		item.setType(material);
 		
-		//create the itemstack
-		ItemStack item = new ItemStack(material);
+		
+		
 		
 		//make meta changes
 		ItemMeta meta = item.getItemMeta();
@@ -347,8 +357,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	 * If the inventory was a menu, handles the menu accordingly
 	 * @param event
 	 */
-	@EventHandler(ignoreCancelled=true)
-	public void inventoryClick(InventoryClickEvent event){		
+	@EventHandler
+	public void inventoryClick(InventoryClickEvent event){	
 				
 		//check if player was viewing a menu
 		String playerName = event.getWhoClicked().getName();

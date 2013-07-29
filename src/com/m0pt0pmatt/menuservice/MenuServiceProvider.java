@@ -962,6 +962,12 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public void saveAll() {
 		for (Menu menu: menusByName.values()){
 			
+			if (menu.hasAttribute("autoSave")){
+				if (!(Boolean) menu.getAttribute("autoSave")){
+					continue;
+				}
+			}
+			
 			Plugin plugin = Bukkit.getPluginManager().getPlugin((String) menu.getAttribute("plugin"));
 			if (plugin != null){
 				String filename = null;
@@ -1062,6 +1068,16 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public List<Menu> getMenus() {
 		
 		return new LinkedList<Menu>(menusByName.values());
+	}
+
+
+	@Override
+	public List<MenuInstance> getMenuInstances(Menu menu) {
+		if (!menusByName.containsKey(menu.getName())){
+			return null;
+		}
+		
+		return menusToInstances.get(menu);
 	}
 
 }
