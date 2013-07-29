@@ -119,17 +119,11 @@ public class AbstractComponent implements Component{
 	}
 	
 	/**
-	 * Returns an attribute, Assuming it is a List of some type
-	 * 
+	 * Returns a given attribute of the Component
+	 * @param name the name of the attribute
+	 * @return the attribute if it exists, otherwise null
 	 */
-	public List<?> getListAttribute(String name){
-		Object attribute = getAttribute(name);
-		if (attribute instanceof List){
-			return (List<?>) attribute;
-		}
-		return null;
-	}
-	
+	@Override
 	public ContainerAttribute getConatinerAttribute(String name){
 		Object attribute = getAttribute(name);
 		if (attribute instanceof ContainerAttribute){
@@ -138,6 +132,12 @@ public class AbstractComponent implements Component{
 		return null;
 	}
 	
+	/**
+	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
+	 * @param name the name of the attribute
+	 * @param instance The menuInstance whose paramters will be checked
+	 * @return if a parameter
+	 */
 	@Override
 	public Object getParameteredAttribute(String name, MenuInstance instance) {
 		Object attribute = getAttribute(name);
@@ -187,23 +187,49 @@ public class AbstractComponent implements Component{
 		return actions;
 	}	
 	
+	/**
+	 * Adds action tags to a given interaction
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 */
 	@Override
 	public void addAction(String type, List<Integer> tags) {
 		addAction(type, tags, new LinkedList<String>(), "<player>", new LinkedList<String>());
 		
 	}
 	
+	/**
+	 * Adds action tags and permission to the given interaction
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 * @param permissions the permission to add
+	 */
 	@Override
 	public void addAction(String type, List<Integer> tags, List<String> permissions) {
 		addAction(type, tags, new LinkedList<String>(), "<player>", permissions);
 		
 	}
 
+	/**
+	 * Adds action tags and commands to the given interaction.
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 * @param commands the commands to add
+	 * @param commandSender the Entity which executes the commands
+	 */
 	@Override
 	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender) {
 		addAction(type, tags, commands, commandSender, new LinkedList<String>());
 	}
 
+	/**
+	 * Adds action tags, commands, and permissions to the given interaction.
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 * @param commands the commands to add
+	 * @param commandSender the Entity which executes the commands
+	 * @param permissions the permission to add
+	 */
 	@Override
 	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender, List<String> permissions) {
 		
@@ -223,8 +249,13 @@ public class AbstractComponent implements Component{
 		
 	}
 
+	/**
+	 * Checks if the component has an action for the given interaction
+	 * @param type the type of interaction
+	 * @return true if there exists an interaction, false otherwise
+	 */
 	@Override
-	public boolean hasAction(String type) {
+	public boolean hasInteraction(String type) {
 		if (!this.hasAttribute("actions")){
 			return false;
 		}
@@ -241,6 +272,11 @@ public class AbstractComponent implements Component{
 		return false;
 	}
 
+	/**
+	 * Returns an action
+	 * @param type
+	 * @return
+	 */
 	@Override
 	public ContainerAttribute getAction(String type) {
 		if (!this.hasAttribute("actions")){

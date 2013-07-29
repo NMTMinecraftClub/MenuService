@@ -89,13 +89,6 @@ public interface Component {
 	 * @param name the name of the attribute
 	 * @return the attribute if it exists, otherwise null
 	 */
-	public List<?> getListAttribute(String name);
-	
-	/**
-	 * Returns a given attribute of the Component
-	 * @param name the name of the attribute
-	 * @return the attribute if it exists, otherwise null
-	 */
 	public ContainerAttribute getConatinerAttribute(String name);
 	
 	/**
@@ -113,16 +106,52 @@ public interface Component {
 	 */
 	public boolean hasAttribute(String name);
 	
+	/**
+	 * Adds action tags to a given interaction
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 */
 	public void addAction(String type, List<Integer> tags);
 	
+	/**
+	 * Adds action tags and permission to the given interaction
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 * @param permissions the permission to add
+	 */
 	public void addAction(String type, List<Integer> tags, List<String> permissions);
 	
+	/**
+	 * Adds action tags and commands to the given interaction.
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 * @param commands the commands to add
+	 * @param commandSender the Entity which executes the commands
+	 */
 	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender);
 	
+	/**
+	 * Adds action tags, commands, and permissions to the given interaction.
+	 * @param type the type of interaction
+	 * @param tags the action tags to add
+	 * @param commands the commands to add
+	 * @param commandSender the Entity which executes the commands
+	 * @param permissions the permission to add
+	 */
 	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender, List<String> permissions);
 	
-	public boolean hasAction(String type);
+	/**
+	 * Checks if the component has an action for the given interaction
+	 * @param type the type of interaction
+	 * @return true if there exists an interaction, false otherwise
+	 */
+	public boolean hasInteraction(String type);
 	
+	/**
+	 * Returns an action
+	 * @param type
+	 * @return
+	 */
 	public ContainerAttribute getAction(String type);
 
 }
