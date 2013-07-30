@@ -130,6 +130,13 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		//create the itemstack
 		ItemStack item;
+		if (component.hasAttribute("item")){
+			Object o = component.getAttribute("item");
+			System.out.println("ITEM");
+			System.out.println(o.toString());
+
+		}
+		
 		if (component.hasAttribute("item") && component.getAttribute("material") instanceof ItemStack){
 			item = (ItemStack) component.getAttribute("item");
 		} else{
@@ -145,9 +152,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			material = Material.WOOL;
 		}
 		item.setType(material);
-		
-		
-		
 		
 		//make meta changes
 		ItemMeta meta = item.getItemMeta();
@@ -177,7 +181,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		item.setItemMeta(meta);
 		
 		//set the location of the item
-		int spot = getSpot(x, y, inventory.firstEmpty(), inventory.getSize());
+		int spot = getSpot(x, y, inventory);
 		if (spot != -1){
 			inventory.setItem(spot, item);
 		}
@@ -193,22 +197,48 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	 * @param y
 	 * @return
 	 */
-	private int getSpot(int x, int y, int firstEmpty, int size){
+	private int getSpot(int x, int y, Inventory inv){
 		
-		int spot = firstEmpty;
-		if (x != -1 && y != -1){
-			spot = (9 * y) + x;
+		if (inv.firstEmpty() == -1){
+			return -1;
 		}
 		
-		if (spot >= size){
-			if (firstEmpty != -1){
-				spot = firstEmpty;
-			}
-			else{
-				spot = -1;
+		if (x < 0 && y < 0){
+			x = inv.firstEmpty() % 9;
+			y = inv.firstEmpty() / 9;
+			return (9 * y) + x;
+		}
+		
+		else if (x < 0){			
+			for (int i = 0; i < 9; i++){
+				if (inv.getItem((9*y) + i) == null){
+					x = i;
+					break;
+				}
 			}
 		}
-		return spot;
+		
+		else if (y < 0){
+			for (int i = 0; i < inv.getSize() / 9; i++){
+				if (inv.getItem((9*i) + x) == null){
+					y = i;
+					break;
+				}
+			}
+		}
+		
+		System.out.println("x:" + x);
+		System.out.println("Y:" + y);
+		
+		if (inv.getItem((9*y) + x) != null){
+			return -1;
+		}
+		
+		if ((9 * y) + x >= inv.getSize()){
+			return -1;
+		}
+		
+		return (9 * y) + x;
 	}
 	
 	/**
@@ -300,8 +330,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//get the MenuInstance
 		MenuInstance instance = this.getPlayers().get(playerName);
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, this.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
 			return;
 		}
 

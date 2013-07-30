@@ -116,7 +116,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//check if null
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, "No MenuInstance was found for the player " + playerName);
 			return;
 		}
 		

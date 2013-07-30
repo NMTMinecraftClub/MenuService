@@ -46,5 +46,11 @@ public class Logger {
 			//log the message
 			plugin.getLogger().log(level, msg);;
 		}
+		
+		if (level == Level.SEVERE){
+			for (StackTraceElement e: Thread.currentThread().getStackTrace()){
+				System.out.println(e.toString());
+			}
+		}
 	}
 }

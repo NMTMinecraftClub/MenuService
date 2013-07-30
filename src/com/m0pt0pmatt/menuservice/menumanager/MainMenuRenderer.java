@@ -45,8 +45,13 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	public MainMenuRenderer(MenuService menuService, Plugin plugin) {
 		super(menuService, plugin);
 		this.menuService = menuService;
+		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 
+	private int getIndex(int x, int y){
+		return ((9 * y) + x);
+	}
+	
 	/**
 	 * Renders a MenuInstance for a given player
 	 * @param menuInstance the MenuInstance to render
@@ -55,6 +60,9 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	@Override
 	public void renderPlayer(MenuInstance menuInstance, String playerName) {
 		List<Menu> menus = menuService.getMenus();
+		
+		int y = 1;
+		int x = 0;
 		
 		Inventory inv = (Inventory) menuInstance.getParameter("inventory");
 		
@@ -71,9 +79,15 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 			meta.setDisplayName(menu.getName());
 			item.setItemMeta(meta);
 			
-			menuSpots.put(inv.firstEmpty(), menu);
+			menuSpots.put(getIndex(x, y), menu);
 			
-			inv.addItem(item);
+			inv.setItem(getIndex(x, y), item);
+			
+			x++;
+			if (x == 9){
+				x = 0;
+				y++;
+			}
 			
 		}
 		

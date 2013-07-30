@@ -81,9 +81,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		//setup the MenuService Provider
 		menuService = new MenuServiceProvider(this);
 		commandHandler = new CommandHandler(this);
-		menuManager = new MenuManager(menuService, this);
-		System.out.println("oijoijfoisjfoiesjfoisejf" + menuManager);
-		
+		menuManager = new MenuManager(menuService, this);		
 		
 		Logger.log(3, Level.INFO, "MenuService initialized");
 		
@@ -204,7 +202,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		for (File file: this.getDataFolder().listFiles()){
 			
 			//make sure the file is not the config file and has the .yml extension
-			if ((!file.getName().equalsIgnoreCase("config.yml")) && file.getName().endsWith(".yml")){
+			if ((!file.getName().equalsIgnoreCase("config.yml")) && (!file.getName().equalsIgnoreCase("binds.yml")) && file.getName().endsWith(".yml")){
 				
 				//load the menu
 				Menu menu = menuService.loadMenu(this, file.getName());

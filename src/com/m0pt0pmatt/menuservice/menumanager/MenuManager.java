@@ -116,6 +116,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_EDITMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		//add "open" component
@@ -127,6 +128,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_OPENMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		//add "close" component
@@ -138,6 +140,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_CLOSEMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		//add "load" component
@@ -149,6 +152,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_LOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		//add "save" component
@@ -160,6 +164,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_SAVEMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		//add "reload" component
@@ -171,6 +176,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_RELOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		//add "unload" component
@@ -182,6 +188,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_UNLOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		//add "help" component
@@ -193,6 +200,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_HELP.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
 		return menu;
