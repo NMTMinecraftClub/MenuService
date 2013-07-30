@@ -39,7 +39,7 @@ public class MenuManager {
 	/**
 	 * A Map of the Menus used by the Menu Manager
 	 */
-	private static Map<String, Menu> menus;
+	public static Map<String, Menu> menus;
 	
 	/**
 	 * The Renderer for the Main Menu
@@ -73,7 +73,7 @@ public class MenuManager {
 		menus.put("instancesMenu", buildMenuMenu());
 		menus.put("playerMenu", buildInstanceMenu());
 		
-		managerListener = new ManagerListener(menuService);
+		managerListener = new ManagerListener(menuService, this);
 		
 		//Add the Menus to the MenuService
 		for (Menu menu: menus.values()){
@@ -239,6 +239,10 @@ public class MenuManager {
 		//add the custom renderer
 		menu.addRenderer(menuMenuRenderer);
 		
+		for (Renderer r: menu.getRenderers()){
+			System.out.println(r.getName());
+		}
+		
 		//add attributes to the menu
 		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService").getName());
 		menu.addAttribute("size", 6);
@@ -249,6 +253,58 @@ public class MenuManager {
 		//add Components to the Menu
 		Component component;
 		List<Integer> actionTags;
+		
+		//add "create" component
+		component = new AbstractComponent();
+		component.setTag("createButton");
+		component.setType("button");
+		component.addAttribute("text", "Create Instance");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(MenuType.MAIN_HELP.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 0);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
+		
+		//add "open" component
+		component = new AbstractComponent();
+		component.setTag("openButton");
+		component.setType("button");
+		component.addAttribute("text", "Open Instance");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(MenuType.MAIN_HELP.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 1);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
+		
+		//add "close" component
+		component = new AbstractComponent();
+		component.setTag("closeButton");
+		component.setType("button");
+		component.addAttribute("text", "Close Instance");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(MenuType.MAIN_HELP.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 2);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
+		
+		//add "remove" component
+		component = new AbstractComponent();
+		component.setTag("removeButton");
+		component.setType("button");
+		component.addAttribute("text", "Remove Instance");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(MenuType.MAIN_HELP.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 3);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
 		
 		return menu;
 	}

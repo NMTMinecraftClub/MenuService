@@ -11,9 +11,11 @@ import com.m0pt0pmatt.menuservice.api.MenuService;
 public class ManagerListener implements ActionListener{
 	
 	private MenuService menuService;
+	private MenuManager manager;
 	
-	public ManagerListener(MenuService menuService){
+	public ManagerListener(MenuService menuService, MenuManager manager){
 		this.menuService = menuService;
+		this.manager = manager;
 	}
 	
 	@Override
@@ -22,6 +24,8 @@ public class ManagerListener implements ActionListener{
 		
 		if (tag == MenuType.MAINMENU.getType()){
 			handleMainMenu(event);
+		} else if (tag == MenuType.MENUMENU.getType()){
+			handleMenuMenu(event);
 		}
 		
 		
@@ -44,7 +48,8 @@ public class ManagerListener implements ActionListener{
 			
 			Menu menu = menuSpots.get(spot);
 			menuService.closeMenuInstance(playerName);
-			MenuInstance newInstance = menuService.createMenuInstance(menu, "MenuManager-MenuMenu-" + playerName);
+			MenuInstance newInstance = menuService.createMenuInstance(MenuManager.menus.get("instancesMenu"), "MenuManager-MenuMenu-" + playerName);
+			newInstance.addParameter("menu", menu);
 			menuService.openMenuInstance(newInstance, playerName);
 			break;
 		case MAIN_EDITMENU:
@@ -77,6 +82,39 @@ public class ManagerListener implements ActionListener{
 		
 	}
 	
+	@SuppressWarnings("unchecked")
+	private void handleMenuMenu(ActionEvent event){
+		MenuInstance instance = event.getAction().getInstance();
+		String playerName = event.getAction().getPlayerName();
+		int type = (Integer) instance.getParameter(playerName + ":menuSpot");
+		int spot = (Integer) instance.getParameter(playerName + ":slot");
+		
+		MenuType menuType = MenuType.getMenuType(type);
+		
+		Map<Integer, Menu> menuSpots;
+		
+		switch (menuType){
+		case MENU_CREATEINSTANCE:
+			System.out.println("CREATE");
+			break;
+		case MENU_OPENINSTANCE:
+			System.out.println("OPEN");
+			break;
+		case MENU_CLOSEINSTANCE:
+			System.out.println("CLOSE");
+			break;
+		case MENU_REMOVEINSTANCE:
+			System.out.println("REMOVE");
+			break;
+		case MENU_INSTANCECLICKED:
+			System.out.println("INSTANCECLICKED");
+			break;
+		default:
+			
+		}
+		
+	}
+	
 
 	@Override
 	public void playerAdded(MenuInstance instance, String playerName) {}
@@ -89,7 +127,7 @@ public class ManagerListener implements ActionListener{
 
 	@Override
 	public String getName() {
-		return "MenuManager";
+		return "MenuManagerListener";
 	}
 
 	@Override

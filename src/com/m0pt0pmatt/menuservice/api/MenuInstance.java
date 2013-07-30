@@ -161,6 +161,7 @@ public final class MenuInstance {
 	
 	public void renderPlayer(String playerName){
 		for (Renderer renderer: menu.getRenderers()){
+			System.out.println("Ren: " + renderer.getName());
 			renderer.renderPlayer(this, playerName);
 		}
 		for (Renderer renderer: renderers.values()){

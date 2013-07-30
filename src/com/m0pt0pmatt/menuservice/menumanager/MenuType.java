@@ -6,7 +6,8 @@ import java.util.Map;
 
 public enum MenuType {
 
-	MAINMENU(-1),
+	MAINMENU(0),
+	MENUMENU(1),
 	
 	MAIN_MENUCLICKED(10),
 	MAIN_EDITMENU(12),
@@ -19,9 +20,10 @@ public enum MenuType {
 	MAIN_HELP(19),
 	
 	MENU_CREATEINSTANCE(20),
-	MENU_CLOSEINSTANCE(21),
-	MENU_OPENINSTANCE(22),
-	MENU_REMOVEINSTANCE(23);
+	MENU_OPENINSTANCE(21),
+	MENU_CLOSEINSTANCE(22),
+	MENU_REMOVEINSTANCE(23),
+	MENU_INSTANCECLICKED(24);
 	
 	private static final Map<Integer, MenuType> lookup = new HashMap<Integer, MenuType>();
 	

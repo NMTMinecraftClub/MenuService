@@ -32,11 +32,6 @@ import com.m0pt0pmatt.menuservice.api.Renderer;
  *
  */
 public class MainMenuRenderer extends AbstractRenderer implements Renderer, Listener{
-
-	/**
-	 * The MenuService for the Server
-	 */
-	private MenuService menuService;
 	
 	/**
 	 * Creates a MainMenuRenderer
@@ -45,7 +40,6 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	 */
 	public MainMenuRenderer(MenuService menuService, Plugin plugin) {
 		super(menuService, plugin);
-		this.menuService = menuService;
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 
@@ -60,34 +54,35 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	 */
 	@Override
 	public void renderPlayer(MenuInstance menuInstance, String playerName) {
-		List<Menu> menus = menuService.getMenus();
+		List<Menu> menus = getMenuService().getMenus();
 		
 		int y = 1;
 		int x = 0;
 		
 		Inventory inv = (Inventory) menuInstance.getParameter("inventory");
 		
-		Player player = Bukkit.getPlayer(playerName);
-		
 		Map<Integer, Menu> menuSpots = new HashMap<Integer, Menu>();
 		
 		for (Menu menu: menus){
 			
-			player.sendMessage(menu.getName());
+			if (!MenuManager.menus.containsValue(menu)){
+
+
 			
-			ItemStack item = new ItemStack(Material.WOOL);
-			ItemMeta meta = item.getItemMeta();
-			meta.setDisplayName(menu.getName());
-			item.setItemMeta(meta);
-			
-			menuSpots.put(getIndex(x, y), menu);
-			
-			inv.setItem(getIndex(x, y), item);
-			
-			x++;
-			if (x == 9){
-				x = 0;
-				y++;
+				ItemStack item = new ItemStack(Material.WOOL);
+				ItemMeta meta = item.getItemMeta();
+				meta.setDisplayName(menu.getName());
+				item.setItemMeta(meta);
+				
+				menuSpots.put(getIndex(x, y), menu);
+				
+				inv.setItem(getIndex(x, y), item);
+				
+				x++;
+				if (x == 9){
+					x = 0;
+					y++;
+				}
 			}
 			
 		}
@@ -119,7 +114,9 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	 * @param playerName the name of the player
 	 */
 	@Override
-	public void closeMenu(String playerName) {}
+	public void closeMenu(String playerName) {
+		getPlayers().remove(playerName);
+	}
 	
 	/**
 	 * Closes the Menu when the player closes the Inventory
@@ -150,10 +147,6 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 		
 		//get the playerName
 		String playerName = event.getWhoClicked().getName();
-		
-		for (Entry<String, MenuInstance> entry: this.getPlayers().entrySet()){
-			System.out.println(entry);
-		}
 		
 		//check if the player was viewing the menu
 		if (!(getPlayers().containsKey(playerName))){
