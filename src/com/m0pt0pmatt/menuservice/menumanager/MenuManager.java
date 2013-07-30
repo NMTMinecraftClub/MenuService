@@ -8,7 +8,9 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 import org.bukkit.plugin.Plugin;
 
@@ -49,6 +51,8 @@ public class MenuManager {
 	 */
 	private static MenuMenuRenderer menuMenuRenderer;
 	
+	private static ManagerListener managerListener;
+	
 	/**
 	 * Creates a Menu Manager
 	 * @param menuService
@@ -68,6 +72,8 @@ public class MenuManager {
 		menus.put("mainMenu", buildMainMenu());
 		menus.put("instancesMenu", buildMenuMenu());
 		menus.put("playerMenu", buildInstanceMenu());
+		
+		managerListener = new ManagerListener(menuService);
 		
 		//Add the Menus to the MenuService
 		for (Menu menu: menus.values()){
@@ -115,7 +121,8 @@ public class MenuManager {
 		actionTags = new LinkedList<Integer>();
 		actionTags.add(MenuType.MAIN_EDITMENU.getType());
 		component.addAction("leftClick", actionTags);
-		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("item", new ItemStack(Material.WHEAT));
+		component.addAttribute("x", 0);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -128,6 +135,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_OPENMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 1);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -140,6 +148,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_CLOSEMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 2);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -152,6 +161,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_LOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 3);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -164,6 +174,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_SAVEMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 4);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -176,6 +187,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_RELOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 5);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -188,6 +200,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_UNLOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 6);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -200,6 +213,7 @@ public class MenuManager {
 		actionTags.add(MenuType.MAIN_HELP.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 7);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -291,6 +305,7 @@ public class MenuManager {
 			Logger.log(2, Level.SEVERE, LogMessage.CANTSHOWMAINMENU, player.getName());
 			return false;
 		}
+		instance.addActionListener(managerListener);
 		
 		return menuService.openMenuInstance(instance, player.getName());
 	}

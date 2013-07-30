@@ -3,6 +3,7 @@ package com.m0pt0pmatt.menuservice.menumanager;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -94,8 +95,6 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 		menuInstance.addParameter("menuSpots", menuSpots);
 		getPlayers().put(playerName, menuInstance);
 		
-		player.openInventory(inv);
-		
 	}
 
 	/**
@@ -133,7 +132,7 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 		String playerName = event.getPlayer().getName();
 		
 		//check if the player was viewing the menu
-		if (!getPlayers().containsKey(playerName)){
+		if (!(getPlayers().containsKey(playerName))){
 			return;
 		}
 		
@@ -148,11 +147,16 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	@EventHandler
 	public void inventoryClick(InventoryClickEvent event){	
 		
+		
 		//get the playerName
 		String playerName = event.getWhoClicked().getName();
 		
+		for (Entry<String, MenuInstance> entry: this.getPlayers().entrySet()){
+			System.out.println(entry);
+		}
+		
 		//check if the player was viewing the menu
-		if (!getPlayers().containsKey(playerName)){
+		if (!(getPlayers().containsKey(playerName))){
 			return;
 		}
 		
@@ -166,32 +170,40 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 		int spot = event.getSlot();
 		switch (spot){
 		case 0:
-			activateListeners(instance, MenuType.MAIN_EDITMENU.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_EDITMENU.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		case 1:
-			activateListeners(instance, MenuType.MAIN_OPENMENU.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_OPENMENU.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		case 2:
-			activateListeners(instance, MenuType.MAIN_CLOSEMENU.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_CLOSEMENU.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		case 3:
-			activateListeners(instance, MenuType.MAIN_LOADMENU.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_LOADMENU.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		case 4:
-			activateListeners(instance, MenuType.MAIN_SAVEMENU.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_SAVEMENU.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		case 5:
-			activateListeners(instance, MenuType.MAIN_RELOADMENU.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_RELOADMENU.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		case 6:
-			activateListeners(instance, MenuType.MAIN_UNLOADMENU.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_UNLOADMENU.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		case 7:
-			activateListeners(instance, MenuType.MAIN_HELP.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_HELP.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 			return;
 		default:
-			instance.addParameter("menuSpot", spot);
-			activateListeners(instance, MenuType.MAIN_MENUCLICKED.getType(), playerName, "leftClick");
+			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_MENUCLICKED.getType());
+			activateListeners(instance, MenuType.MAINMENU.getType(), playerName, "leftClick");
 		}
 
 	}

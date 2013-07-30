@@ -20,7 +20,7 @@ public class ManagerListener implements ActionListener{
 	public void handleAction(ActionEvent event) {
 		int tag = event.getAction().getTag();
 		
-		if (tag >= 0 && tag < 10){
+		if (tag == MenuType.MAINMENU.getType()){
 			handleMainMenu(event);
 		}
 		
@@ -29,17 +29,19 @@ public class ManagerListener implements ActionListener{
 	
 	@SuppressWarnings("unchecked")
 	private void handleMainMenu(ActionEvent event){
-		int tag = event.getAction().getTag();
-		MenuType menuType = MenuType.getMenuType(tag);
-		String playerName = event.getAction().getPlayerName();
 		MenuInstance instance = event.getAction().getInstance();
+		String playerName = event.getAction().getPlayerName();
+		int type = (Integer) instance.getParameter(playerName + ":menuSpot");
+		int spot = (Integer) instance.getParameter(playerName + ":slot");
+		
+		MenuType menuType = MenuType.getMenuType(type);
 		
 		Map<Integer, Menu> menuSpots;
 		
 		switch (menuType){
 		case MAIN_MENUCLICKED:
 			menuSpots = (Map<Integer, Menu>) instance.getParameter("menuSpots");
-			int spot = (Integer) instance.getParameter("menuSpot");
+			
 			Menu menu = menuSpots.get(spot);
 			menuService.closeMenuInstance(playerName);
 			MenuInstance newInstance = menuService.createMenuInstance(menu, "MenuManager-MenuMenu-" + playerName);

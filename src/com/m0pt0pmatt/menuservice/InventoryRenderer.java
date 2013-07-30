@@ -28,6 +28,7 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
+import com.m0pt0pmatt.menuservice.menumanager.MenuType;
 
 /**
  * InventoryRenderer is a built in Renderer for MenuService.
@@ -130,28 +131,25 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		//create the itemstack
 		ItemStack item;
-		if (component.hasAttribute("item")){
-			Object o = component.getAttribute("item");
-			System.out.println("ITEM");
-			System.out.println(o.toString());
-
-		}
-		
-		if (component.hasAttribute("item") && component.getAttribute("material") instanceof ItemStack){
-			item = (ItemStack) component.getAttribute("item");
-		} else{
-			item = new ItemStack(Material.WOOL);
-		}
 		
 		//create the correct material
 		Material material;
-		if (component.hasAttribute("material") && component.getAttribute("material") instanceof Integer){
-			material = Material.getMaterial((Integer) component.getAttribute("material"));
-		}
+		
+		if (component.hasAttribute("item") && component.getAttribute("item") instanceof ItemStack){
+			item = (ItemStack) component.getAttribute("item");
+		} 
+		
 		else{
-			material = Material.WOOL;
+			if (component.hasAttribute("material") && component.getAttribute("material") instanceof Integer){
+				material = Material.getMaterial((Integer) component.getAttribute("material"));
+				item = new ItemStack(material);
+			}
+			else{
+				material = Material.WOOL;
+				item = new ItemStack(Material.WOOL);
+			}
+			
 		}
-		item.setType(material);
 		
 		//make meta changes
 		ItemMeta meta = item.getItemMeta();
@@ -226,9 +224,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 				}
 			}
 		}
-		
-		System.out.println("x:" + x);
-		System.out.println("Y:" + y);
 		
 		if (inv.getItem((9*y) + x) != null){
 			return -1;
@@ -405,6 +400,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			return;
 		}
 		
+		instance.addParameter(playerName + ":" + "slot", event.getSlot());
+		
 		//get the item map
 		@SuppressWarnings("unchecked")
 		Map<Integer, String> itemMap = (Map<Integer, String>) instance.getParameters().get("itemMap");
@@ -424,6 +421,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			//run each action
 			for (Object action: actions.getAttributes().values()){
 				if (action instanceof ContainerAttribute){
+					
 					executeAction((ContainerAttribute) action, event, instance, component);
 				}
 			}

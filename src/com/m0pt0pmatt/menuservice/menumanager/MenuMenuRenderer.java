@@ -1,7 +1,5 @@
 package com.m0pt0pmatt.menuservice.menumanager;
 
-import java.util.List;
-
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
