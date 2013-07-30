@@ -42,8 +42,7 @@ public class CommandHandler {
 		
 		//if there are no args, print out the help menu
 		if (args.length == 0){
-			plugin.showHelp(sender);
-			return true;
+			return handleHelp(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "list" command

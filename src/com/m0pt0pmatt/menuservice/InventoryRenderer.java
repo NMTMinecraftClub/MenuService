@@ -321,9 +321,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			Logger.log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
 			return;
 		}
-		
-		System.out.println("CLOSING");
-		
+				
 		//get the MenuInstance
 		MenuInstance instance = this.getPlayers().get(playerName);
 		if (instance == null){

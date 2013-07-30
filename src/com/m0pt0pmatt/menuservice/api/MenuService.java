@@ -251,13 +251,25 @@ public interface MenuService {
 	 */
 	public boolean unbindMenu(Material material);
 	
+	public Map<Material, Menu> getMaterialBinds();
+	public Map<ItemStack, Menu> getItemStackBinds();
+	public void setMaterialBinds(Map<Material, Menu> materialBinds);
+	public void setItemStackBinds(Map<ItemStack, Menu> itemBinds);
+
+	
 	/**
 	 * Saves all Menus to file
 	 */
-	public void saveAll();
+	public void saveMenus();
 	
 	/**
 	 * Closes all Menus
 	 */
-	public void closeAll();
+	public void closeMenus();
+	
+	public void loadMenus();
+	
+	public void loadBinds();
+	
+	public void saveBinds();
 }

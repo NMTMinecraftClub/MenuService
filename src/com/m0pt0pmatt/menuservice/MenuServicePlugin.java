@@ -48,22 +48,24 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	/**
 	 * The config file for the plugin
 	 */
-	private static String configFileName = "config.yml";
+	public static String configFileName = "config.yml";
 	
 	/**
 	 * The config file which stores all of the bind to menus
 	 */
-	private static String bindsFileName = "binds.yml";
+	public static String bindsFileName = "binds.yml";
 	
-	/**
-	 * The config file for the plugin
-	 */
-	private YamlConfiguration config;
+	
 	
 	/**
 	 * The config file that holds all the menu binds
 	 */
-	private YamlConfiguration binds;
+	public static YamlConfiguration binds;
+	
+	/**
+	 * The config file for the plugin
+	 */
+	public static YamlConfiguration config;
 	
 	/**
 	 * the verbosity level of the plugin. The higher the level, the more messages will be logged to the terminal.
@@ -94,9 +96,9 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		Logger.log(1, Level.INFO, "Loaded " + configFileName);
 		
 		//load all menus in the MenuService folder
-		loadMenus();
+		menuService.loadMenus();
 		
-		loadBinds();
+		menuService.loadBinds();
 		
 		//register the plugin so it can listen to open menus
 		Bukkit.getPluginManager().registerEvents(this, this);	
@@ -138,88 +140,9 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 	}
 	
-	private void loadBinds() {
-		//create data folder if needed
-		if (!this.getDataFolder().exists()){
-			Logger.log(2, Level.INFO, "Creating Data Folder");
-			this.getDataFolder().mkdir();
-		}
-		
-		//create configuration file if needed
-		File configFile = new File(this.getDataFolder(), bindsFileName);
-		if (!configFile.exists()){
-			try {
-				configFile.createNewFile();
-			} catch (IOException e) {
-				Logger.log(1, Level.SEVERE, "Unable to create binds file!");
-			}
-		}
-		
-		//load the configuration file
-		binds = YamlConfiguration.loadConfiguration(configFile);
-		if (binds == null){
-			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
-		}
-		
-		if (binds.contains("materials")){
-			MemorySection materialSection = (MemorySection) binds.get("materials");
-			for (String m: materialSection.getKeys(false)){
-				MemorySection s = (MemorySection) materialSection.get(m);
-				Material material = null;
-				try{
-					material = Material.getMaterial(Integer.parseInt(s.getName()));						
-				} catch (NumberFormatException e){
-					material = Material.getMaterial(s.getName());
-				}
-				
-				if (material == null){
-					continue;
-				}
-				
-				if ((!s.contains("menu")) || (!s.contains("plugin"))){
-					continue;
-				}
-				
-				Object menu = s.get("menu");
-				Object plugin = s.get("plugin");
-				
-				if (!(menu instanceof String) || !(plugin instanceof String)){
-					continue;
-				}
-					
-				this.bindMenu(material, (String) plugin, (String) menu);
-
-			}
-		}
-	}
 	
-	/**
-	 * Loads menus stored in MenuService
-	 */
-	private void loadMenus() {
-		
-		//load menus in the MenuService folder
-		for (File file: this.getDataFolder().listFiles()){
-			
-			//make sure the file is not the config file and has the .yml extension
-			if ((!file.getName().equalsIgnoreCase("config.yml")) && (!file.getName().equalsIgnoreCase("binds.yml")) && file.getName().endsWith(".yml")){
-				
-				//load the menu
-				Menu menu = menuService.loadMenu(this, file.getName());
-				if (menu == null){
-					continue;
-				}
-				
-				//attach the default renderer
-				Renderer renderer = menuService.getRenderer("inventory");
-				menu.addRenderer(renderer);
-				
-				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
-			}
-			
-		}
-		
-	}
+	
+	
 
 	/**
 	 * Ran when the plugin is disabled.
@@ -231,11 +154,11 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//save all the menus to file
 		Logger.log(1, Level.INFO, "Saving all menus to file");
-		menuService.saveAll();
+		menuService.saveMenus();
 		
 		//close all menuinstances
 		Logger.log(1, Level.INFO, "Closing all menus");
-		menuService.closeAll();
+		menuService.closeMenus();
 		
 		//save the config file
 		try {
@@ -585,14 +508,6 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//bind the Material
 		return menuService.bindMenu(material, menu);
-	}
-	
-	/**
-	 * Shows the CommandSender a help menu
-	 * @param sender
-	 */
-	protected void showHelp(CommandSender sender) {
-		sender.sendMessage("Good luck!");
 	}
 	
 	/**

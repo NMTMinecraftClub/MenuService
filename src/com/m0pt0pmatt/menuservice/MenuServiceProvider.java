@@ -1,5 +1,7 @@
 package com.m0pt0pmatt.menuservice;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -12,6 +14,8 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.MemorySection;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -953,12 +957,34 @@ public class MenuServiceProvider implements MenuService, Listener{
 		materialsToMenus.remove(material);
 		return true;
 	}
+	
+	@Override
+	public Map<Material, Menu> getMaterialBinds() {
+		return materialsToMenus;
+	}
+
+
+	@Override
+	public Map<ItemStack, Menu> getItemStackBinds() {
+		return itemsToMenus;
+	}
+	
+	@Override
+	public void setMaterialBinds(Map<Material, Menu> materialBinds) {
+		this.materialsToMenus = materialBinds;
+	}
+
+
+	@Override
+	public void setItemStackBinds(Map<ItemStack, Menu> itemBinds) {
+		this.itemsToMenus = itemBinds;
+	}
 
 	/**
 	 * Saves all Menus to file
 	 */
 	@Override
-	public void saveAll() {
+	public void saveMenus() {
 		for (Menu menu: menusByName.values()){
 			
 			if (menu.hasAttribute("autoSave")){
@@ -986,7 +1012,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * Closes all Menus
 	 */
 	@Override
-	public void closeAll() {
+	public void closeMenus() {
 		for (Renderer renderer: renderersByName.values()){
 			renderer.closeAll();
 		}
@@ -1078,5 +1104,103 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		return menusToInstances.get(menu);
 	}
+
+
+	/**
+	 * Loads menus stored in MenuService
+	 */
+	public void loadMenus() {
+		
+		//load menus in the MenuService folder
+		for (File file: plugin.getDataFolder().listFiles()){
+			
+			//make sure the file is not the config file and has the .yml extension
+			if ((!file.getName().equalsIgnoreCase("config.yml")) && (!file.getName().equalsIgnoreCase("binds.yml")) && file.getName().endsWith(".yml")){
+				
+				//load the menu
+				Menu menu = this.loadMenu(plugin, file.getName());
+				if (menu == null){
+					continue;
+				}
+				
+				//attach the default renderer
+				Renderer renderer = this.getRenderer("inventory");
+				menu.addRenderer(renderer);
+				
+				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
+			}
+			
+		}
+		
+	}
+
+
+	@Override
+	public void loadBinds() {
+		//create data folder if needed
+		if (!plugin.getDataFolder().exists()){
+			Logger.log(2, Level.INFO, "Creating Data Folder");
+			plugin.getDataFolder().mkdir();
+		}
+		
+		//create configuration file if needed
+		File configFile = new File(plugin.getDataFolder(), MenuServicePlugin.bindsFileName);
+		if (!configFile.exists()){
+			try {
+				configFile.createNewFile();
+			} catch (IOException e) {
+				Logger.log(1, Level.SEVERE, "Unable to create binds file!");
+			}
+		}
+		
+		//load the configuration file
+		MenuServicePlugin.binds = YamlConfiguration.loadConfiguration(configFile);
+		if (MenuServicePlugin.binds == null){
+			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
+		}
+		
+		if (MenuServicePlugin.binds.contains("materials")){
+			MemorySection materialSection = (MemorySection) MenuServicePlugin.binds.get("materials");
+			for (String m: materialSection.getKeys(false)){
+				MemorySection s = (MemorySection) materialSection.get(m);
+				Material material = null;
+				try{
+					material = Material.getMaterial(Integer.parseInt(s.getName()));						
+				} catch (NumberFormatException e){
+					material = Material.getMaterial(s.getName());
+				}
+				
+				if (material == null){
+					continue;
+				}
+				
+				if ((!s.contains("menu")) || (!s.contains("plugin"))){
+					continue;
+				}
+				
+				Object menu = s.get("menu");
+				Object plugin = s.get("plugin");
+				
+				if (!(menu instanceof String) || !(plugin instanceof String)){
+					continue;
+				}
+					
+				Plugin p = Bukkit.getPluginManager().getPlugin((String) plugin);
+				
+				this.bindMenu(material, this.getMenu(p, (String)menu));
+
+			}
+		}
+	}
+
+
+	@Override
+	public void saveBinds() {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+	
 
 }
