@@ -78,10 +78,11 @@ public abstract class AbstractRenderer implements Renderer{
 	
 	@Override
 	public void closeAll() {
-		for (Entry<MenuInstance, List<String>> entry: this.getInstances().entrySet()){
-			for (String player: entry.getValue()){
-				this.closeMenu(player);
-			}
+		System.out.println("aaCLOSING");
+
+		
+		for (Entry<String, MenuInstance> entry: this.players.entrySet()){
+			this.closeMenu(entry.getKey());
 		}
 		
 	}

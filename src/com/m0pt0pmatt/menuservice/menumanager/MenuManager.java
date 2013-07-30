@@ -239,10 +239,6 @@ public class MenuManager {
 		//add the custom renderer
 		menu.addRenderer(menuMenuRenderer);
 		
-		for (Renderer r: menu.getRenderers()){
-			System.out.println(r.getName());
-		}
-		
 		//add attributes to the menu
 		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService").getName());
 		menu.addAttribute("size", 6);

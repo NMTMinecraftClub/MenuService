@@ -66,9 +66,7 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 		for (Menu menu: menus){
 			
 			if (!MenuManager.menus.containsValue(menu)){
-
-
-			
+				
 				ItemStack item = new ItemStack(Material.WOOL);
 				ItemMeta meta = item.getItemMeta();
 				meta.setDisplayName(menu.getName());
