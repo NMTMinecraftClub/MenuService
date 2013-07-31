@@ -1,6 +1,6 @@
 name: MenuService
 main: com.m0pt0pmatt.menuservice.MenuServicePlugin
-version: 0.6
+version: 0.7
 author: m0pt0pmatt
 permissions:
   menuservice.*:
