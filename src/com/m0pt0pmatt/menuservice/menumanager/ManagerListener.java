@@ -82,7 +82,6 @@ public class ManagerListener implements ActionListener{
 		
 	}
 	
-	@SuppressWarnings("unchecked")
 	private void handleMenuMenu(ActionEvent event){
 		MenuInstance instance = event.getAction().getInstance();
 		String playerName = event.getAction().getPlayerName();

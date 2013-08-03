@@ -45,7 +45,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	 * @param plugin
 	 */
 	public InventoryRenderer(MenuService menuService, MenuServicePlugin plugin){
-		super(menuService, plugin);
+		super(menuService);
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 

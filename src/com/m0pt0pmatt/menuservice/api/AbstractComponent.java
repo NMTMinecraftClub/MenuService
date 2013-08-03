@@ -23,7 +23,10 @@ public class AbstractComponent implements Component{
 	 * Creates a new AbstractComponent, giving default values to all variables
 	 */
 	public AbstractComponent(){
+		
 		this.attributes = new TreeMap<String, Object>();
+		
+		//give default values
 		attributes.put("type", "no-type");
 		attributes.put("tag", "no-tag");
 		attributes.put("lore", new LinkedList<String>());
@@ -34,14 +37,17 @@ public class AbstractComponent implements Component{
 	 * @param attributes
 	 */
 	public AbstractComponent(Map<String, Object> attributes) {
+		
+		//if the given attributes was null, create a new Map. Else use the provided attributes
 		attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
 		
+		//make sure the attributes have default values
 		if (!attributes.containsKey("type")) attributes.put("type", "no-type");
 		if (!attributes.containsKey("tag")) attributes.put("tag", "no-tag");
 		if (!attributes.containsKey("actions")) attributes.put("actions", new LinkedList<Integer>());
 		if (!attributes.containsKey("lore")) attributes.put("lore", new LinkedList<String>());
 	}
-
+	
 	/**
 	 * Sets the type of the Component
 	 * @param type

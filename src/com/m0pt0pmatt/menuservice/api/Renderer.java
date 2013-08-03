@@ -38,6 +38,9 @@ public interface Renderer {
 	 */
 	public void closeMenu(String playerName);
 	
+	/**
+	 * Closes all menus for all players
+	 */
 	public void closeAll();
 	
 }

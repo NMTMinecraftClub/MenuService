@@ -2,8 +2,6 @@ package com.m0pt0pmatt.menuservice.menumanager;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -28,7 +26,7 @@ import com.m0pt0pmatt.menuservice.api.Renderer;
 public class MenuMenuRenderer extends AbstractRenderer implements Renderer, Listener{
 	
 	public MenuMenuRenderer(MenuService menuService, Plugin plugin) {
-		super(menuService, plugin);
+		super(menuService);
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
