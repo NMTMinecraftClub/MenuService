@@ -27,7 +27,10 @@ public final class Action {
 	//the name of the player invoking the action
 	private String playerName;
 	
+	//The MenuInstance where the action took place
 	private MenuInstance instance;
+	
+	//The type of interaction (leftClick, rightClick, etc)
 	private String interaction;
 	
 	/**
@@ -43,14 +46,6 @@ public final class Action {
 		this.actionTag = actionTag;
 		this.playerName = playerName;
 		this.instance = instance;
-		this.interaction = interaction;
-	}
-	
-	public String getInteraction() {
-		return interaction;
-	}
-
-	public void setInteraction(String interaction) {
 		this.interaction = interaction;
 	}
 
@@ -85,6 +80,14 @@ public final class Action {
 	 */
 	public String getPlayerName(){
 		return playerName;
+	}
+	
+	/**
+	 * Returns the type of interaction for this action (leftClick, rightClick, etc)
+	 * @return the type of interaction for this action (leftClick, rightClick, etc)
+	 */
+	public String getInteraction() {
+		return interaction;
 	}
 	
 }

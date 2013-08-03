@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.bukkit.plugin.Plugin;
-
 /**
  * An AbstractRenderer is a Basic Renderer that is designed to help other Renderers easier to create.
  * An AbstractRenderer does not Render or provide for any MenuInstance. It simple does housekeeping.
