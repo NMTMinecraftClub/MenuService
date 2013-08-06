@@ -251,10 +251,10 @@ public interface MenuService {
 	 */
 	public boolean unbindMenu(Material material);
 	
-	public Map<Material, Menu> getMaterialBinds();
-	public Map<ItemStack, Menu> getItemStackBinds();
-	public void setMaterialBinds(Map<Material, Menu> materialBinds);
-	public void setItemStackBinds(Map<ItemStack, Menu> itemBinds);
+	public Map<Material, String> getMaterialBinds();
+	public Map<ItemStack, String> getItemStackBinds();
+	public void setMaterialBinds(Map<Material, String> materialBinds);
+	public void setItemStackBinds(Map<ItemStack, String> itemBinds);
 
 	
 	/**

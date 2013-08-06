@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -55,10 +56,10 @@ public class MenuServiceProvider implements MenuService, Listener{
 	private Map<String, Menu> commandsToMenus;
 	
 	//The Map of binded Materials
-	private Map<Material, Menu> materialsToMenus;
+	private Map<Material, String> materialsToMenus;
 	
 	//The Map of binded ItemStacks
-	private Map<ItemStack, Menu> itemsToMenus;
+	private Map<ItemStack, String> itemsToMenus;
 	
 	//The plugin which loaded the MenuServiceProvider
 	private MenuServicePlugin plugin;
@@ -89,8 +90,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		playersToInstances = Collections.synchronizedMap(new HashMap<String, MenuInstance>());
 		menusToInstances = Collections.synchronizedMap(new HashMap<Menu, List<MenuInstance>>());
 		commandsToMenus = Collections.synchronizedMap(new HashMap<String, Menu>());
-		materialsToMenus = Collections.synchronizedMap(new HashMap<Material, Menu>());
-		itemsToMenus = Collections.synchronizedMap(new HashMap<ItemStack, Menu>());
+		materialsToMenus = Collections.synchronizedMap(new HashMap<Material, String>());
+		itemsToMenus = Collections.synchronizedMap(new HashMap<ItemStack, String>());
 		Logger.log(3, Level.INFO, "Maps initialized");
 		
 		//add Renderers
@@ -852,7 +853,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return false;
 		}
 		
-		itemsToMenus.put(new ItemStack(item), menu);
+		itemsToMenus.put(new ItemStack(item), menu.getName());
 		return true;
 	}
 
@@ -883,7 +884,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return false;
 		}
 		
-		materialsToMenus.put(material, menu);
+		materialsToMenus.put(material, menu.getName());
 		return true;
 	}
 
@@ -902,18 +903,18 @@ public class MenuServiceProvider implements MenuService, Listener{
 		}
 		
 		if (itemsToMenus.containsValue(menu)){
-			Iterator<Entry<ItemStack, Menu>> iterator = itemsToMenus.entrySet().iterator();
+			Iterator<Entry<ItemStack, String>> iterator = itemsToMenus.entrySet().iterator();
 			while (iterator.hasNext()){
-				if (iterator.next().getKey().equals(menu)){
+				if (iterator.next().getKey().equals(menu.getName())){
 					iterator.remove();
 				}
 			}
 		}
 		
 		if (materialsToMenus.containsValue(menu)){
-			Iterator<Entry<Material, Menu>> iterator = materialsToMenus.entrySet().iterator();
+			Iterator<Entry<Material, String>> iterator = materialsToMenus.entrySet().iterator();
 			while (iterator.hasNext()){
-				if (iterator.next().getKey().equals(menu)){
+				if (iterator.next().getKey().equals(menu.getName())){
 					iterator.remove();
 				}
 			}
@@ -959,24 +960,24 @@ public class MenuServiceProvider implements MenuService, Listener{
 	}
 	
 	@Override
-	public Map<Material, Menu> getMaterialBinds() {
+	public Map<Material, String> getMaterialBinds() {
 		return materialsToMenus;
 	}
 
 
 	@Override
-	public Map<ItemStack, Menu> getItemStackBinds() {
+	public Map<ItemStack, String> getItemStackBinds() {
 		return itemsToMenus;
 	}
 	
 	@Override
-	public void setMaterialBinds(Map<Material, Menu> materialBinds) {
+	public void setMaterialBinds(Map<Material, String> materialBinds) {
 		this.materialsToMenus = materialBinds;
 	}
 
 
 	@Override
-	public void setItemStackBinds(Map<ItemStack, Menu> itemBinds) {
+	public void setItemStackBinds(Map<ItemStack, String> itemBinds) {
 		this.itemsToMenus = itemBinds;
 	}
 
@@ -1079,7 +1080,11 @@ public class MenuServiceProvider implements MenuService, Listener{
 		if (materialsToMenus.containsKey(item.getType())){
 
 			event.setCancelled(true);
-			Menu menu = materialsToMenus.get(item.getType());
+			
+			String menuName = materialsToMenus.get(item.getType());
+			Menu menu = menusByName.get(menuName);
+			//TODO: Add checks
+			
 			this.openMenuInstance(this.createMenuInstance(menu, menu.getName() + ": " + event.getPlayer().getName()), event.getPlayer().getName());
 			return;
 		}
@@ -1157,50 +1162,68 @@ public class MenuServiceProvider implements MenuService, Listener{
 		MenuServicePlugin.binds = YamlConfiguration.loadConfiguration(configFile);
 		if (MenuServicePlugin.binds == null){
 			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
+			return;
 		}
 		
 		if (MenuServicePlugin.binds.contains("materials")){
 			MemorySection materialSection = (MemorySection) MenuServicePlugin.binds.get("materials");
 			for (String m: materialSection.getKeys(false)){
 				MemorySection s = (MemorySection) materialSection.get(m);
-				Material material = null;
-				try{
-					material = Material.getMaterial(Integer.parseInt(s.getName()));						
-				} catch (NumberFormatException e){
-					material = Material.getMaterial(s.getName());
-				}
 				
-				if (material == null){
-					continue;
-				}
-				
-				if ((!s.contains("menu")) || (!s.contains("plugin"))){
-					continue;
-				}
-				
-				Object menu = s.get("menu");
-				Object plugin = s.get("plugin");
-				
-				if (!(menu instanceof String) || !(plugin instanceof String)){
-					continue;
-				}
-					
-				Plugin p = Bukkit.getPluginManager().getPlugin((String) plugin);
-				
-				this.bindMenu(material, this.getMenu(p, (String)menu));
 
 			}
 		}
 	}
 
-
 	@Override
 	public void saveBinds() {
-		// TODO Auto-generated method stub
+		
+		//Create file
+		File bindsFile = new File(this.plugin.getDataFolder(), "binds.yml");
+		try {
+			if (bindsFile.exists()) bindsFile.delete();
+			bindsFile.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
+		}
+		
+		YamlConfiguration bindsConfig = YamlConfiguration.loadConfiguration(bindsFile);
+		
+		Map<String, List<ItemStack>> reverseItemMap = new TreeMap<String, List<ItemStack>>();
+		
+		for (Entry<ItemStack, String> entry: this.itemsToMenus.entrySet()){
+			if (!reverseItemMap.containsKey(entry.getValue())){
+				reverseItemMap.put(entry.getValue(), new LinkedList<ItemStack>());
+			}
+			reverseItemMap.get(entry.getValue()).add(entry.getKey());
+		}
+		
+		for (Entry<String, List<ItemStack>> entry: reverseItemMap.entrySet()){
+			bindsConfig.set("itemstacks." + entry.getKey(), entry.getValue());
+		}
+		
+		
+		Map<String, List<Material>> reverseMaterialMap = new TreeMap<String, List<Material>>();
+		
+		for (Entry<Material, String> entry: this.materialsToMenus.entrySet()){
+			if (!reverseMaterialMap.containsKey(entry.getValue())){
+				reverseMaterialMap.put(entry.getValue(), new LinkedList<Material>());
+			}
+			reverseMaterialMap.get(entry.getValue()).add(entry.getKey());
+		}
+		
+		for (Entry<String, List<Material>> entry: reverseMaterialMap.entrySet()){
+			bindsConfig.set("materials." + entry.getKey(), entry.getValue());
+		}
+		
+		try {
+			bindsConfig.save(bindsFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
-
-
-	
 
 }
