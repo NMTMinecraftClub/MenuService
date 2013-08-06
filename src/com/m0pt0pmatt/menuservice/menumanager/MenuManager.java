@@ -49,8 +49,11 @@ public class MenuManager {
 	/**
 	 * The Renderer for the Menu Menu
 	 */
-	private static MenuMenuRenderer menuMenuRenderer;
+	private static InstancesMenuRenderer instancesMenuRenderer;
 	
+	/**
+	 * The Listener for the MenuManager
+	 */
 	private static ManagerListener managerListener;
 	
 	/**
@@ -65,13 +68,13 @@ public class MenuManager {
 		
 		//Create the Renderers
 		mainMenuRenderer = new MainMenuRenderer(menuService, plugin);
-		menuMenuRenderer = new MenuMenuRenderer(menuService, plugin);
+		instancesMenuRenderer = new InstancesMenuRenderer(menuService, plugin);
 		
 		//Create the Menus
 		menus = new HashMap<String, Menu>();
 		menus.put("mainMenu", buildMainMenu());
-		menus.put("instancesMenu", buildMenuMenu());
-		menus.put("playerMenu", buildInstanceMenu());
+		menus.put("instancesMenu", buildInstancesMenu());
+		menus.put("playersMenu", buildPlayersMenu());
 		
 		managerListener = new ManagerListener(menuService, this);
 		
@@ -221,10 +224,10 @@ public class MenuManager {
 	}
 	
 	/**
-	 * Builds the Menu Menu
-	 * @return the Menu Menu
+	 * Builds the Instances Menu
+	 * @return the Instances Menu
 	 */
-	private Menu buildMenuMenu() {
+	private Menu buildInstancesMenu() {
 		
 		//create the Component
 		MenuComponent menu = new MenuComponent();
@@ -237,13 +240,13 @@ public class MenuManager {
 		menu.addRenderer(renderer);
 		
 		//add the custom renderer
-		menu.addRenderer(menuMenuRenderer);
+		menu.addRenderer(instancesMenuRenderer);
 		
 		//add attributes to the menu
 		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService").getName());
 		menu.addAttribute("size", 6);
-		menu.setTag("MenuService-MenuManager-MenuMenu");
-		menu.addAttribute("title", "MenuService Menu Manager: Menus");
+		menu.setTag("MenuService-MenuManager-InstancesMenu");
+		menu.addAttribute("title", "MenuService Menu Manager: Instances");
 		menu.addAttribute("autoSave", false);
 		
 		//add Components to the Menu
@@ -309,7 +312,7 @@ public class MenuManager {
 	 * Builds the Instance Menu
 	 * @return the Instance Menu
 	 */
-	private Menu buildInstanceMenu() {
+	private Menu buildPlayersMenu() {
 		
 		//create the Component
 		MenuComponent menu = new MenuComponent();
@@ -326,8 +329,8 @@ public class MenuManager {
 		//add attributes to the menu		
 		menu.addAttribute("plugin", Bukkit.getPluginManager().getPlugin("MenuService").getName());
 		menu.addAttribute("size", 6);
-		menu.setTag("MenuService-MenuManager-InstanceMenu");
-		menu.addAttribute("title", "MenuService Menu Manager: Menus");
+		menu.setTag("MenuService-MenuManager-PlayersMenu");
+		menu.addAttribute("title", "MenuService Menu Manager: Players");
 		menu.addAttribute("autoSave", false);
 		
 		//add Components to the Menu

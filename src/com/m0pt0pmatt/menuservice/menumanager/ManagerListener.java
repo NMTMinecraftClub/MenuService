@@ -25,7 +25,7 @@ public class ManagerListener implements ActionListener{
 		if (tag == MenuType.MAINMENU.getType()){
 			handleMainMenu(event);
 		} else if (tag == MenuType.MENUMENU.getType()){
-			handleMenuMenu(event);
+			handleInstancesMenu(event);
 		}
 		
 		
@@ -48,7 +48,7 @@ public class ManagerListener implements ActionListener{
 			
 			Menu menu = menuSpots.get(spot);
 			menuService.closeMenuInstance(playerName);
-			MenuInstance newInstance = menuService.createMenuInstance(MenuManager.menus.get("instancesMenu"), "MenuManager-MenuMenu-" + playerName);
+			MenuInstance newInstance = menuService.createMenuInstance(MenuManager.menus.get("instancesMenu"), "MenuManager-InstancesMenu-" + playerName);
 			newInstance.addParameter("menu", menu);
 			menuService.openMenuInstance(newInstance, playerName);
 			break;
@@ -82,7 +82,7 @@ public class ManagerListener implements ActionListener{
 		
 	}
 	
-	private void handleMenuMenu(ActionEvent event){
+	private void handleInstancesMenu(ActionEvent event){
 		MenuInstance instance = event.getAction().getInstance();
 		String playerName = event.getAction().getPlayerName();
 		int type = (Integer) instance.getParameter(playerName + ":menuSpot");

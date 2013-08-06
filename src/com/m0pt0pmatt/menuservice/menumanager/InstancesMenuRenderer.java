@@ -23,9 +23,9 @@ import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Renderer;
 
-public class MenuMenuRenderer extends AbstractRenderer implements Renderer, Listener{
+public class InstancesMenuRenderer extends AbstractRenderer implements Renderer, Listener{
 	
-	public MenuMenuRenderer(MenuService menuService, Plugin plugin) {
+	public InstancesMenuRenderer(MenuService menuService, Plugin plugin) {
 		super(menuService);
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
