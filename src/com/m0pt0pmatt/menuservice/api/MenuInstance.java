@@ -1,8 +1,10 @@
 package com.m0pt0pmatt.menuservice.api;
 
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * A MenuInstance represents a single MenuImpletation for a given player.
@@ -24,6 +26,7 @@ public final class MenuInstance {
 	private Map<String, Object> parameters;
 	private Map<String, Renderer> renderers;
 	private Map<String, ActionListener> actionListeners;
+	private Set<String> highlightedButtons;
 	
 	/**
 	 * Creates a MenuInstance given a type and parameters
@@ -38,8 +41,23 @@ public final class MenuInstance {
 		this.parameters = parameters;
 		this.renderers = renderers;
 		this.actionListeners = actionListeners;
+		highlightedButtons = new HashSet<String>();
 	}
 
+	public boolean isHighlighted(String tag){
+		return highlightedButtons.contains(tag);
+	}
+	
+	public void highlightButton(String tag){
+		highlightedButtons.add(tag);
+		renderAll();
+	}
+	
+	public void unhighlightButton(String tag){
+		highlightedButtons.remove(tag);
+		renderAll();
+	}
+	
 	public String getName() {
 		return name;
 	}

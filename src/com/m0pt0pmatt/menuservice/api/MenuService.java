@@ -178,7 +178,7 @@ public interface MenuService {
 	 * Renderers can be assigned to Menus (and thus every MenuInstance of a menu) or individual MenuInstances.
 	 * @param renderer The Renderer to be added to the MenuService
 	 */
-	public void addRenderer(Renderer renderer);
+	public boolean addRenderer(Renderer renderer);
 	
 	/**
 	 * Returns a Renderer by name from the MenuService.

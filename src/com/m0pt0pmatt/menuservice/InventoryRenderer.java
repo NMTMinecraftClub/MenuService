@@ -10,6 +10,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -174,6 +176,31 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			}
 		}
 		meta.setLore(newLore);
+		
+		//highlight the item if needed
+		if (instance.isHighlighted(component.getTag())){
+			item.addUnsafeEnchantment(new Enchantment(100){
+
+				@Override
+				public boolean canEnchantItem(ItemStack item) {return true;}
+
+				@Override
+				public boolean conflictsWith(Enchantment other) {return false;}
+
+				@Override
+				public EnchantmentTarget getItemTarget() {return null;}
+
+				@Override
+				public int getMaxLevel() {return 0;}
+
+				@Override
+				public String getName() {return null;}
+
+				@Override
+				public int getStartLevel() {return 0;}
+				
+			}, 0);
+		}
 		
 		//set the metadata
 		item.setItemMeta(meta);

@@ -95,8 +95,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 		Logger.log(3, Level.INFO, "Maps initialized");
 		
 		//add Renderers
-		addRenderer(new InventoryRenderer(this, plugin));
-		Logger.log(1, Level.INFO, "InventoryRenderer loaded");
+		new InventoryRenderer(this, plugin);
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		Logger.log(3, Level.INFO, "MenuServiceProvider registered in Bukkit");
@@ -698,33 +697,35 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @param renderer The Renderer to be added to the MenuService
 	 */
 	@Override
-	public void addRenderer(Renderer renderer) {
+	public boolean addRenderer(Renderer renderer) {
 		
 		//check for null
 		if (renderer == null){
 			Logger.log(2, Level.SEVERE, LogMessage.NULLRENDERER, null);
 			Logger.log(2, Level.SEVERE, LogMessage.CANTADDRENDERER, null);
-			return;
+			return false;
 		}
 		
 		//check to make sure a MenuProvider of the same name isn't already loaded
 		if (renderersByName.containsKey(renderer.getName())){
 			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHRENDERER, renderer.getName());
 			Logger.log(2, Level.SEVERE, LogMessage.CANTADDRENDERER, renderer.getName());
-			return;
+			return false;
 		}
 		
 		//make sure Renderer is an extension of an AbstractRenderer
 		if (!(renderer instanceof AbstractRenderer)){
 			Logger.log(2, Level.SEVERE, LogMessage.RENDERERNOTABSTRACTRENDERER, renderer.getName());
 			Logger.log(2, Level.SEVERE, LogMessage.CANTADDRENDERER, renderer.getName());
-			return;
+			return false;
 		}
 		
 		//add the Renderer
 		renderersByName.put(renderer.getName(), renderer);
 		
 		Logger.log(2, Level.INFO, "Renderer " + renderer.getName() + " was added");
+		
+		return true;
 	}
 	
 	/**

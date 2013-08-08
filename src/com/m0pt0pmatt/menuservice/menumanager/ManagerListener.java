@@ -53,6 +53,11 @@ public class ManagerListener implements ActionListener{
 			menuService.openMenuInstance(newInstance, playerName);
 			break;
 		case MAIN_EDITMENU:
+			if (instance.isHighlighted("editButton")){
+				instance.unhighlightButton("editButton");
+			} else{
+				instance.highlightButton("editButton");
+			}
 			System.out.println("EDIT");
 			break;
 		case MAIN_OPENMENU:
