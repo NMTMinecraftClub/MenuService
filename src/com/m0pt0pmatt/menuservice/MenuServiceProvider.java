@@ -15,7 +15,6 @@ import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.configuration.MemorySection;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -31,6 +30,8 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Renderer;
+import com.m0pt0pmatt.menuservice.renderers.InventoryRenderer;
+import com.m0pt0pmatt.menuservice.renderers.TextRenderer;
 
 /**
  * The MenuServiceProvider is the provider for the Bukkit service MenuService.
@@ -96,6 +97,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//add Renderers
 		new InventoryRenderer(this, plugin);
+		new TextRenderer(this, plugin);
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		Logger.log(3, Level.INFO, "MenuServiceProvider registered in Bukkit");
@@ -1166,14 +1168,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return;
 		}
 		
-		if (MenuServicePlugin.binds.contains("materials")){
-			MemorySection materialSection = (MemorySection) MenuServicePlugin.binds.get("materials");
-			for (String m: materialSection.getKeys(false)){
-				MemorySection s = (MemorySection) materialSection.get(m);
-				
-
-			}
-		}
+//		if (MenuServicePlugin.binds.contains("materials")){
+//			MemorySection materialSection = (MemorySection) MenuServicePlugin.binds.get("materials");
+//			for (String m: materialSection.getKeys(false)){
+//				//MemorySection s = (MemorySection) materialSection.get(m);
+//				
+//
+//			}
+//		}
 	}
 
 	@Override

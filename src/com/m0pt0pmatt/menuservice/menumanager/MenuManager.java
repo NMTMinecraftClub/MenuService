@@ -12,17 +12,16 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
-import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.LogMessage;
 import com.m0pt0pmatt.menuservice.Logger;
+import com.m0pt0pmatt.menuservice.MenuServicePlugin;
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuComponent;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
-import com.m0pt0pmatt.menuservice.api.Renderer;
 
 /**
  * The MenuManager is an interactive menu that allows server admins to be able to manage the Menus for a server.
@@ -61,7 +60,7 @@ public class MenuManager {
 	 * @param menuService
 	 * @param plugin
 	 */
-	public MenuManager(MenuService menuService, Plugin plugin){
+	public MenuManager(MenuService menuService, MenuServicePlugin plugin){
 		
 		//store the MenuService
 		this.menuService = menuService;
@@ -93,13 +92,6 @@ public class MenuManager {
 		
 		//create the Component
 		MenuComponent menu = new MenuComponent();
-		
-		//add the "inventory" renderer
-		Renderer renderer = menuService.getRenderer("inventory");
-		if (renderer == null){
-			return null;
-		}
-		menu.addRenderer(renderer);
 		
 		//add the custom renderer
 		menu.addRenderer(mainMenuRenderer);
@@ -232,13 +224,6 @@ public class MenuManager {
 		//create the Component
 		MenuComponent menu = new MenuComponent();
 		
-		//add the "inventory" renderer
-		Renderer renderer = menuService.getRenderer("inventory");
-		if (renderer == null){
-			return null;
-		}
-		menu.addRenderer(renderer);
-		
 		//add the custom renderer
 		menu.addRenderer(instancesMenuRenderer);
 		
@@ -317,13 +302,6 @@ public class MenuManager {
 		//create the Component
 		MenuComponent menu = new MenuComponent();
 		
-		//add the "inventory" renderer
-		Renderer renderer = menuService.getRenderer("inventory");
-		if (renderer == null){
-			return null;
-		}
-		menu.addRenderer(renderer);
-		
 		//add the custom renderer
 
 		//add attributes to the menu		
@@ -334,8 +312,8 @@ public class MenuManager {
 		menu.addAttribute("autoSave", false);
 		
 		//add Components to the Menu
-		Component component;
-		List<Integer> actionTags;
+		//Component component;
+		//List<Integer> actionTags;
 		
 		return menu;
 	}

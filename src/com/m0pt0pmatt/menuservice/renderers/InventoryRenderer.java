@@ -1,4 +1,4 @@
-package com.m0pt0pmatt.menuservice;
+package com.m0pt0pmatt.menuservice.renderers;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -21,6 +21,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
+import com.m0pt0pmatt.menuservice.LogMessage;
+import com.m0pt0pmatt.menuservice.Logger;
+import com.m0pt0pmatt.menuservice.MenuServicePlugin;
 import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
 import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
@@ -30,7 +33,6 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
-import com.m0pt0pmatt.menuservice.menumanager.MenuType;
 
 /**
  * InventoryRenderer is a built in Renderer for MenuService.
@@ -556,86 +558,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		return false;
 	}
 	
-	/**
-	 * Checks if the player has permission to interact with the component
-	 * @param player
-	 * @param component
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private boolean hasPermissions(Player player, Component component){
-		if (component.hasAttribute("permissions")){
-			List<String> permissions = null;
-			try{
-				permissions = (List<String>) component.getAttribute("permissions");
-			} catch (ClassCastException e){
-				return true;
-			}
-			if (permissions == null){
-				return true;
-			}
-			for (String permission: permissions){
-				if (!player.hasPermission(permission)){
-					return false;
-				}
-			}
-			
-		}
-		
-		return true;
-	}
 	
-	/**
-	 * Checks if a player can activate a given action
-	 * @param player
-	 * @param action
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private boolean hasPermissions(Player player, ContainerAttribute action){
-		if (action.hasAttribute("permissions")){
-			List<String> permissions = null;
-			try{
-				permissions = (List<String>) action.getAttribute("permissions");
-			} catch (ClassCastException e){
-				return true;
-			}
-			if (permissions == null){
-				return true;
-			}
-			for (String permission: permissions){
-				if (!player.hasPermission(permission)){
-					return false;
-				}
-			}
-			
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Retrieves the CommandSender for the given placeholder
-	 * @param player the player who interacted with the action
-	 * @param sender the placeholder
-	 * @return
-	 */
-	private CommandSender getCommandSender(Player player, String sender){
-		CommandSender cSender;
-		if (sender == null){
-			cSender = null;
-		} else if (sender.equals("<server>")){
-			cSender = Bukkit.getServer().getConsoleSender();
-		} else if (sender.equals("<player>")){
-			cSender = player;
-		} else {
-			cSender = Bukkit.getPlayer(sender);
-		}
-		if (cSender == null){
-			cSender = player;
-		}
-		return cSender;
-	}
 
 	
 	

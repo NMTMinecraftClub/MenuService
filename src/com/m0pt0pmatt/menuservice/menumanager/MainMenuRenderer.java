@@ -9,13 +9,11 @@ import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
+import com.m0pt0pmatt.menuservice.MenuServicePlugin;
 import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
@@ -23,22 +21,23 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Renderer;
+import com.m0pt0pmatt.menuservice.renderers.InventoryRenderer;
 
 /**
  * The MainMenuRenderer is a custom Renderer for the Main Menu for the MenuManager
  * @author mbroomfield
  *
  */
-public class MainMenuRenderer extends AbstractRenderer implements Renderer, Listener{
+@SuppressWarnings("unused")
+public class MainMenuRenderer extends InventoryRenderer implements Renderer, Listener{
 	
 	/**
 	 * Creates a MainMenuRenderer
 	 * @param menuService
 	 * @param plugin
 	 */
-	public MainMenuRenderer(MenuService menuService, Plugin plugin) {
-		super(menuService);
-		Bukkit.getPluginManager().registerEvents(this, plugin);
+	public MainMenuRenderer(MenuService menuService, MenuServicePlugin plugin) {
+		super(menuService, plugin);
 	}
 
 	private int getIndex(int x, int y){
@@ -52,6 +51,7 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	 */
 	@Override
 	public void renderPlayer(MenuInstance menuInstance, String playerName) {
+		super.renderPlayer(menuInstance, playerName);
 		List<Menu> menus = getMenuService().getMenus();
 		
 		int y = 1;
@@ -89,13 +89,6 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	}
 
 	/**
-	 * Renders the MenuInstance for all players who are currently viewing the MenuInstance
-	 * @param menuInstance the MenuInstance to render
-	 */
-	@Override
-	public void renderAllPlayers(MenuInstance menuInstance) {}
-
-	/**
 	 * Returns the name of the Renderer.
 	 * No two Renderers can share the same name
 	 * @return the name of the Renderer
@@ -104,42 +97,14 @@ public class MainMenuRenderer extends AbstractRenderer implements Renderer, List
 	public String getName() {
 		return "MenuService-MenuManager-MainMenu";
 	}
-
-	/**
-	 * Closes whatever MenuInstance a player is viewing, assuming that the Renderer is providing for that player
-	 * @param playerName the name of the player
-	 */
-	@Override
-	public void closeMenu(String playerName) {
-		getPlayers().remove(playerName);
-	}
-	
-	/**
-	 * Closes the Menu when the player closes the Inventory
-	 * @param event
-	 */
-	@EventHandler
-	public void inventoryClose(InventoryCloseEvent event){
-		
-		//get the playerName
-		String playerName = event.getPlayer().getName();
-		
-		//check if the player was viewing the menu
-		if (!(getPlayers().containsKey(playerName))){
-			return;
-		}
-		
-		//remove the player
-		getPlayers().remove(playerName);
-	}
 	
 	/**
 	 * Handles when a player interacts with the Main Menu
 	 * @param event
 	 */
 	@EventHandler
+	@Override
 	public void inventoryClick(InventoryClickEvent event){	
-		
 		
 		//get the playerName
 		String playerName = event.getWhoClicked().getName();

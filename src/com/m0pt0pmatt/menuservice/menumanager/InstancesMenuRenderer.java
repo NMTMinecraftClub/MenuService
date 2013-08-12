@@ -3,18 +3,15 @@ package com.m0pt0pmatt.menuservice.menumanager;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
+import com.m0pt0pmatt.menuservice.MenuServicePlugin;
 import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
@@ -22,12 +19,12 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Renderer;
+import com.m0pt0pmatt.menuservice.renderers.InventoryRenderer;
 
-public class InstancesMenuRenderer extends AbstractRenderer implements Renderer, Listener{
+public class InstancesMenuRenderer extends InventoryRenderer implements Renderer, Listener{
 	
-	public InstancesMenuRenderer(MenuService menuService, Plugin plugin) {
-		super(menuService);
-		Bukkit.getPluginManager().registerEvents(this, plugin);
+	public InstancesMenuRenderer(MenuService menuService, MenuServicePlugin plugin) {
+		super(menuService, plugin);
 	}
 	
 	private int getIndex(int x, int y){
@@ -36,6 +33,7 @@ public class InstancesMenuRenderer extends AbstractRenderer implements Renderer,
 
 	@Override
 	public void renderPlayer(MenuInstance menuInstance, String playerName) {
+		super.renderPlayer(menuInstance, playerName);
 		
 		int x = 0;
 		int y = 1;
@@ -70,36 +68,8 @@ public class InstancesMenuRenderer extends AbstractRenderer implements Renderer,
 	}
 
 	@Override
-	public void renderAllPlayers(MenuInstance menuInstance) {}
-
-	@Override
 	public String getName() {
 		return "MenuService-MenuManager-MenuMenu";
-	}
-
-	@Override
-	public void closeMenu(String playerName) {
-		getPlayers().remove(playerName);
-	}
-	
-	///////////////////////
-	/**
-	 * Closes the Menu when the player closes the Inventory
-	 * @param event
-	 */
-	@EventHandler
-	public void inventoryClose(InventoryCloseEvent event){
-		
-		//get the playerName
-		String playerName = event.getPlayer().getName();
-		
-		//check if the player was viewing the menu
-		if (!(getPlayers().containsKey(playerName))){
-			return;
-		}
-		
-		//remove the player
-		getPlayers().remove(playerName);
 	}
 	
 	/**

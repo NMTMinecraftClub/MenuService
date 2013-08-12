@@ -11,11 +11,11 @@ import com.m0pt0pmatt.menuservice.api.MenuService;
 public class ManagerListener implements ActionListener{
 	
 	private MenuService menuService;
-	private MenuManager manager;
+	//private MenuManager manager;
 	
 	public ManagerListener(MenuService menuService, MenuManager manager){
 		this.menuService = menuService;
-		this.manager = manager;
+		//this.manager = manager;
 	}
 	
 	@Override
@@ -91,11 +91,11 @@ public class ManagerListener implements ActionListener{
 		MenuInstance instance = event.getAction().getInstance();
 		String playerName = event.getAction().getPlayerName();
 		int type = (Integer) instance.getParameter(playerName + ":menuSpot");
-		int spot = (Integer) instance.getParameter(playerName + ":slot");
+		//int spot = (Integer) instance.getParameter(playerName + ":slot");
 		
 		MenuType menuType = MenuType.getMenuType(type);
 		
-		Map<Integer, Menu> menuSpots;
+		//Map<Integer, Menu> menuSpots;
 		
 		switch (menuType){
 		case MENU_CREATEINSTANCE:

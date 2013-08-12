@@ -7,6 +7,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
+
 /**
  * An AbstractRenderer is a Basic Renderer that is designed to help other Renderers easier to create.
  * An AbstractRenderer does not Render or provide for any MenuInstance. It simple does housekeeping.
@@ -158,6 +162,87 @@ public abstract class AbstractRenderer implements Renderer{
 			i.remove();
 		}
 		
+	}
+	
+	/**
+	 * Checks if the player has permission to interact with the component
+	 * @param player
+	 * @param component
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean hasPermissions(Player player, Component component){
+		if (component.hasAttribute("permissions")){
+			List<String> permissions = null;
+			try{
+				permissions = (List<String>) component.getAttribute("permissions");
+			} catch (ClassCastException e){
+				return true;
+			}
+			if (permissions == null){
+				return true;
+			}
+			for (String permission: permissions){
+				if (!player.hasPermission(permission)){
+					return false;
+				}
+			}
+			
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Checks if a player can activate a given action
+	 * @param player
+	 * @param action
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean hasPermissions(Player player, ContainerAttribute action){
+		if (action.hasAttribute("permissions")){
+			List<String> permissions = null;
+			try{
+				permissions = (List<String>) action.getAttribute("permissions");
+			} catch (ClassCastException e){
+				return true;
+			}
+			if (permissions == null){
+				return true;
+			}
+			for (String permission: permissions){
+				if (!player.hasPermission(permission)){
+					return false;
+				}
+			}
+			
+		}
+		
+		return true;
+	}
+	
+	/**
+	 * Retrieves the CommandSender for the given placeholder
+	 * @param player the player who interacted with the action
+	 * @param sender the placeholder
+	 * @return
+	 */
+	protected CommandSender getCommandSender(Player player, String sender){
+		CommandSender cSender;
+		if (sender == null){
+			cSender = null;
+		} else if (sender.equals("<server>")){
+			cSender = Bukkit.getServer().getConsoleSender();
+		} else if (sender.equals("<player>")){
+			cSender = player;
+		} else {
+			cSender = Bukkit.getPlayer(sender);
+		}
+		if (cSender == null){
+			cSender = player;
+		}
+		return cSender;
 	}
 	
 }
