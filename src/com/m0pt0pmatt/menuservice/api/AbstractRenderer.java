@@ -31,7 +31,7 @@ public abstract class AbstractRenderer implements Renderer{
 
 	/**
 	 * Creates an AbstractRenderer.
-	 * Adds the AbstractRenderer to the MenuService
+	 * Does not add the AbstractRenderer to the MenuService
 	 * @param menuService
 	 */
 	public AbstractRenderer(MenuService menuService){
@@ -43,8 +43,6 @@ public abstract class AbstractRenderer implements Renderer{
 		//assign the menuService
 		this.menuService = menuService;
 		
-		//add the AbstractRenderer to the MenuService
-		menuService.addRenderer(this);
 	}
 	
 	/**
@@ -148,9 +146,7 @@ public abstract class AbstractRenderer implements Renderer{
 	public void closeAll() {
 		
 		//for every player
-		Iterator<Entry<String, MenuInstance>> i = players.entrySet().iterator();
-		while (i.hasNext()){
-			Entry<String, MenuInstance> entry = i.next();
+		for (Entry<String, MenuInstance> entry: players.entrySet()){
 			
 			//close the menu
 			this.closeMenu(entry.getKey());
@@ -158,8 +154,6 @@ public abstract class AbstractRenderer implements Renderer{
 			//remove the MenuInstance
 			this.removeMenuInstance(entry.getValue());
 			
-			//remove the player entry
-			i.remove();
 		}
 		
 	}

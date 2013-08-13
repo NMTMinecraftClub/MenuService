@@ -8,9 +8,7 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.DyeColor;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
 import com.m0pt0pmatt.menuservice.LogMessage;
@@ -69,18 +67,23 @@ public class MenuManager {
 		mainMenuRenderer = new MainMenuRenderer(menuService, plugin);
 		instancesMenuRenderer = new InstancesMenuRenderer(menuService, plugin);
 		
+		//add the Renderers
+		menuService.addRenderer(mainMenuRenderer);
+		menuService.addRenderer(instancesMenuRenderer);
+		
 		//Create the Menus
 		menus = new HashMap<String, Menu>();
 		menus.put("mainMenu", buildMainMenu());
 		menus.put("instancesMenu", buildInstancesMenu());
 		menus.put("playersMenu", buildPlayersMenu());
 		
-		managerListener = new ManagerListener(menuService, this);
-		
 		//Add the Menus to the MenuService
 		for (Menu menu: menus.values()){
 			menuService.addMenu(plugin, menu);
 		}
+		
+		//create the listener
+		managerListener = new ManagerListener(menuService, this);
 
 	}
 
@@ -103,7 +106,6 @@ public class MenuManager {
 		menu.addAttribute("title", "Menu Manager: Main Menu");
 		menu.addAttribute("autoSave", false);
 		
-		
 		//add Components to the Menu
 		Component component;
 		List<Integer> actionTags;
@@ -116,7 +118,7 @@ public class MenuManager {
 		actionTags = new LinkedList<Integer>();
 		actionTags.add(MenuType.MAIN_EDITMENU.getType());
 		component.addAction("leftClick", actionTags);
-		component.addAttribute("item", new ItemStack(Material.WHEAT));
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 0);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);

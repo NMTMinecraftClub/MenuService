@@ -96,8 +96,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		Logger.log(3, Level.INFO, "Maps initialized");
 		
 		//add Renderers
-		new InventoryRenderer(this, plugin);
-		new TextRenderer(this, plugin);
+		this.addRenderer(new InventoryRenderer(this, plugin));
+		this.addRenderer(new TextRenderer(this, plugin));
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		Logger.log(3, Level.INFO, "MenuServiceProvider registered in Bukkit");

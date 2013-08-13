@@ -11,7 +11,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.enchantments.Enchantment;
-import org.bukkit.enchantments.EnchantmentTarget;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -59,7 +58,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	 * @return the Inventory created
 	 */
 	private Inventory createInventory(MenuInstance instance){
-		
+				
 		if (instance == null){
 			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
 			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, null);
@@ -97,6 +96,9 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		
 		//create the inventory
+		if (title.length() > 32){
+			title = title.substring(0, 31);
+		}
 		Inventory inventory = Bukkit.createInventory(null, size, title);
 		if (inventory == null){
 			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, instance.getName());
@@ -114,8 +116,10 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		
 		//add the created inventory as a parameter
-		instance.getParameters().put("inventory", inventory);
-		
+		if (instance.hasParameter("inventory")){
+			instance.removeParameter("inventory");
+		}
+		instance.addParameter("inventory", inventory);		
 		return inventory;
 	}
 	
@@ -181,27 +185,9 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		//highlight the item if needed
 		if (instance.isHighlighted(component.getTag())){
-			item.addUnsafeEnchantment(new Enchantment(100){
-
-				@Override
-				public boolean canEnchantItem(ItemStack item) {return true;}
-
-				@Override
-				public boolean conflictsWith(Enchantment other) {return false;}
-
-				@Override
-				public EnchantmentTarget getItemTarget() {return null;}
-
-				@Override
-				public int getMaxLevel() {return 0;}
-
-				@Override
-				public String getName() {return null;}
-
-				@Override
-				public int getStartLevel() {return 0;}
-				
-			}, 0);
+			meta.addEnchant(Enchantment.WATER_WORKER, 1, true);
+		} else{
+			meta.removeEnchant(Enchantment.WATER_WORKER);
 		}
 		
 		//set the metadata
@@ -290,6 +276,9 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		for (String player: instance.getPlayers()){
 			Bukkit.getPlayer(player).openInventory(inv);
 			this.getPlayers().put(player, instance);
+			if (!instance.hasPlayer(player)){
+				instance.getPlayers().add(player);
+			}
 		}
 		
 	}
@@ -322,10 +311,14 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		
 		//open the inventory
+		Bukkit.getPlayer(playerName).closeInventory();
 		Bukkit.getPlayer(playerName).openInventory(inv);
 		
 		//add the player for bookkeeping
 		this.getPlayers().put(playerName, instance);
+		if (!instance.hasPlayer(playerName)){
+			instance.getPlayers().add(playerName);
+		}
 	}
 
 	/**

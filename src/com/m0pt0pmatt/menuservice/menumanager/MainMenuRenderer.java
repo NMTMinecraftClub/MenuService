@@ -87,6 +87,17 @@ public class MainMenuRenderer extends InventoryRenderer implements Renderer, Lis
 		getPlayers().put(playerName, menuInstance);
 		
 	}
+	
+	/**
+	 * Renders the MenuInstance for all players who are currently viewing the MenuInstance
+	 * @param menuInstance the Menuinstance to render
+	 */
+	@Override
+	public void renderAllPlayers(MenuInstance instance) {
+		for (String player: instance.getPlayers()){
+			this.renderPlayer(instance, player);
+		}
+	}
 
 	/**
 	 * Returns the name of the Renderer.
@@ -122,6 +133,7 @@ public class MainMenuRenderer extends InventoryRenderer implements Renderer, Lis
 		
 		//get the spot
 		int spot = event.getSlot();
+		instance.addParameter(playerName + ":" + "slot", spot);
 		switch (spot){
 		case 0:
 			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MAIN_EDITMENU.getType());

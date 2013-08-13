@@ -58,6 +58,32 @@ public final class MenuInstance {
 		renderAll();
 	}
 	
+	public Set<String> getHighlightedButtons(){
+		return highlightedButtons;
+	}
+	
+	public void unhighlightAllButtons(){
+		highlightedButtons.clear();
+		renderAll();
+	}
+	
+	public void toggleHighlightedButton(String tag){
+		if (isHighlighted(tag)){
+			unhighlightButton(tag);
+		} else{
+			highlightButton(tag);
+		}
+	}
+	
+	public void toggleAndRemoveOtherHighlights(String tag){
+		if (isHighlighted(tag)){
+			unhighlightAllButtons();
+		} else{
+			unhighlightAllButtons();
+			highlightButton(tag);
+		}
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -179,7 +205,6 @@ public final class MenuInstance {
 	
 	public void renderPlayer(String playerName){
 		for (Renderer renderer: menu.getRenderers()){
-			System.out.println("Ren: " + renderer.getName());
 			renderer.renderPlayer(this, playerName);
 		}
 		for (Renderer renderer: renderers.values()){

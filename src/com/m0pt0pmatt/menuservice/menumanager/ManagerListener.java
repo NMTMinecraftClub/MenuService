@@ -1,7 +1,10 @@
 package com.m0pt0pmatt.menuservice.menumanager;
 
 import java.util.Map;
+import java.util.logging.Level;
 
+import com.m0pt0pmatt.menuservice.LogMessage;
+import com.m0pt0pmatt.menuservice.Logger;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Menu;
@@ -34,7 +37,17 @@ public class ManagerListener implements ActionListener{
 	@SuppressWarnings("unchecked")
 	private void handleMainMenu(ActionEvent event){
 		MenuInstance instance = event.getAction().getInstance();
+		if (instance == null){
+			Logger.log(2, Level.WARNING, LogMessage.NULLMENUINSTANCE, null);
+			return;
+		}
+		
 		String playerName = event.getAction().getPlayerName();
+		if (playerName == null){
+			Logger.log(2, Level.WARNING, LogMessage.NULLPLAYERNAME, null);
+			return;
+		}
+		
 		int type = (Integer) instance.getParameter(playerName + ":menuSpot");
 		int spot = (Integer) instance.getParameter(playerName + ":slot");
 		
@@ -53,32 +66,35 @@ public class ManagerListener implements ActionListener{
 			menuService.openMenuInstance(newInstance, playerName);
 			break;
 		case MAIN_EDITMENU:
-			if (instance.isHighlighted("editButton")){
-				instance.unhighlightButton("editButton");
-			} else{
-				instance.highlightButton("editButton");
-			}
+			instance.toggleAndRemoveOtherHighlights("editButton");
 			System.out.println("EDIT");
 			break;
 		case MAIN_OPENMENU:
+			instance.toggleAndRemoveOtherHighlights("openButton");
 			System.out.println("OPEN");
 			break;
 		case MAIN_CLOSEMENU:
+			instance.toggleAndRemoveOtherHighlights("closeButton");
 			System.out.println("CLOSE");
 			break;
 		case MAIN_LOADMENU:
+			instance.toggleAndRemoveOtherHighlights("loadButton");
 			System.out.println("LOAD");
 			break;
 		case MAIN_SAVEMENU:
+			instance.toggleAndRemoveOtherHighlights("saveButton");
 			System.out.println("SAVE");
 			break;
 		case MAIN_RELOADMENU:
+			instance.toggleAndRemoveOtherHighlights("reloadButton");
 			System.out.println("RELOAD");
 			break;
 		case MAIN_UNLOADMENU:
+			instance.toggleAndRemoveOtherHighlights("unloadButton");
 			System.out.println("UNLOAD");
 			break;
 		case MAIN_HELP:
+			instance.toggleAndRemoveOtherHighlights("helpButton");
 			System.out.println("HELP");
 			break;
 		default:
