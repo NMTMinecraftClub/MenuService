@@ -411,6 +411,10 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			return;
 		}
 		
+		if (event.getRawSlot() >= 54 || event.getRawSlot() < 0){
+			return;
+		}
+		
 		//get the instance and the menu
 		MenuInstance instance = getPlayers().get(playerName);
 		if (instance == null){

@@ -137,6 +137,11 @@ public class MenuServiceProvider implements MenuService, Listener{
 			for (ActionListener listener: instance.getActionListeners().values()){
 				listener.playerCountZero(instance, playerName);
 			}
+			if (instance.hasParameter("removeOnEmpty")){
+				if ((Boolean)instance.getParameter("removeOnEmpty")){
+					this.removeMenuInstance(instance);
+				}
+			}
 		}
 		
 		//unregister the player from the MenuInstance
@@ -267,6 +272,11 @@ public class MenuServiceProvider implements MenuService, Listener{
 			Logger.log(2, Level.INFO, "Run " + menu.getName() + " with the command: /" + command);
 		}
 		
+		//add a default renderer if it has none
+		if (menu.getRenderers().size() == 0){
+			menu.addRenderer(this.getRenderer("inventory"));
+		}
+		
 		return true;
 	}
 
@@ -351,7 +361,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @param menu the Menu to remove
 	 */
 	@Override
-	public void removeMenu(Plugin plugin, Menu menu) {
+	public void removeMenu(Menu menu) {
 		
 		//check menu
 		if (menu == null){
@@ -360,28 +370,26 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return;
 		}
 		
-		//check plugin
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENU, menu.getName());
-		}
-		
-		//check if plugin is correct
-		if (!plugin.getName().equals(menu.getAttribute("plugin"))){
-			Logger.log(2, Level.SEVERE, LogMessage.WRONGMENU, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENU, menu.getName());
-			return;
-		}
-		
-		//remove the menu
-		menusByName.remove(menu.getName());
-		
 		//remove all of the MenuInstances for the Menu
 		List<MenuInstance> instances = menusToInstances.remove(menu);
 		for (MenuInstance instance: instances){
 			this.removeMenuInstance(instance);
 		}
 		
+		//remove all commands
+		Iterator<Entry<String, Menu>> i = this.commandsToMenus.entrySet().iterator();
+		while (i.hasNext()){
+			if (i.next().getValue().equals(menu)){
+				i.remove();
+			}
+		}
+		
+		//remove all binds
+		this.unbindMenu(menu);
+		
+		//remove the menu
+		menusByName.remove(menu.getName());
+				
 		this.plugin.getLogger().warning("Removed Menu " + menu.getName());
 	}
 
@@ -411,7 +419,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		if (plugin.getName().equals(menu.getAttribute("plugin"))){
 			//remove the menu
-			removeMenu(plugin, menu);
+			removeMenu(menu);
 			Logger.log(2, Level.SEVERE, "Removed menu " + menuName);
 			return menu;
 		}
@@ -500,8 +508,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return;
 		}
 		
-		if (!menusToInstances.containsKey(instance.getMenu())){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, instance.getName());
+		if (!menusToInstances.containsValue(instance.getMenu())){
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, instance.getMenu().getName());
 			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENUINSTANCE, instance.getName());
 			return;
 		}
@@ -584,8 +592,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 			}
 		}
 		
-		Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENUINSTANCE, instanceName);
-		Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENUINSTANCE, instanceName);
 		return null;
 	}
 
@@ -991,8 +997,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public void saveMenus() {
 		for (Menu menu: menusByName.values()){
 			
-			if (menu.hasAttribute("autoSave")){
-				if (!(Boolean) menu.getAttribute("autoSave")){
+			if (menu.hasAttribute("dynamic")){
+				if ((Boolean) menu.getAttribute("dynamic")){
 					continue;
 				}
 			}
@@ -1049,8 +1055,13 @@ public class MenuServiceProvider implements MenuService, Listener{
 			if (command.equals(entry.getKey())){
 								
 				//commands match. Start Menu
-				MenuInstance instance = createMenuInstance(entry.getValue(), player.getName() + ": " + entry.getValue().getName());
-				openMenuInstance(instance, player.getName());
+				if (this.hasMenuInstance(entry.getValue(),  player.getName() + ": " + entry.getValue().getName())){
+					openMenuInstance(this.getMenuInstance(entry.getValue(),  player.getName() + ": " + entry.getValue().getName()), player.getName());
+				} else {
+					MenuInstance instance = createMenuInstance(entry.getValue(), player.getName() + ": " + entry.getValue().getName());
+					instance.addParameter("removeOnEmpty", true);
+					openMenuInstance(instance, player.getName());
+				}
 				return true;
 			}
 		}
@@ -1130,10 +1141,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 				if (menu == null){
 					continue;
 				}
-				
-				//attach the default renderer
-				Renderer renderer = this.getRenderer("inventory");
-				menu.addRenderer(renderer);
 				
 				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
 			}
@@ -1228,5 +1235,55 @@ public class MenuServiceProvider implements MenuService, Listener{
 		}
 		
 	}
+
+
+	@Override
+	public void reloadMenus() {
+		List<Menu> menusToReload = new LinkedList<Menu>();
+		
+		for (Menu menu: menusByName.values()){
+			if (menu.hasAttribute("dynamic")){
+				if ((Boolean)menu.getAttribute("dynamic") == true){
+					continue;
+				}
+			}
+			menusToReload.add(menu);
+		}
+		
+		for (Menu menu: menusToReload){
+			this.reloadMenu(menu);
+		}
+	}
+
+
+	@Override
+	public List<Menu> unloadMenus() {
+		List<Menu> list = new LinkedList<Menu>();
+		
+		for (Menu menu: menusByName.values()){
+			if (menu.hasAttribute("permanent")){
+				if ((Boolean)menu.getAttribute("permanent") == true){
+					continue;
+				}
+			}
+			list.add(menu);
+		}
+		for (Menu menu: list){
+			this.removeMenu(menu);
+		}
+		
+		return list;
+	}
+
+
+	@Override
+	public void reloadMenu(Menu menu) {
+		String name = menu.getName();
+		String pluginName = menu.getPlugin();
+		this.removeMenu(menu);
+		this.loadMenu(Bukkit.getPluginManager().getPlugin(pluginName), name);
+	}
+
+
 
 }

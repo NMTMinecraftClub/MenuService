@@ -90,31 +90,41 @@ public class InstancesMenuRenderer extends InventoryRenderer implements Renderer
 		//cancel the event
 		event.setCancelled(true);
 		
+		if (event.getRawSlot() >= 54 || event.getRawSlot() < 0){
+			return;
+		}
+		
 		//get the instance
 		MenuInstance instance = getPlayers().get(playerName);
 		
-		//get the spot
+		//get the spot which was clicked and add it to the instance
 		int spot = event.getSlot();
-		switch (spot){
-		case 0:
-			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MENU_CREATEINSTANCE.getType());
-			activateListeners(instance, MenuType.MENUMENU.getType(), playerName, "leftClick");
-			return;
-		case 1:
-			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MENU_OPENINSTANCE.getType());
-			activateListeners(instance, MenuType.MENUMENU.getType(), playerName, "leftClick");
-			return;
-		case 2:
-			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MENU_CLOSEINSTANCE.getType());
-			activateListeners(instance, MenuType.MENUMENU.getType(), playerName, "leftClick");
-			return;
-		case 3:
-			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MENU_REMOVEINSTANCE.getType());
-			activateListeners(instance, MenuType.MENUMENU.getType(), playerName, "leftClick");
-			return;
-		default:
-			instance.addParameter(playerName + ":" + "menuSpot", MenuType.MENU_INSTANCECLICKED.getType());
-			activateListeners(instance, MenuType.MENUMENU.getType(), playerName, "leftClick");
+		instance.addParameter(playerName + ":" + "slot", spot);
+		
+		if (spot >= 0 && spot < 6){
+			
+			//player clicked a command
+			activateListeners(instance, spot, playerName, "leftClick");
+		} else if (spot == MenuManager.getIndex(0, 8)){
+			
+			//player clicked the left button
+			activateListeners(instance, InstancesMenuButtons.MENU_LEFTBUTTON.getType(), playerName, "leftClick");
+		} else if (spot == MenuManager.getIndex(8, 8)){
+			
+			//player clicked the right button
+			activateListeners(instance, InstancesMenuButtons.MENU_RIGHTBUTTON.getType(), playerName, "leftClick");
+		} else if (spot == MenuManager.getIndex(7, 8)){
+			
+			//player clicked the back button
+			activateListeners(instance, InstancesMenuButtons.MENU_BACKBUTTON.getType(), playerName, "leftClick");
+		} else{
+			
+			//did the player click a menu?
+			if (event.getInventory().getItem(event.getSlot()) != null){
+				
+				//player clicked a menu
+				activateListeners(instance, MainMenuButtons.MAIN_MENUCLICKED.getType(), playerName, "leftClick");
+			}
 		}
 
 	}

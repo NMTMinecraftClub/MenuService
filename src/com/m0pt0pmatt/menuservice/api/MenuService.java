@@ -70,10 +70,9 @@ public interface MenuService {
 	
 	/**
 	 * Removes a Menu from the MenuService. This does not save the menu to file.
-	 * @param plugin The Plugin which owns the Menu.
 	 * @param menu the Menu to remove
 	 */
-	public void removeMenu(Plugin plugin, Menu menu);
+	public void removeMenu(Menu menu);
 	
 	/**
 	 * Removes a Menu from the MenuService. This does not save the menu to file.
@@ -267,9 +266,23 @@ public interface MenuService {
 	 */
 	public void closeMenus();
 	
+	/**
+	 * Reloads all Menus
+	 */
+	public void reloadMenus();
+	
+	public void reloadMenu(Menu menu);
+
+	/**
+	 * Unloads all Menus
+	 */
+	public List<Menu> unloadMenus();
+		
 	public void loadMenus();
 	
 	public void loadBinds();
 	
 	public void saveBinds();
+
+	
 }

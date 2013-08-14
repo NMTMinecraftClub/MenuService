@@ -49,9 +49,14 @@ public class MenuManager {
 	private static InstancesMenuRenderer instancesMenuRenderer;
 	
 	/**
-	 * The Listener for the MenuManager
+	 * The Listener for the MainMenu
 	 */
-	private static ManagerListener managerListener;
+	protected static MainMenuListener mainMenuListener;
+	
+	/**
+	 * The Listener for the InstancesMenu
+	 */
+	protected static InstancesMenuListener instancesMenuListener;
 	
 	/**
 	 * Creates a Menu Manager
@@ -82,16 +87,16 @@ public class MenuManager {
 			menuService.addMenu(plugin, menu);
 		}
 		
-		//create the listener
-		managerListener = new ManagerListener(menuService, this);
-
+		//create the listeners
+		mainMenuListener = new MainMenuListener(menuService, this);
+		instancesMenuListener = new InstancesMenuListener(menuService, this);
 	}
 
 	/**
 	 * Builds the Main Menu
 	 * @return the Main Menu
 	 */
-	public Menu buildMainMenu(){
+	private Menu buildMainMenu(){
 		
 		//create the Component
 		MenuComponent menu = new MenuComponent();
@@ -104,7 +109,8 @@ public class MenuManager {
 		menu.setTag("MenuService-MenuManager-MainMenu");
 		menu.addAttribute("size", 6);
 		menu.addAttribute("title", "Menu Manager: Main Menu");
-		menu.addAttribute("autoSave", false);
+		menu.addAttribute("dynamic", true);
+		menu.addAttribute("permanent", true);
 		
 		//add Components to the Menu
 		Component component;
@@ -116,7 +122,7 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Edit a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_EDITMENU.getType());
+		actionTags.add(MainMenuButtons.MAIN_EDITMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 0);
@@ -129,7 +135,7 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Open a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_OPENMENU.getType());
+		actionTags.add(MainMenuButtons.MAIN_OPENMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 1);
@@ -142,23 +148,10 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Close a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_CLOSEMENU.getType());
+		actionTags.add(MainMenuButtons.MAIN_CLOSEMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 2);
-		component.addAttribute("y", 0);
-		menu.addComponent(component);
-		
-		//add "load" component
-		component = new AbstractComponent();
-		component.setTag("loadButton");
-		component.setType("button");
-		component.addAttribute("text", "Load a Menu");
-		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_LOADMENU.getType());
-		component.addAction("leftClick", actionTags);
-		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
-		component.addAttribute("x", 3);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -168,7 +161,20 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Save a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_SAVEMENU.getType());
+		actionTags.add(MainMenuButtons.MAIN_SAVEMENU.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 3);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
+		
+		//add "saveAll" component
+		component = new AbstractComponent();
+		component.setTag("saveAllButton");
+		component.setType("button");
+		component.addAttribute("text", "Save All Menus");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(MainMenuButtons.MAIN_SAVEALL.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 4);
@@ -181,10 +187,23 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Reload a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_RELOADMENU.getType());
+		actionTags.add(MainMenuButtons.MAIN_RELOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 5);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
+		
+		//add "reloadAll" component
+		component = new AbstractComponent();
+		component.setTag("reloadButton");
+		component.setType("button");
+		component.addAttribute("text", "Reload All Menus");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(MainMenuButtons.MAIN_RELOADALL.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 6);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -194,23 +213,23 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Unload a Menu");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_UNLOADMENU.getType());
-		component.addAction("leftClick", actionTags);
-		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
-		component.addAttribute("x", 6);
-		component.addAttribute("y", 0);
-		menu.addComponent(component);
-		
-		//add "help" component
-		component = new AbstractComponent();
-		component.setTag("helpButton");
-		component.setType("button");
-		component.addAttribute("text", "Help");
-		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_HELP.getType());
+		actionTags.add(MainMenuButtons.MAIN_UNLOADMENU.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 7);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
+		
+		//add "unloadAll" component
+		component = new AbstractComponent();
+		component.setTag("unloadAllButton");
+		component.setType("button");
+		component.addAttribute("text", "Unload All Menus");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(MainMenuButtons.MAIN_UNLOADALL.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 8);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -234,19 +253,20 @@ public class MenuManager {
 		menu.addAttribute("size", 6);
 		menu.setTag("MenuService-MenuManager-InstancesMenu");
 		menu.addAttribute("title", "MenuService Menu Manager: Instances");
-		menu.addAttribute("autoSave", false);
+		menu.addAttribute("dynamic", true);
+		menu.addAttribute("permanent", true);
 		
 		//add Components to the Menu
 		Component component;
 		List<Integer> actionTags;
 		
-		//add "create" component
+		//add "edit" component
 		component = new AbstractComponent();
-		component.setTag("createButton");
+		component.setTag("editButton");
 		component.setType("button");
-		component.addAttribute("text", "Create Instance");
+		component.addAttribute("text", "Edit Instance");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_HELP.getType());
+		actionTags.add(InstancesMenuButtons.MENU_EDITINSTANCE.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 0);
@@ -259,7 +279,7 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Open Instance");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_HELP.getType());
+		actionTags.add(InstancesMenuButtons.MENU_OPENINSTANCE.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 1);
@@ -272,10 +292,23 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Close Instance");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_HELP.getType());
+		actionTags.add(InstancesMenuButtons.MENU_CLOSEINSTANCE.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
 		component.addAttribute("x", 2);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
+		
+		//add "closeALL" component
+		component = new AbstractComponent();
+		component.setTag("closeAllButton");
+		component.setType("button");
+		component.addAttribute("text", "Close All Instances");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(InstancesMenuButtons.MENU_CLOSEALL.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 3);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
@@ -285,13 +318,25 @@ public class MenuManager {
 		component.setType("button");
 		component.addAttribute("text", "Remove Instance");
 		actionTags = new LinkedList<Integer>();
-		actionTags.add(MenuType.MAIN_HELP.getType());
+		actionTags.add(InstancesMenuButtons.MENU_REMOVEINSTANCE.getType());
 		component.addAction("leftClick", actionTags);
 		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
-		component.addAttribute("x", 3);
+		component.addAttribute("x", 4);
 		component.addAttribute("y", 0);
 		menu.addComponent(component);
 		
+		//add "removeAll" component
+		component = new AbstractComponent();
+		component.setTag("removeAllButton");
+		component.setType("button");
+		component.addAttribute("text", "Remove All Instances");
+		actionTags = new LinkedList<Integer>();
+		actionTags.add(InstancesMenuButtons.MENU_REMOVEALL.getType());
+		component.addAction("leftClick", actionTags);
+		component.addAttribute("item", new Wool(DyeColor.ORANGE).toItemStack());
+		component.addAttribute("x", 5);
+		component.addAttribute("y", 0);
+		menu.addComponent(component);
 		return menu;
 	}
 	
@@ -311,7 +356,8 @@ public class MenuManager {
 		menu.addAttribute("size", 6);
 		menu.setTag("MenuService-MenuManager-PlayersMenu");
 		menu.addAttribute("title", "MenuService Menu Manager: Players");
-		menu.addAttribute("autoSave", false);
+		menu.addAttribute("dynamic", true);
+		menu.addAttribute("permanent", true);
 		
 		//add Components to the Menu
 		//Component component;
@@ -340,10 +386,14 @@ public class MenuManager {
 			Logger.log(2, Level.SEVERE, LogMessage.CANTSHOWMAINMENU, player.getName());
 			return false;
 		}
-		instance.addActionListener(managerListener);
+		instance.addActionListener(mainMenuListener);
 		
 		return menuService.openMenuInstance(instance, player.getName());
 	}
 
+	public static int getIndex(int x, int y){
+		return ((9 * y) + x);
+	}
+	
 	
 }
