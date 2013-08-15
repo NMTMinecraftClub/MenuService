@@ -132,6 +132,9 @@ public class MenuServiceProvider implements MenuService, Listener{
 		//remove the player from the instance
 		instance.removePlayer(playerName);
 		
+		//unregister the player from the MenuInstance
+		this.playersToInstances.remove(playerName);
+		
 		//if there are no more players for the instance, notify the ActionListeners
 		if (instance.getPlayers().size() == 0){
 			for (ActionListener listener: instance.getActionListeners().values()){
@@ -144,8 +147,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			}
 		}
 		
-		//unregister the player from the MenuInstance
-		this.playersToInstances.remove(playerName);
+		
 		
 		this.plugin.getLogger().info("MenuInstance closed for player " + playerName);
 	}
@@ -181,9 +183,10 @@ public class MenuServiceProvider implements MenuService, Listener{
 		}		
 		
 		//load the file
-		Menu menu = yamlBuilder.loadYAML(plugin, fileName);
+		Menu menu = yamlBuilder.loadMenu(plugin, fileName);
+
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, fileName);
+			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHFILE, fileName);
 			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, fileName);
 			return null;
 		}
@@ -508,7 +511,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return;
 		}
 		
-		if (!menusToInstances.containsValue(instance.getMenu())){
+		if (!menusToInstances.containsKey(instance.getMenu())){
 			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, instance.getMenu().getName());
 			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENUINSTANCE, instance.getName());
 			return;

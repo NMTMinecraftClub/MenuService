@@ -11,6 +11,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
+
 /**
  * An AbstractRenderer is a Basic Renderer that is designed to help other Renderers easier to create.
  * An AbstractRenderer does not Render or provide for any MenuInstance. It simple does housekeeping.

@@ -3,6 +3,9 @@ package com.m0pt0pmatt.menuservice.api;
 import java.util.List;
 import java.util.Map;
 
+import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
+import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
+
 /**
  * A MenuComponent is a part of a Menu.
  * Components must have a type. This allows Renderers to know how to render them.
@@ -77,6 +80,8 @@ public interface Component {
 	 */
 	public void addAttribute(String name, Object value);
 	
+	public void addAttribute(Attribute attribute, Object value);
+	
 	/**
 	 * Returns a given attribute of the Component
 	 * @param name the name of the attribute
@@ -84,12 +89,16 @@ public interface Component {
 	 */
 	public Object getAttribute(String name);
 	
+	public Object getAttribute(Attribute attribute);
+	
 	/**
 	 * Returns a given attribute of the Component
 	 * @param name the name of the attribute
 	 * @return the attribute if it exists, otherwise null
 	 */
-	public ContainerAttribute getConatinerAttribute(String name);
+	public ContainerAttribute getContainerAttribute(String name);
+	
+	public ContainerAttribute getContainerAttribute(Attribute attribute);
 	
 	/**
 	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter

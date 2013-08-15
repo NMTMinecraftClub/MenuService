@@ -27,11 +27,11 @@ import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
 import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
-import com.m0pt0pmatt.menuservice.api.ContainerAttribute;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
+import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
 /**
  * InventoryRenderer is a built in Renderer for MenuService.

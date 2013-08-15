@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
+import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
+
 /**
  * A AbstractComponent is a basic implementation of a Component.
  * A AbstractComponent is designed to be extended for other ComponentTypes, but this is not necessary.
@@ -114,6 +117,16 @@ public class AbstractComponent implements Component{
 		attributes.put(name, value);
 	}
 	
+	@Override
+	public void addAttribute(Attribute attribute, Object value) {
+		if (!value.getClass().equals(attribute.getAttributeClass())){
+			return;
+		}
+		
+		attributes.put(attribute.getName(), value);
+		
+	}
+	
 	/**
 	 * Returns a given attribute of the Component
 	 * @param name
@@ -124,19 +137,38 @@ public class AbstractComponent implements Component{
 		return attributes.get(name);
 	}
 	
+	@Override
+	public Object getAttribute(Attribute attribute) {
+		Object o = attributes.get(attribute.getName());
+		if (o.getClass().equals(attribute.getClass())){
+			return o;
+		}
+		return null;
+	}
+	
 	/**
 	 * Returns a given attribute of the Component
 	 * @param name the name of the attribute
 	 * @return the attribute if it exists, otherwise null
 	 */
 	@Override
-	public ContainerAttribute getConatinerAttribute(String name){
+	public ContainerAttribute getContainerAttribute(String name){
 		Object attribute = getAttribute(name);
 		if (attribute instanceof ContainerAttribute){
 			return (ContainerAttribute) attribute;
 		}
 		return null;
 	}
+	
+	@Override
+	public ContainerAttribute getContainerAttribute(Attribute a) {
+		Object attribute = getAttribute(a.getName());
+		if (attribute instanceof ContainerAttribute){
+			return (ContainerAttribute) attribute;
+		}
+		return null;
+	}
+	
 	
 	/**
 	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
@@ -266,7 +298,7 @@ public class AbstractComponent implements Component{
 			return false;
 		}
 		
-		ContainerAttribute actions = this.getConatinerAttribute("actions");
+		ContainerAttribute actions = this.getContainerAttribute("actions");
 		if (actions == null){
 			return false;
 		}
@@ -289,7 +321,7 @@ public class AbstractComponent implements Component{
 			return null;
 		}
 		
-		ContainerAttribute actions = this.getConatinerAttribute("actions");
+		ContainerAttribute actions = this.getContainerAttribute("actions");
 		if (actions == null){
 			return null;
 		}
@@ -300,5 +332,9 @@ public class AbstractComponent implements Component{
 		
 		return null;
 	}
+
+	
+
+	
 	
 }

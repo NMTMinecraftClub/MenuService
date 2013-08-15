@@ -14,9 +14,9 @@ import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
 import com.m0pt0pmatt.menuservice.api.Component;
-import com.m0pt0pmatt.menuservice.api.ContainerAttribute;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuComponent;
+import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
 /**
  * This class converts a YAML file into a MenuObject, or a MenuObject into a YAML file
@@ -101,6 +101,10 @@ class YAMLBuilder {
 			}
 		}
 		
+	}
+	
+	public Menu loadMenu(Plugin plugin, String menuName){
+		return loadYAML(plugin, menuName + ".yml");
 	}
 
 	public Menu loadYAML(Plugin plugin, String fileName){

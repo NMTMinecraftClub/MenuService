@@ -32,6 +32,7 @@ public enum LogMessage {
 	NOSUCHRENDERER ("Error: The specified Renderer is not loaded in the MenuService"),
 	NOSUCHMENUINSTANCE ("Error: The specified MenuInstance is not loaded in the MenuService"),
 	NOSUCHPLAYER ("Error: The specified Player does not exist"),
+	NOSUCHFILE ("Error: the specified file does not exist"),
 	
 	WRONGMENU ("Error: The Menu is loaded but under a different plugin"),
 	
