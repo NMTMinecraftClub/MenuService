@@ -36,7 +36,7 @@ public class CommandHandler {
 	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
 		
 		//make sure the command is for MenuService
-		if (!cmd.getName().equalsIgnoreCase(plugin.getName())){
+		if (!Keyword.is(Keyword.MENUSERVICE, cmd.getName())){
 			return false;
 		}
 		
@@ -46,68 +46,68 @@ public class CommandHandler {
 		}
 		
 		//check if the command is a "list" command
-		if (args[0].equalsIgnoreCase("list")){
+		if (Keyword.is(Keyword.LIST, args[0])){
 			return handleList(sender, cmd, label, args);
 		}
 		
 		//check if the command is an "open" command
-		if (args[0].equalsIgnoreCase("open")){
+		if (Keyword.is(Keyword.OPEN, args[0])){
 			return handleOpen(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "close" command
-		if (args[0].equalsIgnoreCase("close")){
+		if (Keyword.is(Keyword.CLOSE, args[0])){
 			return handleClose(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "load" command
-		else if (args[0].equalsIgnoreCase("load")){
+		if (Keyword.is(Keyword.LOAD, args[0])){
 			return handleLoad(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "save" command
-		else if (args[0].equalsIgnoreCase("save")){
+		if (Keyword.is(Keyword.SAVE, args[0])){
 			return handleSave(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "reload" command
-		else if (args[0].equalsIgnoreCase("reload")){
+		if (Keyword.is(Keyword.RELOAD, args[0])){
 			return handleReload(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "unload" command
-		else if (args[0].equalsIgnoreCase("unload")){
+		if (Keyword.is(Keyword.UNLOAD, args[0])){
 			return handleUnload(sender, cmd, label, args);
 		}
 		
 		//check if the command is an "edit" command
-		else if (args[0].equalsIgnoreCase("edit")){
+		if (Keyword.is(Keyword.EDIT, args[0])){
 			return handleEdit(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "delete" command
-		else if (args[0].equalsIgnoreCase("delete")){
+		if (Keyword.is(Keyword.DELETE, args[0])){
 			return handleDelete(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "bind" command
-		else if (args[0].equalsIgnoreCase("bind")){
+		if (Keyword.is(Keyword.BIND, args[0])){
 			return handleBind(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "unbind" command
-		else if (args[0].equalsIgnoreCase("unbind")){
+		if (Keyword.is(Keyword.UNBIND, args[0])){
 			return handleUnbind(sender, cmd, label, args);
 		}
 		
 		//check if the command is a "help" command
-		else if (args[0].equalsIgnoreCase("help")){
+		if (Keyword.is(Keyword.HELP, args[0])){
 			return handleHelp(sender, cmd, label, args);
 		}
 		
-		//incorrect command
-		sender.sendMessage("Incorrect use of /menuservice");
-		return false;
+		//incorrect usage
+		MessageFormat.sendMessage(sender, MessageFormat.INCORRECTUSE, LogMessage.INCORRECTUSE);
+		return handleHelp(sender, cmd, label, args);
 	}
 	
 	/**
@@ -119,21 +119,23 @@ public class CommandHandler {
 	 * @return true if a successful command is ran, false otherwise
 	 */
 	private boolean handleHelp(CommandSender sender, Command cmd, String label, String[] args){
-		sender.sendMessage("MenuService commands:");
-		sender.sendMessage("/menuservice help");
-		sender.sendMessage("/menuservice open [menu]");
-		sender.sendMessage("/menuservice open [menu] -p [plugin]");
-		sender.sendMessage("/menuservice open [menu] [player] ");
-		sender.sendMessage("/menuservice open [menu] [player] -p [plugin]");
-		sender.sendMessage("/menuservice close [player]");
-		sender.sendMessage("/menuservice closeall [menu]");
-		sender.sendMessage("/menuservice closeall [menu] -p [plugin]");
-		sender.sendMessage("/menuservice load [filename]");
-		sender.sendMessage("/menuservice load [filename] -p [plugin]");
-		sender.sendMessage("/menuservice save [menu] [filename]");
-		sender.sendMessage("/menuservice save [menu] [filename] -p [plugin]");
-		sender.sendMessage("/menuservice reload [menu]");
-		sender.sendMessage("/menuservice reload [menu] -p [plugin]");
+		
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "MenuService commands:");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice help");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice open menu [menu]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice open instance [instance]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice open player [player]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice close all");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice close [menu]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice close [menu] all");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice close [instance]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice close [player]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice load [filename]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice load [filename] -p [plugin]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice save [menu] [filename]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice save [menu] [filename] -p [plugin]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice reload [menu]");
+		MessageFormat.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice reload [menu] -p [plugin]");
 
 		return true;
 	}

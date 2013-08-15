@@ -76,6 +76,9 @@ public enum LogMessage {
 	MENUALREADYEXISTS ("Error: MenuService arleady has a Menu with the same name"),
 	
 	
+	//Command messages
+	INCORRECTUSE("Incorrect use of /menuservice"),
+	
 	//MenuManager Error Messages
 	CANTSHOWMAINMENU ("Error: Could not show the Main Menu of the Menu Manager");
 	
