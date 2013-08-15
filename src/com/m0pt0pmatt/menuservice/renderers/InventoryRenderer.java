@@ -441,7 +441,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		
 		//get the actions
-		ContainerAttribute actions = component.getConatinerAttribute("actions");
+		ContainerAttribute actions = component.getContainerAttribute("actions");
 		if (actions != null){
 
 			//run each action
