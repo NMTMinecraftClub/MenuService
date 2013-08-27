@@ -131,6 +131,11 @@ public class MenuComponent extends AbstractComponent implements Menu{
 		return false;
 	}
 
+	@Override
+	public String getFileName() {
+		return getName() + ".yml";
+	}
+
 	
 
 	

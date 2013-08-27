@@ -45,6 +45,8 @@ public interface MenuService {
 	 */
 	public boolean saveMenu(Plugin plugin, Menu menu, String fileName);
 	
+	public boolean saveMenu(Menu menu);
+	
 	/**
 	 * Adds a Menu to the MenuService
 	 * @param plugin the Plugin which owns the Menu
@@ -54,11 +56,10 @@ public interface MenuService {
 	
 	/**
 	 * Returns a Menu from the MenuService
-	 * @param plugin the Plugin which stores the Menu
 	 * @param menuName the name of the Menu
 	 * @return the Menu if it exists, null otherwise
 	 */
-	public Menu getMenu(Plugin plugin, String menuName);
+	public Menu getMenu(String menuName);
 	
 	/**
 	 * Checks if a Menu is loaded into the MenuService

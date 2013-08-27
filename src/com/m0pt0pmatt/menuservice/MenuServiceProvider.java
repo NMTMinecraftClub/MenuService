@@ -170,15 +170,15 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//check the filename
 		if (fileName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLFILENAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLFILENAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, null);
 			return null;
 		}
 				
 		//check the plugin
 		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, fileName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, fileName);
+			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, fileName);
+			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
 			return null;
 		}		
 		
@@ -186,8 +186,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		Menu menu = yamlBuilder.loadMenu(plugin, fileName);
 
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHFILE, fileName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, fileName);
+			Logger.log(2, Level.SEVERE, Message.NOSUCHFILE, fileName);
+			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
 			return null;
 		}
 		
@@ -197,7 +197,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return menu;
 		}
 		
-		Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, fileName);
+		Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
 		return menu;
 	}
 	
@@ -213,27 +213,45 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//check the menu
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, null);
 			return false;
 		}
 		
 		//check the plugin
 		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, menu.getName());
 			return false;
 		}
 		
 		//check the fileName
 		if (fileName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLFILENAME, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLFILENAME, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, menu.getName());
 			return false;
 		}
 		
 		//save the Menu
 		return this.yamlBuilder.saveYAML(plugin, menu, fileName);
+	}
+	
+	@Override
+	public boolean saveMenu(Menu menu){
+		
+		if (menu == null){
+			Logger.log(2, Level.WARNING, Message.NULLMENU);
+			return false;
+		}
+		
+		
+		Plugin plugin = Bukkit.getPluginManager().getPlugin(menu.getPlugin());
+		if (plugin == null){
+			Logger.log(2, Level.WARNING, Message.NOSUCHPLUGIN, menu.getName());
+			return false;
+		}
+		
+		return saveMenu(plugin, menu, menu.getFileName());
 	}
 	
 	/**
@@ -246,22 +264,22 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//check menu
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTADDMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, null);
 			return false;
 		}
 		
 		//check Plugin
 		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTADDMENU, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, menu.getName());
 			return false;
 		}
 		
 		//check if menu exists
 		if (menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, LogMessage.MENUALREADYEXISTS, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTADDMENU, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.MENUALREADYEXISTS, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, menu.getName());
 			return false;
 		}
 		
@@ -290,33 +308,20 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @return the Menu if it exists, null otherwise
 	 */
 	@Override
-	public Menu getMenu(Plugin plugin, String menuName) {
+	public Menu getMenu(String menuName) {
 		
 		//check for null menuName
 		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENU, null);
 			return null;
-		}
-		
-		//check for null plugin
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENU, menuName);
 		}
 		
 		//get the menu
 		Menu menu = menusByName.get(menuName);
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENU, menuName);
-			return null;
-		}
-		
-		//if plugin is wrong
-		if (!((String)menu.getAttribute("plugin")).equals(plugin.getName())){
-			Logger.log(2, Level.SEVERE, LogMessage.WRONGMENU, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENU, menuName);
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENU, menuName);
 			return null;
 		}
 		
@@ -334,14 +339,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//check menu
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTHASMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTHASMENU, null);
 		}
 		
 		//check plugin
 		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTHASMENU, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTHASMENU, menu.getName());
 		}
 		
 		//see if MenuService contains the menu
@@ -368,8 +373,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//check menu
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
 			return;
 		}
 		
@@ -406,14 +411,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public Menu removeMenu(Plugin plugin, String menuName) {
 		
 		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
 			return null;
 		}
 		
 		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENU, menuName);
+			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menuName);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, menuName);
 			return null;
 		}
 		
@@ -427,8 +432,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return menu;
 		}
 		
-		Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-		Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENU, menuName);
+		Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
+		Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, menuName);
 		return null;
 	}
 	
@@ -466,14 +471,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public MenuInstance createMenuInstance(Menu menu, String instanceName, Map<String, Object> parameters) {
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, null);
 			return null;
 		}
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCENAME, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, menu.getName());
 			return null;
 		}
 		
@@ -482,8 +487,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		}
 		
 		if (!menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, null);
 			return null;
 		}
 		
@@ -506,14 +511,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public void removeMenuInstance(MenuInstance instance) {
 		
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
 			return;
 		}
 		
 		if (!menusToInstances.containsKey(instance.getMenu())){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, instance.getMenu().getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENUINSTANCE, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, instance.getMenu().getName());
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, instance.getName());
 			return;
 		}
 		
@@ -537,21 +542,21 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public MenuInstance removeMenuInstance(Menu menu, String instanceName) {
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
 			return null;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
 			return null;
 		}
 		
 		MenuInstance instance =  this.getMenuInstance(menu, instanceName);
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVEMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
 			return null;
 		}
 		
@@ -570,22 +575,22 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public MenuInstance getMenuInstance(Menu menu, String instanceName) {
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCENAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, null);
 			return null;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, instanceName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENUINSTANCE, instanceName);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
 			return null;
 		}
 		
 
 		List<MenuInstance> instances = menusToInstances.get(menu);
 		if (instances == null){
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENUINSTANCE, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETMENUINSTANCE, instanceName);
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
 			return null;
 		}
 		
@@ -608,14 +613,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean hasMenuInstance(Menu menu, String instanceName) {
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCENAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTHASMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, null);
 			return false;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, instanceName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTHASMENUINSTANCE, instanceName);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
+			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, instanceName);
 			return false;
 		}
 		
@@ -641,28 +646,28 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean openMenuInstance(MenuInstance instance, String playerName) {
 		
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, null);
 			return false;
 		}
 		
 		if (playerName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLAYERNAME, instance.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENUINSTANCE, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLPLAYERNAME, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
 			return false;
 		}
 		
 		Menu menu = instance.getMenu();
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, instance.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENUINSTANCE, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
 			return false;
 		}
 		
 		Player player = Bukkit.getPlayer(playerName);
 		if (player == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHPLAYER, instance.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENUINSTANCE, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.NOSUCHPLAYER, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
 			return false;
 		}
 		
@@ -672,8 +677,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 				permissions = (List<String>) menu.getAttribute("permissions");
 			}
 			catch (ClassCastException e){
-				Logger.log(2, Level.SEVERE, LogMessage.CANTCASTATTRIBUTE, "permissions");
-				Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENUINSTANCE, instance.getName());
+				Logger.log(2, Level.SEVERE, Message.CANTCASTATTRIBUTE, "permissions");
+				Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
 				return false;
 			}
 			if (permissions != null){
@@ -712,22 +717,22 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//check for null
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLRENDERER, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTADDRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.CANTADDRENDERER, null);
 			return false;
 		}
 		
 		//check to make sure a MenuProvider of the same name isn't already loaded
 		if (renderersByName.containsKey(renderer.getName())){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHRENDERER, renderer.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTADDRENDERER, renderer.getName());
+			Logger.log(2, Level.SEVERE, Message.NOSUCHRENDERER, renderer.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTADDRENDERER, renderer.getName());
 			return false;
 		}
 		
 		//make sure Renderer is an extension of an AbstractRenderer
 		if (!(renderer instanceof AbstractRenderer)){
-			Logger.log(2, Level.SEVERE, LogMessage.RENDERERNOTABSTRACTRENDERER, renderer.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTADDRENDERER, renderer.getName());
+			Logger.log(2, Level.SEVERE, Message.RENDERERNOTABSTRACTRENDERER, renderer.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTADDRENDERER, renderer.getName());
 			return false;
 		}
 		
@@ -748,8 +753,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public Renderer getRenderer(String rendererName) {
 		
 		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTGETRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTGETRENDERER, null);
 		}
 		
 		return renderersByName.get(rendererName);
@@ -764,15 +769,15 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public Renderer removeRenderer(String rendererName) {
 		
 		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVERENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, null);
 			return null;
 		}
 		
 		Renderer renderer = renderersByName.get(rendererName);
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHRENDERER, rendererName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVERENDERER, rendererName);
+			Logger.log(2, Level.SEVERE, Message.NOSUCHRENDERER, rendererName);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, rendererName);
 			return null;
 		}
 		
@@ -789,14 +794,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public void removeRenderer(Renderer renderer) {
 		
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLRENDERER, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVERENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, null);
 			return;
 		}
 		
 		if (!renderersByName.containsKey(renderer)){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHRENDERER, renderer.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTREMOVERENDERER, renderer.getName());
+			Logger.log(2, Level.SEVERE, Message.NOSUCHRENDERER, renderer.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, renderer.getName());
 			return;
 		}
 		
@@ -813,8 +818,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean hasRenderer(Renderer renderer) {
 		
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLRENDERER, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTHASRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
 			return false;
 		}
 		
@@ -830,8 +835,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean hasRenderer(String rendererName) {
 		
 		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTHASRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
 			return false;
 		}
 		
@@ -848,20 +853,20 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean bindMenu(ItemStack item, Menu menu) {
 		
 		if (item == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, null);
+			Logger.log(2, Level.SEVERE, Message.NULLITEMSTACK, null);
+			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, null);
 			return false;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, item.toString());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, item.toString());
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, item.toString());
+			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, item.toString());
 			return false;
 		}
 		
 		if (!menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, item.toString());
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, item.toString());
 			return false;
 		}
 		
@@ -879,20 +884,20 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean bindMenu(Material material, Menu menu) {
 		
 		if (material == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMATERIAL, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMATERIAL, null);
+			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, null);
 			return false;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, material.toString());
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, material.toString());
 			return false;
 		}
 		
 		if (!menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menu.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, material.toString());
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, material.toString());
 			return false;
 		}
 		
@@ -909,8 +914,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean unbindMenu(Menu menu) {
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTUNBINDMENU, null);
 			return false;
 		}
 		
@@ -944,8 +949,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean unbindMenu(ItemStack item) {
 		
 		if (item == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDITEM, null);
+			Logger.log(2, Level.SEVERE, Message.NULLITEMSTACK, null);
+			Logger.log(2, Level.SEVERE, Message.CANTUNBINDITEM, null);
 			return false;
 		}
 		
@@ -962,8 +967,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean unbindMenu(Material material) {
 		
 		if (material == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMATERIAL, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMATERIAL, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMATERIAL, null);
+			Logger.log(2, Level.SEVERE, Message.CANTUNBINDMATERIAL, null);
 			return false;
 		}
 		
@@ -1042,13 +1047,13 @@ public class MenuServiceProvider implements MenuService, Listener{
 	protected boolean checkCommand(String command, Player player){
 
 		if (command == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLCOMMAND, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTEXECUTECOMMAND, null);
+			Logger.log(2, Level.SEVERE, Message.NULLCOMMAND, null);
+			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, null);
 			return false;
 		}
 		if (player == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLAYER, command);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTEXECUTECOMMAND, command);
+			Logger.log(2, Level.SEVERE, Message.NULLPLAYER, command);
+			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, command);
 			return false;
 		}
 		

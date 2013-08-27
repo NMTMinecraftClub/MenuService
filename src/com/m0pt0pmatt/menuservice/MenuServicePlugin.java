@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -13,14 +12,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
-import org.bukkit.inventory.ItemStack;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.m0pt0pmatt.menuservice.api.Menu;
-import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
+import com.m0pt0pmatt.menuservice.commands.CommandHandler;
 import com.m0pt0pmatt.menuservice.menumanager.MenuManager;
 
 /**
@@ -41,7 +37,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	private static CommandHandler commandHandler;
 	
-	protected static MenuManager menuManager;
+	
 	
 	/**
 	 * The config file for the plugin
@@ -80,8 +76,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//setup the MenuService Provider
 		menuService = new MenuServiceProvider(this);
-		commandHandler = new CommandHandler(this);
-		menuManager = new MenuManager(menuService, this);		
+		commandHandler = new CommandHandler(menuService, this);	
 		
 		Logger.log(3, Level.INFO, "MenuService initialized");
 		
@@ -180,334 +175,6 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	}
 	
 	
-	protected void listMenus(CommandSender sender) {
-		for (Menu menu: menuService.getMenus()){
-			sender.sendMessage(menu.getName() + ": " + menu.getPlugin());
-		}
-	}
-
-	/**
-	 * Closes a menu for a given player
-	 * @param playerName the name of the player
-	 */
-	protected void closeMenu(String playerName) {
-		
-		//close the menu
-		menuService.closeMenuInstance(playerName);
-	}
-
-	/**
-	 * Saves a Menu to file
-	 * @param menuName the name of the menu
-	 * @param pluginName the name of the plugin which holds the menu
-	 * @param fileName the name to save the menu to
-	 * @return true if successful, false if unsuccessful 
-	 */
-	protected boolean saveMenu(String menuName, String pluginName, String fileName) {
-		
-		//check menuName
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, null);
-			return false;
-		}
-		
-		//check the plugin
-		if (pluginName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
-			return false;
-		}
-		
-		//get the plugin
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
-			return false;
-		}
-		
-		//check the filename
-		if (fileName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLFILENAME, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
-			return false;
-		}
-		
-		//get the menu
-		Menu menu = menuService.getMenu(plugin, menuName);
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSAVEMENU, menuName);
-			return false;
-		}
-		
-		//save the menu
-		return menuService.saveMenu(plugin, menu, fileName);
-	}
-
-	/**
-	 * Loads a menu from a file
-	 * @param pluginName the name of the plugin which holds the menu
-	 * @param fileName the name of the file of the menu
-	 * @return true if successful, false if unsuccessful 
-	 */
-	protected boolean loadMenu(String pluginName, String menuName) {
-		
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, null);
-			return false;
-		}
-		
-		//check the pluginName
-		if (pluginName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, menuName);
-		}
-		
-		//get the Plugin
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTLOADMENU, menuName);
-			return false;
-		}
-		
-		//load the menu
-		if (menuService.loadMenu(plugin, menuName) == null){
-			
-			//failed.
-			return false;
-		}
-		
-		//successful
-		return true;
-	}
-
-	/**
-	 * unbinds all materials and items from a menu
-	 * @param menuName the name of the menu
-	 * @return true if successful, false if unsuccessful
-	 */
-	protected boolean unbindMenu(String menuName) {
-		
-		//unbind the menu
-		return unbindMenu(this.getName(), menuName);
-	}
-	
-	protected boolean unbindMenu(String pluginName, String menuName) {
-		
-		//check the menuname
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, null);
-			return false;
-		}
-		
-		//get the plugin
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, menuName);
-			return false;
-		}
-		
-		//get the menu
-		Menu menu = menuService.getMenu(plugin, menuName);
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMENU, menuName);
-			return false;
-		}
-		
-		//unbind the menu
-		return menuService.unbindMenu(menu);	
-	}
-
-	/**
-	 * unbinds an Item from a Menu if it is binded
-	 * @param itemInHand the item
-	 * @return true if successful, false if unsuccessful
-	 */
-	protected boolean unbindItem(ItemStack itemInHand) {
-		
-		//check if the item is null
-		if (itemInHand == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDITEM, null);
-			return false;
-		}
-		
-		//unbind the item
-		return menuService.unbindMenu(itemInHand);		
-	}
-
-	/**
-	 * Unbinds a Material from a Menu if it is binded
-	 * @param type the Material
-	 * @return true if successful, false if unseuccessful
-	 */
-	protected boolean unbindMaterial(Material type) {
-		
-		//check for null
-		if (type == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMATERIAL, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTUNBINDMATERIAL, null);
-			return false;
-		}
-		
-		//unbind the material
-		return menuService.unbindMenu(type);	
-	}
-
-	/**
-	 * Opens a Menu for a given player
-	 * @param pluginName the name of the Plugin which the Menu belongs to
-	 * @param menuName the name of the menu
-	 * @param playerName the name of the player to open the Menu for
-	 */
-	protected boolean openMenu(String pluginName, String menuName, String playerName){
-		
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, null);
-			return false;
-		}
-		
-		//check pluginName
-		if (pluginName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
-			return false;
-		}
-		
-		//get the plugin
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
-			return false;
-		}
-		
-		//get the Menu
-		Menu menu = menuService.getMenu(plugin, menuName);
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
-			return false;
-		}
-		
-		//get the instance
-		MenuInstance instance = menuService.createMenuInstance(menu, menuName + ": " + playerName);
-		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTOPENMENU, menuName);
-			return false;
-		}
-		
-		//open the menu
-		return menuService.openMenuInstance(instance, playerName);
-	}
-	
-	/**
-	 * Binds a single item to a Menu
-	 * @param item the ItemStack to be binded
-	 * @param pluginName the name of the plugin which the Menu belongs to
-	 * @param menuName the name of the menu
-	 */
-	protected boolean bindMenu(ItemStack item, String pluginName, String menuName){
-		
-		//check menuName
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, null);
-			return false;
-		}
-		
-		//check item
-		if (item == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLITEMSTACK, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
-			return false;
-		}
-		
-		//check pluginName
-		if (pluginName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
-			return false;
-		}
-		
-		//get the plugin
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
-			return false;
-		}
-		
-		//get the menu
-		Menu menu = menuService.getMenu(plugin, menuName);
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, menuName);
-			return false;
-		}
-		
-		//bind the item
-		return menuService.bindMenu(item, menu);
-	}
-	
-	/**
-	 * Binds the Material to a Menu
-	 * @param material the Material to be binded
-	 * @param pluginName the name of the Plugin that the Menu belongs to
-	 * @param menuName the name of the Menu
-	 */
-	protected boolean bindMenu(Material material, String pluginName, String menuName){
-		
-		//check menuName
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUITEM, null);
-			return false;
-		}
-		
-		//check material
-		if (material == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMATERIAL, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
-			return false;
-		}
-		
-		//check pluginName
-		if (pluginName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGINNAME, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
-			return false;
-		}
-		
-		//get the plugin
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLUGIN, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
-			return false;
-		}
-		
-		//get the menu
-		Menu menu = menuService.getMenu(plugin, menuName);
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTBINDMENUMATERIAL, menuName);
-			return false;
-		}
-		
-		//bind the Material
-		return menuService.bindMenu(material, menu);
-	}
-	
 	/**
 	 * Catch when a player executes a command if a Menu should be opened
 	 * @param event
@@ -521,5 +188,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
             event.setCancelled(true);
         }
     }
+
+	
 	
 }

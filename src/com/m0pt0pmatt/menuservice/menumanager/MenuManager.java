@@ -11,7 +11,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.entity.Player;
 import org.bukkit.material.Wool;
 
-import com.m0pt0pmatt.menuservice.LogMessage;
+import com.m0pt0pmatt.menuservice.Message;
 import com.m0pt0pmatt.menuservice.Logger;
 import com.m0pt0pmatt.menuservice.MenuServicePlugin;
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
@@ -375,15 +375,15 @@ public class MenuManager {
 		
 		//check player
 		if (player == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLAYER, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSHOWMAINMENU, null);
+			Logger.log(2, Level.SEVERE, Message.NULLPLAYER, null);
+			Logger.log(2, Level.SEVERE, Message.CANTSHOWMAINMENU, null);
 			return false;
 		}
 		
 		MenuInstance instance = menuService.createMenuInstance(menus.get("mainMenu"), "MenuService-MainMenu-" + player.getName());
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEMENUINSTANCE, player.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTSHOWMAINMENU, player.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, player.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTSHOWMAINMENU, player.getName());
 			return false;
 		}
 		instance.addActionListener(mainMenuListener);

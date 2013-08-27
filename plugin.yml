@@ -5,49 +5,191 @@ author: m0pt0pmatt
 permissions:
   menuservice.*:
     description: Have access to all MenuService commands
+    default: false
     children:
-      menuservice.open: true
-      menuservice.close: true
-      menuservice.bind: true
-      menuservice.unbind: true
-      menuservice.load: true
-      menuservice.reload: true
-      menuservice.save: true
-      menuservice.help: true
-      menuservice.list: true
-      menuservice.edit: true
-  menuservice.open:
+      menuservice.help.*: true
+      menuservice.list.*: true
+      menuservice.open.*: true
+      menuservice.close.*: true
+      menuservice.load.*: true
+      menuservice.save.*: true
+      menuservice.reload.*: true
+      menuservice.unload.*: true
+      menuservice.bind.*: true
+      menuservice.unbind.*: true
+  menuservice.help.*:
     description: Opens a Menu for a player
     default: false
-  menuservice.close:
-    description: Closes the Menu for a player
+    children:
+      menuservice.help.list: true
+      menuservuce.help.edit: true
+      menuservice.help.open: true
+      menuservice.help.close: true
+      menuservice.help.load: true
+      menuservice.help.save: true
+      menuservice.help.reload: true
+      menuservice.help.unload: true
+  menuservice.help.list:
+    description: Opens a Menu for a player
     default: false
-  menuservice.list:
-    description: List all currently loaded Menus
+  menuservuce.help.edit:
+    description: Opens a Menu for a player
     default: false
-  menuservice.bind:
-    description: Binds a Menu to an item or a material
+  menuservice.help.open:
+    description: Opens a Menu for a player
     default: false
-  menuservice.unbind:
-    description: Unbinds Menus from an item or a material
+  menuservice.help.close:
+    description: Opens a Menu for a player
     default: false
-  menuservice.load:
-    description: loads a Menu from file
+  menuservice.help.load:
+    description: Opens a Menu for a player
     default: false
-  menuservice.reload:
-    description: reloads a Menu from file
+  menuservice.help.save:
+    description: Opens a Menu for a player
     default: false
-  menuservice.unload:
-    description: unloads a Menu from MenuService
+  menuservice.help.reload:
+    description: Opens a Menu for a player
     default: false
-  menuservice.save:
-    description: saves a Menu to file
+  menuservice.help.unload:
+    description: Opens a Menu for a player
     default: false
-  menuservice.edit:
-    description: Opens the Menu Manager
+  menuservice.list.*:
+    description: Opens a Menu for a player
     default: false
-  menuservice.help:
-    description: Get the help menu for MenuService
-    default: true
+    children:
+      menuservice.list.menus: true
+      menuservice.list.instances: true
+      menuservice.list.players: true
+  menuservice.list.menus:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.list.instances:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.list.players:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.open.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+       menuservice.open.self.*: true
+       menuservice.open.other.*: true
+       menuservice.open.menu.*: true
+       menuservice.open.instance.*: true
+       menuservice.open.player: true
+       
+  menuservice.open.self.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.open.menu.self: true
+      menuservice.open.instance.self: true
+  menuservice.open.other.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.open.menu.other: true
+      menuservice.open.instance.other: true
+  menuservice.open.menu.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.open.menu.self: true
+      menuservice.open.menu.other: true
+  menuservice.open.menu.self:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.open.menu.other:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.open.instance.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.open.instance.self: true
+      menuservice.open.instance.other: true
+  menuservice.open.instance.self:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.open.instance.other:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.open.player:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.close.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.close.menu.*: true
+      menuservice.close.instance.*: true
+      menuservice.close.player: true
+  menuservice.close.menu.*:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.close.instance.*:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.close.player:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.load.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.load.menuservice: true
+      menuservice.load.otherplugins: true
+      menuservice.load.override: true
+  menuservice.load.menuservice:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.load.otherplugins:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.load.override:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.save.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.save.otherfile: true
+      menuservice.save.otherplugin: true
+      menuservice.save.menuservice: true
+  menuservice.save.otherfile:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.save.otherplugin:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.save.menuservice:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.reload.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+      menuservice.reload.menuservice: true
+      menuservice.reload.otherplugin: true
+  menuservice.reload.menuservice:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.reload.otherplugin:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.unload.*:
+    description: Opens a Menu for a player
+    default: false
+    children:
+       menuservice.unload.menuservice: true
+       menuservice.unload.otherplugin: true
+  menuservice.unload.menuservice:
+    description: Opens a Menu for a player
+    default: false
+  menuservice.unload.otherplugin:
+    description: Opens a Menu for a player
+    default: false
 commands: 
   menuservice:
+  menumanager:

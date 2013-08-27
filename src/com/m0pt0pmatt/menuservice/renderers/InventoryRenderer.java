@@ -20,7 +20,7 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import com.m0pt0pmatt.menuservice.LogMessage;
+import com.m0pt0pmatt.menuservice.Message;
 import com.m0pt0pmatt.menuservice.Logger;
 import com.m0pt0pmatt.menuservice.MenuServicePlugin;
 import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
@@ -60,15 +60,15 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	private Inventory createInventory(MenuInstance instance){
 				
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.CANTCREATEINVENTORY, null);
 			return null;
 		}
 		
 		Menu menu = instance.getMenu();
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, LogMessage.EMPTYMENUFORINSTANCE, instance.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.EMPTYMENUFORINSTANCE, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTCREATEINVENTORY, instance.getName());
 			return null;
 		}
 		
@@ -101,7 +101,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		Inventory inventory = Bukkit.createInventory(null, size, title);
 		if (inventory == null){
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCREATEINVENTORY, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTCREATEINVENTORY, instance.getName());
 			return null;
 		}
 		
@@ -259,16 +259,16 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void renderAllPlayers(MenuInstance instance) {
 		
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, this.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
+			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, this.getName());
 			return;
 		}
 		
 		//create the inventory
 		Inventory inv = createInventory(instance);
 		if (inv == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLINVENTORY, this.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, this.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLINVENTORY, this.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, this.getName());
 			return;
 		}
 		
@@ -292,21 +292,21 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void renderPlayer(MenuInstance instance, String playerName) {
 		
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLMENUINSTANCE, this.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, null);
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, this.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, null);
 			return;
 		}
 		
 		if (playerName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLAYERNAME, this.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLPLAYERNAME, this.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, instance.getName());
 			return;
 		}
 		
 		Inventory inv = createInventory(instance);
 		if (inv == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLINVENTORY, this.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLINVENTORY, this.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, instance.getName());
 			return;
 		}
 		
@@ -339,8 +339,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void closeMenu(String playerName) {
 		
 		if (playerName == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NULLPLAYERNAME, this.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
+			Logger.log(2, Level.SEVERE, Message.NULLPLAYERNAME, this.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTCLOSEMENU, this.getName());
 			return;
 		}
 				
@@ -353,8 +353,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//get the player
 		Player player = Bukkit.getPlayer(playerName);
 		if (player == null){
-			Logger.log(2, Level.SEVERE, LogMessage.NOSUCHPLAYER, this.getName());
-			Logger.log(2, Level.SEVERE, LogMessage.CANTCLOSEMENU, this.getName());
+			Logger.log(2, Level.SEVERE, Message.NOSUCHPLAYER, this.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTCLOSEMENU, this.getName());
 			return;
 		}
 		

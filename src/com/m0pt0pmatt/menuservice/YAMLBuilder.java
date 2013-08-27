@@ -104,6 +104,10 @@ class YAMLBuilder {
 	}
 	
 	public Menu loadMenu(Plugin plugin, String menuName){
+		if (menuName.endsWith(".yml")){
+			return loadYAML(plugin, menuName);
+		}
+		
 		return loadYAML(plugin, menuName + ".yml");
 	}
 

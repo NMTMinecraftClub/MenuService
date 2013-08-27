@@ -86,5 +86,7 @@ public interface Menu extends Component{
 	 * @return
 	 */
 	public boolean equals(Object arg);
+
+	public String getFileName();
 	
 }

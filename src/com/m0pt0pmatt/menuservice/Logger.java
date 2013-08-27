@@ -22,13 +22,17 @@ public class Logger {
 	 * @param level the Bukkit level of the message
 	 * @param msg the LogMessage
 	 */
-	public static void log(int verboseLevel, Level level, LogMessage msg, Object object){
+	public static void log(int verboseLevel, Level level, Message msg, Object object){
 		String m = msg.getMessage();
 		if (object != null){
 			m = m + ": " + object.toString();
 		}
 		
 		log(verboseLevel, level, m);
+	}
+	
+	public static void log(int verboseLevel, Level level, Message msg){		
+		log(verboseLevel, level, msg.getMessage());
 	}
 	
 	/**
@@ -44,7 +48,7 @@ public class Logger {
 		if (verboseLevel <= verbose){
 			
 			//log the message
-			plugin.getLogger().log(level, msg);;
+			plugin.getLogger().log(level, msg);
 		}
 		
 		if (level == Level.SEVERE){
