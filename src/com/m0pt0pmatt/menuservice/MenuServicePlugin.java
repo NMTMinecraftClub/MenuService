@@ -17,7 +17,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.commands.CommandHandler;
-import com.m0pt0pmatt.menuservice.menumanager.MenuManager;
 
 /**
  * MenuService is a plugin that allows other plugins to implement abstract menu

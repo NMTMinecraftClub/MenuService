@@ -6,7 +6,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.logging.Level;
 
@@ -95,19 +94,20 @@ public class CommandHandler {
 		commands.add(command);
 		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
 		
-		//list menu
+		//list menus
 		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
+		arguments.add(Keyword.MENUS.getKeyword());
 		command = new MyCommand(Keyword.LIST.getKeyword(), arguments, Perm.LISTMENUS);
 		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
+		methods.put(command.toString(), this.getClass().getMethod("listMenus", getFormalParameters(arguments)));
 		
-		//list instance
+		//list instances [menu]
 		arguments = new LinkedList<String>();
-		arguments.add(Keyword.INSTANCE.getKeyword());
+		arguments.add(Keyword.INSTANCES.getKeyword());
+		arguments.add(Keyword.PLACEHOLDER.getKeyword());
 		command = new MyCommand(Keyword.LIST.getKeyword(), arguments, Perm.LISTINSTANCES);
 		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("listMenus", getFormalParameters(arguments)));
+		methods.put(command.toString(), this.getClass().getMethod("listInstances", getFormalParameters(arguments)));
 		
 		//open menu [menu]
 		arguments = new LinkedList<String>();
@@ -493,7 +493,7 @@ public class CommandHandler {
 					
 					//attempt to execute method
 					try {
-						Boolean ret = (Boolean) m.invoke(this, command.getActualArguments(args));
+						Boolean ret = (Boolean) m.invoke(this, (Object[]) command.getActualArguments(args));
 						
 						//check if successful
 						if (!ret){
@@ -530,8 +530,8 @@ public class CommandHandler {
 		
 		//help
 		
-		//list menu
-		//list instance
+		//list menus
+		//list instances [menu]
 		
 		//open menu [menu]
 		//open menu [menu] (player)
@@ -579,8 +579,8 @@ public class CommandHandler {
 		
 		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "MenuService commands:");
 		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice help");
-		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice list menu(s)");
-		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice list instance(s) [menu]");
+		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice list menu");
+		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice list instance [menu]");
 		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice open menu [menu] (player)");
 		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice open instance [instance] (player)");
 		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice open player [player]");
@@ -802,40 +802,6 @@ public class CommandHandler {
 	}
 	
 	/**
-	 * Binds a single item to a Menu
-	 * @param item the ItemStack to be binded
-	 * @param pluginName the name of the plugin which the Menu belongs to
-	 * @param menuName the name of the menu
-	 */
-	public boolean bindMenu(ItemStack item, String menuName){
-		
-		//check menuName
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, null);
-			return false;
-		}
-		
-		//check item
-		if (item == null){
-			Logger.log(2, Level.SEVERE, Message.NULLITEMSTACK, menuName);
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, menuName);
-			return false;
-		}
-		
-		//get the menu
-		Menu menu = menuService.getMenu(menuName);
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, menuName);
-			return false;
-		}
-		
-		//bind the item
-		return menuService.bindMenu(item, menu);
-	}
-	
-	/**
 	 * Binds the Material to a Menu
 	 * @param material the Material to be binded
 	 * @param pluginName the name of the Plugin that the Menu belongs to
@@ -888,24 +854,6 @@ public class CommandHandler {
 		
 		//unbind the menu
 		return menuService.unbindMenu(menu);	
-	}
-
-	/**
-	 * unbinds an Item from a Menu if it is binded
-	 * @param itemInHand the item
-	 * @return true if successful, false if unsuccessful
-	 */
-	public boolean unbindItem(ItemStack itemInHand) {
-		
-		//check if the item is null
-		if (itemInHand == null){
-			Logger.log(2, Level.SEVERE, Message.NULLITEMSTACK, null);
-			Logger.log(2, Level.SEVERE, Message.CANTUNBINDITEM, null);
-			return false;
-		}
-		
-		//unbind the item
-		return menuService.unbindMenu(itemInHand);		
 	}
 
 	/**

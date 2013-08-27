@@ -3,6 +3,12 @@ package com.m0pt0pmatt.menuservice;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 
+/**
+ * A Perm is an enum for a Permission.
+ * This is here to prevent coding errors. Hopefully at some point it will be replaced by a similar system that uses Bukkit's built in Class Permission.
+ * @author Matthew
+ *
+ */
 public enum Perm {
 
 	MENUSERVICE("menuservice.*"),

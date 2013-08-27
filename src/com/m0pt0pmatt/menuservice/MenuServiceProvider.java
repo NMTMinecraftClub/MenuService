@@ -59,9 +59,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 	//The Map of binded Materials
 	private Map<Material, String> materialsToMenus;
 	
-	//The Map of binded ItemStacks
-	private Map<ItemStack, String> itemsToMenus;
-	
 	//The plugin which loaded the MenuServiceProvider
 	private MenuServicePlugin plugin;
 	
@@ -92,7 +89,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 		menusToInstances = Collections.synchronizedMap(new HashMap<Menu, List<MenuInstance>>());
 		commandsToMenus = Collections.synchronizedMap(new HashMap<String, Menu>());
 		materialsToMenus = Collections.synchronizedMap(new HashMap<Material, String>());
-		itemsToMenus = Collections.synchronizedMap(new HashMap<ItemStack, String>());
 		Logger.log(3, Level.INFO, "Maps initialized");
 		
 		//add Renderers
@@ -105,202 +101,195 @@ public class MenuServiceProvider implements MenuService, Listener{
 		Logger.log(3, Level.INFO, "MenuServiceProvider initialized");
 	}
 	
+	/**
+	 * Checks if a binded command is being executed. If so, opens the correct Menu.
+	 * @param command the Command which was executed
+	 * @param player the name of the player who executed the command
+	 * @return true if the command was binded, false otherwise
+	 */
+	protected boolean checkCommand(String command, Player player){
+
+		if (command == null){
+			Logger.log(2, Level.SEVERE, Message.NULLCOMMAND, null);
+			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, null);
+			return false;
+		}
+		if (player == null){
+			Logger.log(2, Level.SEVERE, Message.NULLPLAYER, command);
+			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, command);
+			return false;
+		}
+		
+		for (Entry<String, Menu> entry: commandsToMenus.entrySet()){
+			
+			//check command
+			if (command.equals(entry.getKey())){
+								
+				//commands match. Start Menu
+				if (this.hasMenuInstance(entry.getValue(),  player.getName() + ": " + entry.getValue().getName())){
+					openMenuInstance(this.getMenuInstance(entry.getValue(),  player.getName() + ": " + entry.getValue().getName()), player.getName());
+				} else {
+					MenuInstance instance = createMenuInstance(entry.getValue(), player.getName() + ": " + entry.getValue().getName());
+					instance.addParameter("removeOnEmpty", true);
+					openMenuInstance(instance, player.getName());
+				}
+				return true;
+			}
+		}
+		
+		return false;
+	}
 	
 	/**
-	 * Closes the MenuInstance for a player
-	 * 
-	 * Tells the MenuProvider for the MenuInstance to close the Menu.
-	 * Removes the player from the MenuInstance.
-	 * 
-	 * @param playerName the Name of the player
+	 * Checks if the player right clicked a binded Material
+	 * If so, opens the binded menu.
+	 * @param event
 	 */
-	@Override
-	public void closeMenuInstance(String playerName) {
+	@EventHandler
+	public void itemClick(PlayerInteractEvent event){
 		
-		//get the MenuInstance
-		MenuInstance instance = playersToInstances.get(playerName);
-		
-		//check if null
-		if (instance == null){
+		if (event == null){
 			return;
 		}
 		
-		for (Renderer renderer: instance.getAllRenderers()){
-			renderer.closeMenu(playerName);
+		ItemStack item = event.getItem();
+
+		if (event.getAction() != Action.RIGHT_CLICK_AIR){
+			return;
+		}
+
+		if (!event.isBlockInHand()){
+			return;
+		}
+
+		if (materialsToMenus.containsKey(item.getType())){
+
+			event.setCancelled(true);
+			
+			String menuName = materialsToMenus.get(item.getType());
+			Menu menu = menusByName.get(menuName);
+			//TODO: Add checks
+			
+			this.openMenuInstance(this.createMenuInstance(menu, menu.getName() + ": " + event.getPlayer().getName()), event.getPlayer().getName());
+			return;
+		}
+	}
+	
+	//--------------------------Methods for all Menus--------------------------
+	
+	/**
+	 * Returns a List of the Menus that are currently loaded in the MenuService
+	 * @return all currently loaded Menus
+	 */
+	@Override
+	public List<Menu> getMenus() {
+		
+		return new LinkedList<Menu>(menusByName.values());
+	}
+	
+	/**
+	 * Loads menus stored in MenuService
+	 */
+	public void loadMenus() {
+		
+		//load menus in the MenuService folder
+		for (File file: plugin.getDataFolder().listFiles()){
+			
+			//make sure the file is not the config file and has the .yml extension
+			if ((!file.getName().equalsIgnoreCase("config.yml")) && (!file.getName().equalsIgnoreCase("binds.yml")) && file.getName().endsWith(".yml")){
+				
+				//load the menu
+				Menu menu = this.loadMenu(plugin, file.getName());
+				if (menu == null){
+					continue;
+				}
+				
+				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
+			}
+			
 		}
 		
-		//remove the player from the instance
-		instance.removePlayer(playerName);
-		
-		//unregister the player from the MenuInstance
-		this.playersToInstances.remove(playerName);
-		
-		//if there are no more players for the instance, notify the ActionListeners
-		if (instance.getPlayers().size() == 0){
-			for (ActionListener listener: instance.getActionListeners().values()){
-				listener.playerCountZero(instance, playerName);
-			}
-			if (instance.hasParameter("removeOnEmpty")){
-				if ((Boolean)instance.getParameter("removeOnEmpty")){
-					this.removeMenuInstance(instance);
+	}
+	
+	/**
+	 * Saves all Menus to file
+	 */
+	@Override
+	public void saveMenus() {
+		for (Menu menu: menusByName.values()){
+			
+			if (menu.hasAttribute("dynamic")){
+				if ((Boolean) menu.getAttribute("dynamic")){
+					continue;
 				}
 			}
+			
+			Plugin plugin = Bukkit.getPluginManager().getPlugin((String) menu.getAttribute("plugin"));
+			if (plugin != null){
+				String filename = null;
+				if (menu.hasAttribute("filename")){
+					filename = (String) menu.getAttribute("filename");
+				} else{
+					filename = menu.getTag() + ".yml";
+				}
+				yamlBuilder.saveYAML(plugin, menu, filename);
+			}
+			
+			
 		}
-		
-		
-		
-		this.plugin.getLogger().info("MenuInstance closed for player " + playerName);
 	}
 	
 	/**
-	 * Creates a new Menu from the given Plugin and fileName.
-	 * 
-	 * Since Menus are stored based on the plugin that owns them, 
-	 * the plugin needs to be referenced so the correct file location can be found.
-	 * 
-	 * The fileName is the name of the config file for the Menu.
-	 * 
-	 * After the Menu is loaded, it is stored in the MenuService
-	 * 
-	 * @param plugin The Plugin which the Menu belongs to
-	 * @param fileName The name of the Menu's config file
+	 * Closes all Menus
 	 */
 	@Override
-	public Menu loadMenu(Plugin plugin, String fileName) {
-		
-		//check the filename
-		if (fileName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLFILENAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, null);
-			return null;
-		}
-				
-		//check the plugin
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, fileName);
-			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
-			return null;
-		}		
-		
-		//load the file
-		Menu menu = yamlBuilder.loadMenu(plugin, fileName);
-
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHFILE, fileName);
-			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
-			return null;
+	public void closeMenus() {
+		for (Renderer renderer: renderersByName.values()){
+			renderer.closeAll();
 		}
 		
-		//add the menu
-		if (this.addMenu(plugin, menu)){
-			Logger.log(2, Level.INFO, "Menu " + menu.getName() + " loaded"); 
-			return menu;
-		}
-		
-		Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
-		return menu;
-	}
-	
-	/**
-	 * Saves a Menu to file
-	 * @param plugin the Plugin which will hold the menu
-	 * @param menu the Menu to be saved
-	 * @param fileName the name of the file to store the menu in
-	 * @return true if successful, false is unsuccessful
-	 */
-	@Override
-	public boolean saveMenu(Plugin plugin, Menu menu, String fileName) {
-		
-		//check the menu
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, null);
-			return false;
-		}
-		
-		//check the plugin
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, menu.getName());
-			return false;
-		}
-		
-		//check the fileName
-		if (fileName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLFILENAME, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, menu.getName());
-			return false;
-		}
-		
-		//save the Menu
-		return this.yamlBuilder.saveYAML(plugin, menu, fileName);
 	}
 	
 	@Override
-	public boolean saveMenu(Menu menu){
+	public void reloadMenus() {
+		List<Menu> menusToReload = new LinkedList<Menu>();
 		
-		if (menu == null){
-			Logger.log(2, Level.WARNING, Message.NULLMENU);
-			return false;
+		for (Menu menu: menusByName.values()){
+			if (menu.hasAttribute("dynamic")){
+				if ((Boolean)menu.getAttribute("dynamic") == true){
+					continue;
+				}
+			}
+			menusToReload.add(menu);
 		}
 		
-		
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(menu.getPlugin());
-		if (plugin == null){
-			Logger.log(2, Level.WARNING, Message.NOSUCHPLUGIN, menu.getName());
-			return false;
+		for (Menu menu: menusToReload){
+			this.reloadMenu(menu);
 		}
-		
-		return saveMenu(plugin, menu, menu.getFileName());
-	}
-	
-	/**
-	 * Adds a Menu to the MenuService
-	 * @param plugin the Plugin which owns the Menu
-	 * @param menu the Menu
-	 */
-	@Override
-	public boolean addMenu(Plugin plugin, Menu menu) {
-		
-		//check menu
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, null);
-			return false;
-		}
-		
-		//check Plugin
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, menu.getName());
-			return false;
-		}
-		
-		//check if menu exists
-		if (menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, Message.MENUALREADYEXISTS, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, menu.getName());
-			return false;
-		}
-		
-		menusByName.put(menu.getName(), menu);
-		menusToInstances.put(menu, new LinkedList<MenuInstance>());
-		Logger.log(2, Level.INFO, "Menu " + menu.getName() + " was created and added");
-		
-		String command = (String) menu.getAttribute("openCommand");
-		if (command != null){
-			commandsToMenus.put(command, menu);
-			Logger.log(2, Level.INFO, "Run " + menu.getName() + " with the command: /" + command);
-		}
-		
-		//add a default renderer if it has none
-		if (menu.getRenderers().size() == 0){
-			menu.addRenderer(this.getRenderer("inventory"));
-		}
-		
-		return true;
 	}
 
+
+	@Override
+	public List<Menu> unloadMenus() {
+		List<Menu> list = new LinkedList<Menu>();
+		
+		for (Menu menu: menusByName.values()){
+			if (menu.hasAttribute("permanent")){
+				if ((Boolean)menu.getAttribute("permanent") == true){
+					continue;
+				}
+			}
+			list.add(menu);
+		}
+		for (Menu menu: list){
+			this.removeMenu(menu);
+		}
+		
+		return list;
+	}
+	
+	//--------------------------Methods for one Menu--------------------------
+	
 	/**
 	 * Returns a Menu from the MenuService
 	 * @param plugin the Plugin which stores the Menu
@@ -335,18 +324,12 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @return true if the MenuService has the Menu, false otherwise
 	 */
 	@Override
-	public boolean hasMenu(Plugin plugin, Menu menu) {
+	public boolean hasMenu(Menu menu) {
 		
 		//check menu
 		if (menu == null){
 			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
 			Logger.log(2, Level.SEVERE, Message.CANTHASMENU, null);
-		}
-		
-		//check plugin
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTHASMENU, menu.getName());
 		}
 		
 		//see if MenuService contains the menu
@@ -361,6 +344,58 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		//not the same
 		return false;
+	}
+	
+	@Override
+	public boolean hasMenu(String menuName) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	/**
+	 * Adds a Menu to the MenuService
+	 * @param plugin the Plugin which owns the Menu
+	 * @param menu the Menu
+	 */
+	@Override
+	public boolean addMenu(Menu menu) {
+		
+		//check menu
+		if (menu == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, null);
+			return false;
+		}
+		
+		//check Plugin
+		Plugin plugin = Bukkit.getPluginManager().getPlugin(menu.getPlugin());
+		if (plugin == null){
+			plugin = this.plugin;
+		}
+		
+		//check if menu exists
+		if (menusByName.containsKey(menu.getName())){
+			Logger.log(2, Level.SEVERE, Message.MENUALREADYEXISTS, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, menu.getName());
+			return false;
+		}
+		
+		menusByName.put(menu.getName(), menu);
+		menusToInstances.put(menu, new LinkedList<MenuInstance>());
+		Logger.log(2, Level.INFO, "Menu " + menu.getName() + " was created and added");
+		
+		String command = (String) menu.getAttribute("openCommand");
+		if (command != null){
+			commandsToMenus.put(command, menu);
+			Logger.log(2, Level.INFO, "Run " + menu.getName() + " with the command: /" + command);
+		}
+		
+		//add a default renderer if it has none
+		if (menu.getRenderers().size() == 0){
+			menu.addRenderer(this.getRenderer("inventory"));
+		}
+		
+		return true;
 	}
 	
 	/**
@@ -408,7 +443,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @return The Menu if it exists, null otherwise
 	 */
 	@Override
-	public Menu removeMenu(Plugin plugin, String menuName) {
+	public Menu removeMenu(String menuName) {
 		
 		if (menuName == null){
 			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
@@ -416,25 +451,187 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return null;
 		}
 		
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menuName);
+		//get the menu
+		Menu menu = menusByName.get(menuName);
+		if (menu == null){
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
 			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, menuName);
 			return null;
 		}
 		
-		//get the menu
-		Menu menu = menusByName.get(menuName);
+		Logger.log(2, Level.INFO, Message.MENUREMOVED);
+		return menu;
+	}
+	
+	/**
+	 * Creates a new Menu from the given Plugin and fileName.
+	 * 
+	 * Since Menus are stored based on the plugin that owns them, 
+	 * the plugin needs to be referenced so the correct file location can be found.
+	 * 
+	 * The fileName is the name of the config file for the Menu.
+	 * 
+	 * After the Menu is loaded, it is stored in the MenuService
+	 * 
+	 * @param plugin The Plugin which the Menu belongs to
+	 * @param fileName The name of the Menu's config file
+	 */
+	@Override
+	public Menu loadMenu(Plugin plugin, String fileName) {
 		
-		if (plugin.getName().equals(menu.getAttribute("plugin"))){
-			//remove the menu
-			removeMenu(menu);
-			Logger.log(2, Level.SEVERE, "Removed menu " + menuName);
+		//check the filename
+		if (fileName == null){
+			Logger.log(2, Level.SEVERE, Message.NULLFILENAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, null);
+			return null;
+		}
+				
+		//check the plugin
+		if (plugin == null){
+			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, fileName);
+			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
+			return null;
+		}		
+		
+		//load the file
+		Menu menu = yamlBuilder.loadMenu(plugin, fileName);
+
+		if (menu == null){
+			Logger.log(2, Level.SEVERE, Message.NOSUCHFILE, fileName);
+			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
+			return null;
+		}
+		
+		//add the menu
+		if (this.addMenu(menu)){
+			Logger.log(2, Level.INFO, "Menu " + menu.getName() + " loaded"); 
 			return menu;
 		}
 		
-		Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
-		Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, menuName);
+		Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
+		return menu;
+	}
+	
+	/**
+	 * Saves a Menu to file
+	 * @param plugin the Plugin which will hold the menu
+	 * @param menu the Menu to be saved
+	 * @param fileName the name of the file to store the menu in
+	 * @return true if successful, false is unsuccessful
+	 */
+	@Override
+	public boolean saveMenu(Menu menu) {
+		
+		//check the menu
+		if (menu == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
+			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, null);
+			return false;
+		}
+		
+		//check the plugin
+		Plugin plugin = Bukkit.getPluginManager().getPlugin(menu.getPlugin());
+		if (plugin == null){
+			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, menu.getName());
+			return false;
+		}
+		
+		//save the Menu
+		return this.yamlBuilder.saveYAML(plugin, menu, menu.getFileName());
+	}
+	
+	@Override
+	public void reloadMenu(Menu menu) {
+		String name = menu.getName();
+		String pluginName = menu.getPlugin();
+		this.removeMenu(menu);
+		this.loadMenu(Bukkit.getPluginManager().getPlugin(pluginName), name);
+	}
+
+	@Override
+	public void unloadMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	//--------------------------Methods for all MenuInstances of a Menu--------------------------
+	
+	@Override
+	public List<MenuInstance> getMenuInstances(Menu menu) {
+		if (!menusByName.containsKey(menu.getName())){
+			return null;
+		}
+		
+		return menusToInstances.get(menu);
+	}
+	
+	//--------------------------Methods for a MenuInstance of a Menu--------------------------
+	
+	/**
+	 * Returns a MenuInstance from the MenuService
+	 * @param menu the Menu which the MenuInstance is made of
+	 * @param instanceName the name of the MenuInstance
+	 * @return the MenuInstance if it exists, null otherwise
+	 */
+	@Override
+	public MenuInstance getMenuInstance(Menu menu, String instanceName) {
+		
+		if (instanceName == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, null);
+			return null;
+		}
+		
+		if (menu == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
+			return null;
+		}
+		
+
+		List<MenuInstance> instances = menusToInstances.get(menu);
+		if (instances == null){
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, menu.getName());
+			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
+			return null;
+		}
+		
+		for (MenuInstance instance: instances){
+			if (instance.getName().equals(instanceName)){
+				return instance;
+			}
+		}
+		
 		return null;
+	}
+	
+	/**
+	 * Checks if the MenuService has a MenuInstance
+	 * @param menu the Menu which the MenuInstance is made of
+	 * @param instanceName the name of the MenuInstance
+	 * @return true if it exists, false otherwise
+	 */
+	@Override
+	public boolean hasMenuInstance(Menu menu, String instanceName) {
+		
+		if (instanceName == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, null);
+			return false;
+		}
+		
+		if (menu == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
+			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, instanceName);
+			return false;
+		}
+		
+		if (this.getMenuInstance(menu, instanceName) != null){
+			return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -564,72 +761,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		return instance;
 	}
-
-	/**
-	 * Returns a MenuInstance from the MenuService
-	 * @param menu the Menu which the MenuInstance is made of
-	 * @param instanceName the name of the MenuInstance
-	 * @return the MenuInstance if it exists, null otherwise
-	 */
-	@Override
-	public MenuInstance getMenuInstance(Menu menu, String instanceName) {
-		
-		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, null);
-			return null;
-		}
-		
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
-			return null;
-		}
-		
-
-		List<MenuInstance> instances = menusToInstances.get(menu);
-		if (instances == null){
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
-			return null;
-		}
-		
-		for (MenuInstance instance: instances){
-			if (instance.getName().equals(instanceName)){
-				return instance;
-			}
-		}
-		
-		return null;
-	}
-
-	/**
-	 * Checks if the MenuService has a MenuInstance
-	 * @param menu the Menu which the MenuInstance is made of
-	 * @param instanceName the name of the MenuInstance
-	 * @return true if it exists, false otherwise
-	 */
-	@Override
-	public boolean hasMenuInstance(Menu menu, String instanceName) {
-		
-		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, null);
-			return false;
-		}
-		
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
-			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, instanceName);
-			return false;
-		}
-		
-		if (this.getMenuInstance(menu, instanceName) != null){
-			return true;
-		}
-		
-		return false;
-	}
 	
 	/**
 	 * Opens a MenuInstance to a given player.
@@ -707,6 +838,104 @@ public class MenuServiceProvider implements MenuService, Listener{
 	}
 	
 	/**
+	 * Closes the MenuInstance for a player
+	 * 
+	 * Tells the MenuProvider for the MenuInstance to close the Menu.
+	 * Removes the player from the MenuInstance.
+	 * 
+	 * @param playerName the Name of the player
+	 */
+	@Override
+	public void closeMenuInstance(String playerName) {
+		
+		//get the MenuInstance
+		MenuInstance instance = playersToInstances.get(playerName);
+		
+		//check if null
+		if (instance == null){
+			return;
+		}
+		
+		for (Renderer renderer: instance.getAllRenderers()){
+			renderer.closeMenu(playerName);
+		}
+		
+		//remove the player from the instance
+		instance.removePlayer(playerName);
+		
+		//unregister the player from the MenuInstance
+		this.playersToInstances.remove(playerName);
+		
+		//if there are no more players for the instance, notify the ActionListeners
+		if (instance.getPlayers().size() == 0){
+			for (ActionListener listener: instance.getActionListeners().values()){
+				listener.playerCountZero(instance, playerName);
+			}
+			if (instance.hasParameter("removeOnEmpty")){
+				if ((Boolean)instance.getParameter("removeOnEmpty")){
+					this.removeMenuInstance(instance);
+				}
+			}
+		}
+		
+		
+		
+		this.plugin.getLogger().info("MenuInstance closed for player " + playerName);
+	}
+	
+	//--------------------------Methods for Renderers--------------------------
+	
+	/**
+	 * Returns a Renderer by name from the MenuService.
+	 * @param rendererName The name of the Renderer
+	 * @return The specified Renderer, or null if one does not exist
+	 */
+	@Override
+	public Renderer getRenderer(String rendererName) {
+		
+		if (rendererName == null){
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTGETRENDERER, null);
+		}
+		
+		return renderersByName.get(rendererName);
+	}
+	
+	/**
+	 * Checks if the MenuService has a specified Renderer
+	 * @param the Renderer
+	 * @return true if the Renderer exists, false otherwise
+	 */
+	@Override
+	public boolean hasRenderer(Renderer renderer) {
+		
+		if (renderer == null){
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
+			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
+			return false;
+		}
+		
+		return renderersByName.containsValue(renderer);
+	}
+
+	/**
+	 * Checks if the MenuService has a specified Renderer
+	 * @param rendererName the name of the Renderer
+	 * @return true if the Renderer exists, false otherwise
+	 */
+	@Override
+	public boolean hasRenderer(String rendererName) {
+		
+		if (rendererName == null){
+			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
+			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
+			return false;
+		}
+		
+		return renderersByName.containsKey(rendererName);
+	}
+	
+	/**
 	 * Adds a Renderer to the MenuService.
 	 * After added, a Renderer can be used to Render MenuInstances.
 	 * Renderers can be assigned to Menus (and thus every MenuInstance of a menu) or individual MenuInstances.
@@ -742,22 +971,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 		Logger.log(2, Level.INFO, "Renderer " + renderer.getName() + " was added");
 		
 		return true;
-	}
-	
-	/**
-	 * Returns a Renderer by name from the MenuService.
-	 * @param rendererName The name of the Renderer
-	 * @return The specified Renderer, or null if one does not exist
-	 */
-	@Override
-	public Renderer getRenderer(String rendererName) {
-		
-		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTGETRENDERER, null);
-		}
-		
-		return renderersByName.get(rendererName);
 	}
 	
 	/**
@@ -809,71 +1022,84 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 	}
 	
-	/**
-	 * Checks if the MenuService has a specified Renderer
-	 * @param the Renderer
-	 * @return true if the Renderer exists, false otherwise
-	 */
+	//--------------------------Methods for Binds--------------------------
+
 	@Override
-	public boolean hasRenderer(Renderer renderer) {
-		
-		if (renderer == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
-			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
-			return false;
+	public void loadBinds() {
+		//create data folder if needed
+		if (!plugin.getDataFolder().exists()){
+			Logger.log(2, Level.INFO, "Creating Data Folder");
+			plugin.getDataFolder().mkdir();
 		}
 		
-		return renderersByName.containsValue(renderer);
+		//create configuration file if needed
+		File configFile = new File(plugin.getDataFolder(), MenuServicePlugin.bindsFileName);
+		if (!configFile.exists()){
+			try {
+				configFile.createNewFile();
+			} catch (IOException e) {
+				Logger.log(1, Level.SEVERE, "Unable to create binds file!");
+			}
+		}
+		
+		//load the configuration file
+		MenuServicePlugin.binds = YamlConfiguration.loadConfiguration(configFile);
+		if (MenuServicePlugin.binds == null){
+			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
+			return;
+		}
+		
 	}
 
-	/**
-	 * Checks if the MenuService has a specified Renderer
-	 * @param rendererName the name of the Renderer
-	 * @return true if the Renderer exists, false otherwise
-	 */
 	@Override
-	public boolean hasRenderer(String rendererName) {
+	public void saveBinds() {
 		
-		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
-			return false;
+		//Create file
+		File bindsFile = new File(this.plugin.getDataFolder(), "binds.yml");
+		try {
+			if (bindsFile.exists()) bindsFile.delete();
+			bindsFile.createNewFile();
+		} catch (IOException e) {
+			e.printStackTrace();
+			return;
 		}
 		
-		return renderersByName.containsKey(rendererName);
+		YamlConfiguration bindsConfig = YamlConfiguration.loadConfiguration(bindsFile);
+		
+		Map<String, List<ItemStack>> reverseItemMap = new TreeMap<String, List<ItemStack>>();
+		
+		for (Entry<String, List<ItemStack>> entry: reverseItemMap.entrySet()){
+			bindsConfig.set("itemstacks." + entry.getKey(), entry.getValue());
+		}
+		
+		
+		Map<String, List<Material>> reverseMaterialMap = new TreeMap<String, List<Material>>();
+		
+		for (Entry<Material, String> entry: this.materialsToMenus.entrySet()){
+			if (!reverseMaterialMap.containsKey(entry.getValue())){
+				reverseMaterialMap.put(entry.getValue(), new LinkedList<Material>());
+			}
+			reverseMaterialMap.get(entry.getValue()).add(entry.getKey());
+		}
+		
+		for (Entry<String, List<Material>> entry: reverseMaterialMap.entrySet()){
+			bindsConfig.set("materials." + entry.getKey(), entry.getValue());
+		}
+		
+		try {
+			bindsConfig.save(bindsFile);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
 	}
-
-	/**
-	 * Binds an ItemStack to a Menu, so the Menu can be opened by right-clicking the ItemStack
-	 * @param item the ItemStack
-	 * @param menu the Menu
-	 * @return true if successful, false if unsuccessful
-	 */
+	
 	@Override
-	public boolean bindMenu(ItemStack item, Menu menu) {
-		
-		if (item == null){
-			Logger.log(2, Level.SEVERE, Message.NULLITEMSTACK, null);
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, null);
-			return false;
-		}
-		
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, item.toString());
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, item.toString());
-			return false;
-		}
-		
-		if (!menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUITEM, item.toString());
-			return false;
-		}
-		
-		itemsToMenus.put(new ItemStack(item), menu.getName());
-		return true;
+	public Map<Material, String> getMaterialBinds() {
+		return materialsToMenus;
 	}
-
+	
 	/**
 	 * Binds a Material to a Menu, so the Menu can be opened by right-clicking the Material
 	 * @param material the Material
@@ -919,15 +1145,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 			return false;
 		}
 		
-		if (itemsToMenus.containsValue(menu)){
-			Iterator<Entry<ItemStack, String>> iterator = itemsToMenus.entrySet().iterator();
-			while (iterator.hasNext()){
-				if (iterator.next().getKey().equals(menu.getName())){
-					iterator.remove();
-				}
-			}
-		}
-		
 		if (materialsToMenus.containsValue(menu)){
 			Iterator<Entry<Material, String>> iterator = materialsToMenus.entrySet().iterator();
 			while (iterator.hasNext()){
@@ -937,24 +1154,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 			}
 		}
 		
-		return true;
-	}
-
-	/**
-	 * Unbinds an ItemStack from a menu if it is binded
-	 * @param item the ItemStack
-	 * @return true if successful, false if unsuccessful
-	 */
-	@Override
-	public boolean unbindMenu(ItemStack item) {
-		
-		if (item == null){
-			Logger.log(2, Level.SEVERE, Message.NULLITEMSTACK, null);
-			Logger.log(2, Level.SEVERE, Message.CANTUNBINDITEM, null);
-			return false;
-		}
-		
-		itemsToMenus.remove(item);
 		return true;
 	}
 
@@ -975,323 +1174,5 @@ public class MenuServiceProvider implements MenuService, Listener{
 		materialsToMenus.remove(material);
 		return true;
 	}
-	
-	@Override
-	public Map<Material, String> getMaterialBinds() {
-		return materialsToMenus;
-	}
-
-
-	@Override
-	public Map<ItemStack, String> getItemStackBinds() {
-		return itemsToMenus;
-	}
-	
-	@Override
-	public void setMaterialBinds(Map<Material, String> materialBinds) {
-		this.materialsToMenus = materialBinds;
-	}
-
-
-	@Override
-	public void setItemStackBinds(Map<ItemStack, String> itemBinds) {
-		this.itemsToMenus = itemBinds;
-	}
-
-	/**
-	 * Saves all Menus to file
-	 */
-	@Override
-	public void saveMenus() {
-		for (Menu menu: menusByName.values()){
-			
-			if (menu.hasAttribute("dynamic")){
-				if ((Boolean) menu.getAttribute("dynamic")){
-					continue;
-				}
-			}
-			
-			Plugin plugin = Bukkit.getPluginManager().getPlugin((String) menu.getAttribute("plugin"));
-			if (plugin != null){
-				String filename = null;
-				if (menu.hasAttribute("filename")){
-					filename = (String) menu.getAttribute("filename");
-				} else{
-					filename = menu.getTag() + ".yml";
-				}
-				yamlBuilder.saveYAML(plugin, menu, filename);
-			}
-			
-			
-		}
-	}
-
-	/**
-	 * Closes all Menus
-	 */
-	@Override
-	public void closeMenus() {
-		for (Renderer renderer: renderersByName.values()){
-			renderer.closeAll();
-		}
-		
-	}
-
-
-	/**
-	 * Checks if a binded command is being executed. If so, opens the correct Menu.
-	 * @param command the Command which was executed
-	 * @param player the name of the player who executed the command
-	 * @return true if the command was binded, false otherwise
-	 */
-	protected boolean checkCommand(String command, Player player){
-
-		if (command == null){
-			Logger.log(2, Level.SEVERE, Message.NULLCOMMAND, null);
-			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, null);
-			return false;
-		}
-		if (player == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLAYER, command);
-			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, command);
-			return false;
-		}
-		
-		for (Entry<String, Menu> entry: commandsToMenus.entrySet()){
-			
-			//check command
-			if (command.equals(entry.getKey())){
-								
-				//commands match. Start Menu
-				if (this.hasMenuInstance(entry.getValue(),  player.getName() + ": " + entry.getValue().getName())){
-					openMenuInstance(this.getMenuInstance(entry.getValue(),  player.getName() + ": " + entry.getValue().getName()), player.getName());
-				} else {
-					MenuInstance instance = createMenuInstance(entry.getValue(), player.getName() + ": " + entry.getValue().getName());
-					instance.addParameter("removeOnEmpty", true);
-					openMenuInstance(instance, player.getName());
-				}
-				return true;
-			}
-		}
-		
-		return false;
-	}
-	
-	/**
-	 * Checks if the player right clicked a binded ItemStack or Material
-	 * If so, opens the binded menu.
-	 * @param event
-	 */
-	@EventHandler
-	public void itemClick(PlayerInteractEvent event){
-		
-		if (event == null){
-			return;
-		}
-		
-		ItemStack item = event.getItem();
-
-		if (event.getAction() != Action.RIGHT_CLICK_AIR){
-			return;
-		}
-
-		if (!event.isBlockInHand()){
-			return;
-		}
-
-		if (materialsToMenus.containsKey(item.getType())){
-
-			event.setCancelled(true);
-			
-			String menuName = materialsToMenus.get(item.getType());
-			Menu menu = menusByName.get(menuName);
-			//TODO: Add checks
-			
-			this.openMenuInstance(this.createMenuInstance(menu, menu.getName() + ": " + event.getPlayer().getName()), event.getPlayer().getName());
-			return;
-		}
-	}
-
-	/**
-	 * Returns a List of the Menus that are currently loaded in the MenuService
-	 * @return all currently loaded Menus
-	 */
-	@Override
-	public List<Menu> getMenus() {
-		
-		return new LinkedList<Menu>(menusByName.values());
-	}
-
-
-	@Override
-	public List<MenuInstance> getMenuInstances(Menu menu) {
-		if (!menusByName.containsKey(menu.getName())){
-			return null;
-		}
-		
-		return menusToInstances.get(menu);
-	}
-
-
-	/**
-	 * Loads menus stored in MenuService
-	 */
-	public void loadMenus() {
-		
-		//load menus in the MenuService folder
-		for (File file: plugin.getDataFolder().listFiles()){
-			
-			//make sure the file is not the config file and has the .yml extension
-			if ((!file.getName().equalsIgnoreCase("config.yml")) && (!file.getName().equalsIgnoreCase("binds.yml")) && file.getName().endsWith(".yml")){
-				
-				//load the menu
-				Menu menu = this.loadMenu(plugin, file.getName());
-				if (menu == null){
-					continue;
-				}
-				
-				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
-			}
-			
-		}
-		
-	}
-
-
-	@Override
-	public void loadBinds() {
-		//create data folder if needed
-		if (!plugin.getDataFolder().exists()){
-			Logger.log(2, Level.INFO, "Creating Data Folder");
-			plugin.getDataFolder().mkdir();
-		}
-		
-		//create configuration file if needed
-		File configFile = new File(plugin.getDataFolder(), MenuServicePlugin.bindsFileName);
-		if (!configFile.exists()){
-			try {
-				configFile.createNewFile();
-			} catch (IOException e) {
-				Logger.log(1, Level.SEVERE, "Unable to create binds file!");
-			}
-		}
-		
-		//load the configuration file
-		MenuServicePlugin.binds = YamlConfiguration.loadConfiguration(configFile);
-		if (MenuServicePlugin.binds == null){
-			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
-			return;
-		}
-		
-//		if (MenuServicePlugin.binds.contains("materials")){
-//			MemorySection materialSection = (MemorySection) MenuServicePlugin.binds.get("materials");
-//			for (String m: materialSection.getKeys(false)){
-//				//MemorySection s = (MemorySection) materialSection.get(m);
-//				
-//
-//			}
-//		}
-	}
-
-	@Override
-	public void saveBinds() {
-		
-		//Create file
-		File bindsFile = new File(this.plugin.getDataFolder(), "binds.yml");
-		try {
-			if (bindsFile.exists()) bindsFile.delete();
-			bindsFile.createNewFile();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		
-		YamlConfiguration bindsConfig = YamlConfiguration.loadConfiguration(bindsFile);
-		
-		Map<String, List<ItemStack>> reverseItemMap = new TreeMap<String, List<ItemStack>>();
-		
-		for (Entry<ItemStack, String> entry: this.itemsToMenus.entrySet()){
-			if (!reverseItemMap.containsKey(entry.getValue())){
-				reverseItemMap.put(entry.getValue(), new LinkedList<ItemStack>());
-			}
-			reverseItemMap.get(entry.getValue()).add(entry.getKey());
-		}
-		
-		for (Entry<String, List<ItemStack>> entry: reverseItemMap.entrySet()){
-			bindsConfig.set("itemstacks." + entry.getKey(), entry.getValue());
-		}
-		
-		
-		Map<String, List<Material>> reverseMaterialMap = new TreeMap<String, List<Material>>();
-		
-		for (Entry<Material, String> entry: this.materialsToMenus.entrySet()){
-			if (!reverseMaterialMap.containsKey(entry.getValue())){
-				reverseMaterialMap.put(entry.getValue(), new LinkedList<Material>());
-			}
-			reverseMaterialMap.get(entry.getValue()).add(entry.getKey());
-		}
-		
-		for (Entry<String, List<Material>> entry: reverseMaterialMap.entrySet()){
-			bindsConfig.set("materials." + entry.getKey(), entry.getValue());
-		}
-		
-		try {
-			bindsConfig.save(bindsFile);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-	}
-
-
-	@Override
-	public void reloadMenus() {
-		List<Menu> menusToReload = new LinkedList<Menu>();
-		
-		for (Menu menu: menusByName.values()){
-			if (menu.hasAttribute("dynamic")){
-				if ((Boolean)menu.getAttribute("dynamic") == true){
-					continue;
-				}
-			}
-			menusToReload.add(menu);
-		}
-		
-		for (Menu menu: menusToReload){
-			this.reloadMenu(menu);
-		}
-	}
-
-
-	@Override
-	public List<Menu> unloadMenus() {
-		List<Menu> list = new LinkedList<Menu>();
-		
-		for (Menu menu: menusByName.values()){
-			if (menu.hasAttribute("permanent")){
-				if ((Boolean)menu.getAttribute("permanent") == true){
-					continue;
-				}
-			}
-			list.add(menu);
-		}
-		for (Menu menu: list){
-			this.removeMenu(menu);
-		}
-		
-		return list;
-	}
-
-
-	@Override
-	public void reloadMenu(Menu menu) {
-		String name = menu.getName();
-		String pluginName = menu.getPlugin();
-		this.removeMenu(menu);
-		this.loadMenu(Bukkit.getPluginManager().getPlugin(pluginName), name);
-	}
-
-
 
 }

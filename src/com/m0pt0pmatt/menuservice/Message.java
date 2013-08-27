@@ -73,15 +73,10 @@ public enum Message {
 	
 	EMPTYMENUFORINSTANCE ("Error: The MenuInstance has no Menu"),
 	
-	
-	//cast exceptions
+	//other exceptions
 	CANTCASTATTRIBUTE ("Error: Could not cast the Attribute"),
 	RENDERERNOTABSTRACTRENDERER ("Error: Renderer did not extend the type AbstractRenderer"),
-	
 	MENUALREADYEXISTS ("Error: MenuService arleady has a Menu with the same name"),
-	
-	
-	
 	
 	//MenuManager Error Messages
 	CANTSHOWMAINMENU ("Error: Could not show the Main Menu of the Menu Manager"), 
@@ -93,7 +88,6 @@ public enum Message {
 	BADARGUMENTS("Bad arguments."),
 	INTERNALMETHODNOTFOUND("Internal method was not found."),
 	ERRORINVOKINGMETHOD("An error occurred when running the command"),
-	
 	MENUSAVED("Menu saved"),
 	MENUNOTSAVED("Menu not saved"),
 	MENULOADED("Menu loaded"),
@@ -103,7 +97,8 @@ public enum Message {
 	MENUUNLOADED("Menu unloaded"),
 	MENUNOTUNLOADED("Menu not unloaded"), 
 	MENUOPENED("Menu opened"),
-	MENUNOTOPENED("Menu not opened");
+	MENUNOTOPENED("Menu not opened"),
+	MENUREMOVED("Menu removed");
 	
 	private final String message;
 	
@@ -158,9 +153,14 @@ public enum Message {
 		if (sender instanceof Player){
 			sendMessage((Player) sender, type, message);
 			return;
-		} 
+		}
 		
-		sender.sendMessage("[" + type.getLabel() + "] " + message);
+		if (type.getLabel() == null){
+			sender.sendMessage(message);
+		} else{
+			sender.sendMessage("[" + type.getLabel() + "] " + message);
+		}
+		
 	}
 	
 	/**
@@ -212,7 +212,12 @@ public enum Message {
 	 * @param message the actual message
 	 */
 	public static void sendMessage(Player player, MessageFormat type, String message){
-		player.sendMessage(type.getLabelColor() + "[" + type.getLabel() + "] " + type.getMessageColor() + message);
+		
+		if (type.getLabelColor() == null || type.getLabel() == null){
+			player.sendMessage(type.getMessageColor() + message);
+		} else{
+			player.sendMessage(type.getLabelColor() + "[" + type.getLabel() + "] " + type.getMessageColor() + message);
+		}
 	}
 	
 	/**

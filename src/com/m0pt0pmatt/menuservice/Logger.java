@@ -4,6 +4,11 @@ import java.util.logging.Level;
 
 import org.bukkit.plugin.Plugin;
 
+/**
+ * The Logger outputs messages to the terminal.
+ * @author Matthew
+ *
+ */
 public class Logger {
 
 	

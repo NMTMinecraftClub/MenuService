@@ -4,6 +4,12 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Keywords are common strings throughout MenuService.
+ * They are placed here to prevent spelling errors throughout the program.
+ * @author Matthew
+ *
+ */
 public enum Keyword {
 
 	MENUSERVICE("menuservice"),

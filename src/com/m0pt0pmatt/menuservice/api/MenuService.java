@@ -23,6 +23,79 @@ import org.bukkit.plugin.Plugin;
  */
 public interface MenuService {
 
+	//--------------------------Methods for all Menus--------------------------
+	
+	/**
+	 * Returns a List of the Menus that are currently loaded in the MenuService
+	 * @return all currently loaded Menus
+	 */
+	public List<Menu> getMenus();
+	
+	public void loadMenus();
+	
+	/**
+	 * Saves all Menus to file
+	 */
+	public void saveMenus();
+	
+	/**
+	 * Closes all Menus
+	 */
+	public void closeMenus();
+	
+	/**
+	 * Reloads all Menus
+	 */
+	public void reloadMenus();
+	
+	/**
+	 * Unloads all Menus
+	 */
+	public List<Menu> unloadMenus();
+	
+	//--------------------------Methods for one Menu--------------------------
+	
+	/**
+	 * Returns a Menu from the MenuService
+	 * @param menuName the name of the Menu
+	 * @return the Menu if it exists, null otherwise
+	 */
+	public Menu getMenu(String menuName);
+	
+	/**
+	 * Checks if a Menu is loaded into the MenuService
+	 * @param menu the Menu
+	 * @return true if the MenuService has the Menu, false otherwise
+	 */
+	public boolean hasMenu(Menu menu);
+	
+	/**
+	 * Checks if a Menu is loaded into the MenuService
+	 * @param menuName the name of the Menu
+	 * @return true if the MenuService has the Menu, false otherwise
+	 */
+	public boolean hasMenu(String menuName);
+	
+	/**
+	 * Adds a Menu to the MenuService
+	 * @param plugin the Plugin which owns the Menu
+	 * @param menu the Menu
+	 */
+	public boolean addMenu(Menu menu);
+	
+	/**
+	 * Removes a Menu from the MenuService. This does not save the menu to file.
+	 * @param menu the Menu to remove
+	 */
+	public void removeMenu(Menu menu);
+	
+	/**
+	 * Removes a Menu from the MenuService. This does not save the menu to file.
+	 * @param menuName the name of the Menu
+	 * @return The Menu if it exists, null otherwise
+	 */
+	public Menu removeMenu(String menuName);
+	
 	/**
 	 * Creates a new Menu from the given Plugin and fileName.
 	 * Since Menus are stored based on the plugin that owns them, 
@@ -37,57 +110,46 @@ public interface MenuService {
 	public Menu loadMenu(Plugin plugin, String fileName);
 	
 	/**
-	 * Saves a Menu to file
-	 * @param plugin the Plugin which will hold the menu
+	 * Saves a menu to file
 	 * @param menu the Menu to be saved
-	 * @param fileName the name of the file to store the menu in
-	 * @return true if successful, false is unsuccessful
+	 * @return true if the Menu was saved, false otherwise
 	 */
-	public boolean saveMenu(Plugin plugin, Menu menu, String fileName);
-	
 	public boolean saveMenu(Menu menu);
 	
-	/**
-	 * Adds a Menu to the MenuService
-	 * @param plugin the Plugin which owns the Menu
-	 * @param menu the Menu
-	 */
-	public boolean addMenu(Plugin plugin, Menu menu);
+	public void reloadMenu(Menu menu);
 	
 	/**
-	 * Returns a Menu from the MenuService
-	 * @param menuName the name of the Menu
-	 * @return the Menu if it exists, null otherwise
+	 * Removes the Menu and saves it to file
+	 * @param menu the Menu to be unloaded
 	 */
-	public Menu getMenu(String menuName);
+	public void unloadMenu(Menu menu);
+	
+	//--------------------------Methods for all MenuInstances of a Menu--------------------------
 	
 	/**
-	 * Checks if a Menu is loaded into the MenuService
-	 * @param plugin the Plugin which owns the Menu
-	 * @param menu the Menu
-	 * @return true if the MenuService has the Menu, false otherwise
+	 * Returns a List of the MenuInstances that are currently loaded for the given Menu
+	 * @param menu the given Menu
+	 * @return all menuInstances for the given Menu
 	 */
-	public boolean hasMenu(Plugin plugin, Menu menu);
+	public List<MenuInstance> getMenuInstances(Menu menu);
+	
+	//--------------------------Methods for a MenuInstance of a Menu--------------------------
 	
 	/**
-	 * Removes a Menu from the MenuService. This does not save the menu to file.
-	 * @param menu the Menu to remove
+	 * Returns a MenuInstance from the MenuService
+	 * @param menu the Menu which the MenuInstance is made of
+	 * @param instanceName the name of the MenuInstance
+	 * @return the MenuInstance if it exists, null otherwise
 	 */
-	public void removeMenu(Menu menu);
+	public MenuInstance getMenuInstance(Menu menu, String instanceName);
 	
 	/**
-	 * Removes a Menu from the MenuService. This does not save the menu to file.
-	 * @param plugin The Plugin which owns the Menu.
-	 * @param menuName the name of the Menu
-	 * @return The Menu if it exists, null otherwise
+	 * Checks if the MenuService has a MenuInstance
+	 * @param menu the Menu which the MenuInstance is made of
+	 * @param instanceName the name of the MenuInstance
+	 * @return true if it exists, false otherwise
 	 */
-	public Menu removeMenu(Plugin plugin, String menuName);
-	
-	/**
-	 * Returns a List of the Menus that are currently loaded in the MenuService
-	 * @return all currently loaded Menus
-	 */
-	public List<Menu> getMenus();
+	public boolean hasMenuInstance(Menu menu, String instanceName);
 	
 	/**
 	 * Creates a MenuInstance from the given Menu.
@@ -118,21 +180,6 @@ public interface MenuService {
 	public MenuInstance createMenuInstance(Menu menu, String instanceName, Map<String, Object> parameters);
 	
 	/**
-	 * Opens a MenuInstance to a given player.
-	 * 
-	 * The MenuService will also register that the player is currently viewing the given MenuInstance.
-	 * In order for a MenuInstance to be shown, the Menu of the MenuInstance must be provided for by a MenuProvider.
-	 * MenuInstances also need to have at least one Renderer. This can be assigned to the MenuInstance itself, or inherited from the Renderers of its Menu.
-	 * 
-	 * @param instance The MenuInstane to be shown.
-	 * @param playerName The name of the player to show the MenuInstance to.
-	 */
-	public boolean openMenuInstance(MenuInstance instance, String playerName);
-	
-	
-	public List<MenuInstance> getMenuInstances(Menu menu);
-	
-	/**
 	 * Removes a MenuInstance from the MenuService
 	 * @param instance the MenuInstance to be removed
 	 */
@@ -147,20 +194,16 @@ public interface MenuService {
 	public MenuInstance removeMenuInstance(Menu menu, String instanceName);
 	
 	/**
-	 * Returns a MenuInstance from the MenuService
-	 * @param menu the Menu which the MenuInstance is made of
-	 * @param instanceName the name of the MenuInstance
-	 * @return the MenuInstance if it exists, null otherwise
+	 * Opens a MenuInstance to a given player.
+	 * 
+	 * The MenuService will also register that the player is currently viewing the given MenuInstance.
+	 * In order for a MenuInstance to be shown, the Menu of the MenuInstance must be provided for by a MenuProvider.
+	 * MenuInstances also need to have at least one Renderer. This can be assigned to the MenuInstance itself, or inherited from the Renderers of its Menu.
+	 * 
+	 * @param instance The MenuInstane to be shown.
+	 * @param playerName The name of the player to show the MenuInstance to.
 	 */
-	public MenuInstance getMenuInstance(Menu menu, String instanceName);
-	
-	/**
-	 * Checks if the MenuService has a MenuInstance
-	 * @param menu the Menu which the MenuInstance is made of
-	 * @param instanceName the name of the MenuInstance
-	 * @return true if it exists, false otherwise
-	 */
-	public boolean hasMenuInstance(Menu menu, String instanceName);
+	public boolean openMenuInstance(MenuInstance instance, String playerName);
 	
 	/**
 	 * Closes the MenuInstance for a player
@@ -172,13 +215,7 @@ public interface MenuService {
 	 */
 	public void closeMenuInstance(String playerName);
 	
-	/**
-	 * Adds a Renderer to the MenuService.
-	 * After added, a Renderer can be used to Render MenuInstances.
-	 * Renderers can be assigned to Menus (and thus every MenuInstance of a menu) or individual MenuInstances.
-	 * @param renderer The Renderer to be added to the MenuService
-	 */
-	public boolean addRenderer(Renderer renderer);
+	//--------------------------Methods for Renderers--------------------------
 	
 	/**
 	 * Returns a Renderer by name from the MenuService.
@@ -186,19 +223,6 @@ public interface MenuService {
 	 * @return The specified Renderer, or null if one does not exist
 	 */
 	public Renderer getRenderer(String rendererName);
-	
-	/**
-	 * Removes a Renderer from the MenuService
-	 * @param rendererName the name of the Renderer to be removed
-	 * @return the Renderer if it exists, null otherwise
-	 */
-	public Renderer removeRenderer(String rendererName);
-	
-	/**
-	 * Removes a Renderer from the MenuService
-	 * @param renderer the Renderer to be removed
-	 */
-	public void removeRenderer(Renderer renderer);
 	
 	/**
 	 * Checks if the MenuService has a specified Renderer
@@ -215,12 +239,33 @@ public interface MenuService {
 	public boolean hasRenderer(String rendererName);
 	
 	/**
-	 * Binds an ItemStack to a Menu, so the Menu can be opened by right-clicking the ItemStack
-	 * @param item the ItemStack
-	 * @param menu the Menu
-	 * @return true if successful, false if unsuccessful
+	 * Adds a Renderer to the MenuService.
+	 * After added, a Renderer can be used to Render MenuInstances.
+	 * Renderers can be assigned to Menus (and thus every MenuInstance of a menu) or individual MenuInstances.
+	 * @param renderer The Renderer to be added to the MenuService
 	 */
-	public boolean bindMenu(ItemStack item, Menu menu);
+	public boolean addRenderer(Renderer renderer);
+	
+	/**
+	 * Removes a Renderer from the MenuService
+	 * @param renderer the Renderer to be removed
+	 */
+	public void removeRenderer(Renderer renderer);
+	
+	/**
+	 * Removes a Renderer from the MenuService
+	 * @param rendererName the name of the Renderer to be removed
+	 * @return the Renderer if it exists, null otherwise
+	 */
+	public Renderer removeRenderer(String rendererName);
+	
+	//--------------------------Methods for Binds--------------------------
+	
+	public void loadBinds();
+	
+	public void saveBinds();
+	
+	public Map<Material, String> getMaterialBinds();
 	
 	/**
 	 * Binds a Material to a Menu, so the Menu can be opened by right-clicking the Material
@@ -238,52 +283,12 @@ public interface MenuService {
 	public boolean unbindMenu(Menu menu);
 	
 	/**
-	 * Unbinds an ItemStack from a menu if it is binded
-	 * @param item the ItemStack
-	 * @return true if successful, false if unsuccessful
-	 */
-	public boolean unbindMenu(ItemStack item);
-	
-	/**
 	 * Unbinds a Material from a menu if it is binded
 	 * @param material the Material
 	 * @return true if successful, false if unsuccessful
 	 */
 	public boolean unbindMenu(Material material);
 	
-	public Map<Material, String> getMaterialBinds();
-	public Map<ItemStack, String> getItemStackBinds();
-	public void setMaterialBinds(Map<Material, String> materialBinds);
-	public void setItemStackBinds(Map<ItemStack, String> itemBinds);
-
 	
-	/**
-	 * Saves all Menus to file
-	 */
-	public void saveMenus();
-	
-	/**
-	 * Closes all Menus
-	 */
-	public void closeMenus();
-	
-	/**
-	 * Reloads all Menus
-	 */
-	public void reloadMenus();
-	
-	public void reloadMenu(Menu menu);
-
-	/**
-	 * Unloads all Menus
-	 */
-	public List<Menu> unloadMenus();
-		
-	public void loadMenus();
-	
-	public void loadBinds();
-	
-	public void saveBinds();
-
 	
 }
