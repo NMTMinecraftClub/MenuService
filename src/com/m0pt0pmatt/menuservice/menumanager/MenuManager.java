@@ -84,7 +84,7 @@ public class MenuManager {
 		
 		//Add the Menus to the MenuService
 		for (Menu menu: menus.values()){
-			menuService.addMenu(plugin, menu);
+			menuService.addMenu(menu);
 		}
 		
 		//create the listeners

@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 /**
@@ -31,22 +30,22 @@ public interface MenuService {
 	 */
 	public List<Menu> getMenus();
 	
-	public void loadMenus();
+	public boolean loadMenus();
 	
 	/**
 	 * Saves all Menus to file
 	 */
-	public void saveMenus();
+	public boolean saveMenus();
 	
 	/**
 	 * Closes all Menus
 	 */
-	public void closeMenus();
+	public boolean closeMenus();
 	
 	/**
 	 * Reloads all Menus
 	 */
-	public void reloadMenus();
+	public boolean reloadMenus();
 	
 	/**
 	 * Unloads all Menus
@@ -87,7 +86,7 @@ public interface MenuService {
 	 * Removes a Menu from the MenuService. This does not save the menu to file.
 	 * @param menu the Menu to remove
 	 */
-	public void removeMenu(Menu menu);
+	public boolean removeMenu(Menu menu);
 	
 	/**
 	 * Removes a Menu from the MenuService. This does not save the menu to file.
@@ -116,13 +115,19 @@ public interface MenuService {
 	 */
 	public boolean saveMenu(Menu menu);
 	
-	public void reloadMenu(Menu menu);
+	public boolean reloadMenu(Menu menu);
 	
 	/**
 	 * Removes the Menu and saves it to file
 	 * @param menu the Menu to be unloaded
 	 */
-	public void unloadMenu(Menu menu);
+	public boolean unloadMenu(Menu menu);
+	
+	public boolean openMenu(Menu menu, String playerName);
+	
+	public boolean closeMenu(Menu menu, String playerName);
+	
+	public boolean closeMenu(String menuName, String playerName);
 	
 	//--------------------------Methods for all MenuInstances of a Menu--------------------------
 	
@@ -133,8 +138,13 @@ public interface MenuService {
 	 */
 	public List<MenuInstance> getMenuInstances(Menu menu);
 	
+	public boolean closeAllMenuInstances(Menu menu);
+	
 	//--------------------------Methods for a MenuInstance of a Menu--------------------------
 	
+	public String getDefaultMenuInstanceName(Menu menu, String playerName);
+	
+	public String getDefaultMenuInstanceName(String menuName, String playerName);
 	/**
 	 * Returns a MenuInstance from the MenuService
 	 * @param menu the Menu which the MenuInstance is made of
@@ -183,7 +193,7 @@ public interface MenuService {
 	 * Removes a MenuInstance from the MenuService
 	 * @param instance the MenuInstance to be removed
 	 */
-	public void removeMenuInstance(MenuInstance instance);
+	public boolean removeMenuInstance(MenuInstance instance);
 	
 	/**
 	 * Removes a MenuInstance from the MenuService
@@ -205,6 +215,8 @@ public interface MenuService {
 	 */
 	public boolean openMenuInstance(MenuInstance instance, String playerName);
 	
+	public boolean closeMenuInstance(MenuInstance instance);
+	
 	/**
 	 * Closes the MenuInstance for a player
 	 * 
@@ -213,7 +225,7 @@ public interface MenuService {
 	 * 
 	 * @param playerName the Name of the player
 	 */
-	public void closeMenuInstance(String playerName);
+	public boolean closeMenuInstance(String playerName);
 	
 	//--------------------------Methods for Renderers--------------------------
 	
@@ -250,7 +262,7 @@ public interface MenuService {
 	 * Removes a Renderer from the MenuService
 	 * @param renderer the Renderer to be removed
 	 */
-	public void removeRenderer(Renderer renderer);
+	public boolean removeRenderer(Renderer renderer);
 	
 	/**
 	 * Removes a Renderer from the MenuService
@@ -261,9 +273,9 @@ public interface MenuService {
 	
 	//--------------------------Methods for Binds--------------------------
 	
-	public void loadBinds();
+	public boolean loadBinds();
 	
-	public void saveBinds();
+	public boolean saveBinds();
 	
 	public Map<Material, String> getMaterialBinds();
 	
@@ -288,7 +300,5 @@ public interface MenuService {
 	 * @return true if successful, false if unsuccessful
 	 */
 	public boolean unbindMenu(Material material);
-	
-	
 	
 }

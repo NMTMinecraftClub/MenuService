@@ -1,31 +1,28 @@
 package com.m0pt0pmatt.menuservice.menumanager;
 
-import java.util.Map;
-
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
-import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 
 public class InstancesMenuListener implements ActionListener{
 
-	private MenuService menuService;
+	//private MenuService menuService;
 	
 	public InstancesMenuListener(MenuService menuService, MenuManager manager){
-		this.menuService = menuService;
+		//this.menuService = menuService;
 	}
 
 	@Override
 	public void handleAction(ActionEvent event) {
 		
 		int tag = event.getAction().getTag();
-		MenuInstance instance = event.getAction().getInstance();
-		String playerName = event.getAction().getPlayerName();
-		int spot = (Integer) instance.getParameter(playerName + ":slot");
+		//MenuInstance instance = event.getAction().getInstance();
+		//String playerName = event.getAction().getPlayerName();
+		//int spot = (Integer) instance.getParameter(playerName + ":slot");
 						
-		Map<Integer, Menu> menuSpots;
-		Menu menu = null;
+		//Map<Integer, Menu> menuSpots;
+		//Menu menu = null;
 		
 		switch (InstancesMenuButtons.getMenuType(tag)){
 		case MENU_EDITINSTANCE:

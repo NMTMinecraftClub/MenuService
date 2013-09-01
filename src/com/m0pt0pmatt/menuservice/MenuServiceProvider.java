@@ -65,6 +65,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	//the Yaml File loader/saver
 	private YAMLBuilder yamlBuilder;
 	
+	private static final String delimeter = ":"; 
+	
 	/**
 	 * Creates the MenuServiceProvider.
 	 * The plugin of it's creator is needed so the MenuServiceProvider can register events.
@@ -190,7 +192,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 	/**
 	 * Loads menus stored in MenuService
 	 */
-	public void loadMenus() {
+	public boolean loadMenus() {
 		
 		//load menus in the MenuService folder
 		for (File file: plugin.getDataFolder().listFiles()){
@@ -209,13 +211,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 			
 		}
 		
+		return true;
 	}
 	
 	/**
 	 * Saves all Menus to file
 	 */
 	@Override
-	public void saveMenus() {
+	public boolean saveMenus() {
 		for (Menu menu: menusByName.values()){
 			
 			if (menu.hasAttribute("dynamic")){
@@ -237,21 +240,23 @@ public class MenuServiceProvider implements MenuService, Listener{
 			
 			
 		}
+		
+		return true;
 	}
 	
 	/**
 	 * Closes all Menus
 	 */
 	@Override
-	public void closeMenus() {
+	public boolean closeMenus() {
 		for (Renderer renderer: renderersByName.values()){
 			renderer.closeAll();
 		}
-		
+		return true;
 	}
 	
 	@Override
-	public void reloadMenus() {
+	public boolean reloadMenus() {
 		List<Menu> menusToReload = new LinkedList<Menu>();
 		
 		for (Menu menu: menusByName.values()){
@@ -266,6 +271,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 		for (Menu menu: menusToReload){
 			this.reloadMenu(menu);
 		}
+		return true;
 	}
 
 
@@ -404,13 +410,13 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @param menu the Menu to remove
 	 */
 	@Override
-	public void removeMenu(Menu menu) {
+	public boolean removeMenu(Menu menu) {
 		
 		//check menu
 		if (menu == null){
 			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
 			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
-			return;
+			return false;
 		}
 		
 		//remove all of the MenuInstances for the Menu
@@ -434,6 +440,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		menusByName.remove(menu.getName());
 				
 		this.plugin.getLogger().warning("Removed Menu " + menu.getName());
+		
+		return true;
 	}
 
 	/**
@@ -542,17 +550,29 @@ public class MenuServiceProvider implements MenuService, Listener{
 	}
 	
 	@Override
-	public void reloadMenu(Menu menu) {
+	public boolean reloadMenu(Menu menu) {
 		String name = menu.getName();
 		String pluginName = menu.getPlugin();
 		this.removeMenu(menu);
 		this.loadMenu(Bukkit.getPluginManager().getPlugin(pluginName), name);
+		return true;
 	}
 
 	@Override
-	public void unloadMenu(Menu menu) {
-		// TODO Auto-generated method stub
-		
+	public boolean unloadMenu(Menu menu) {
+		return false;
+	}
+	
+	public boolean openMenu(Menu menu, String playerName){
+		return false;
+	}
+	
+	public boolean closeMenu(Menu menu, String playerName){
+		return false;
+	}
+	
+	public boolean closeMenu(String menuName, String playerName){
+		return false;
 	}
 	
 	//--------------------------Methods for all MenuInstances of a Menu--------------------------
@@ -566,7 +586,26 @@ public class MenuServiceProvider implements MenuService, Listener{
 		return menusToInstances.get(menu);
 	}
 	
+	public boolean closeAllMenuInstances(Menu menu){
+		return false;
+	}
+	
 	//--------------------------Methods for a MenuInstance of a Menu--------------------------
+	
+	@Override
+	public String getDefaultMenuInstanceName(Menu menu, String playerName) {
+		
+		if (menu == null){
+			return null;
+		}
+		
+		return getDefaultMenuInstanceName(menu.getName(), playerName);
+	}
+
+	@Override
+	public String getDefaultMenuInstanceName(String menuName, String playerName) {
+		return menuName + delimeter + playerName;
+	}
 	
 	/**
 	 * Returns a MenuInstance from the MenuService
@@ -705,18 +744,18 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @param instance the MenuInstance to be removed
 	 */
 	@Override
-	public void removeMenuInstance(MenuInstance instance) {
+	public boolean removeMenuInstance(MenuInstance instance) {
 		
 		if (instance == null){
 			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
 			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
-			return;
+			return false;
 		}
 		
 		if (!menusToInstances.containsKey(instance.getMenu())){
 			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, instance.getMenu().getName());
 			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, instance.getName());
-			return;
+			return false;
 		}
 		
 		//unregister the instance with the menu
@@ -727,6 +766,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			playersToInstances.remove(playerName);
 		}
 		
+		return true;
 	}
 	
 	/**
@@ -837,6 +877,10 @@ public class MenuServiceProvider implements MenuService, Listener{
 		return true;
 	}
 	
+	public boolean closeMenuInstance(MenuInstance instance){
+		return false;
+	}
+	
 	/**
 	 * Closes the MenuInstance for a player
 	 * 
@@ -846,14 +890,12 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @param playerName the Name of the player
 	 */
 	@Override
-	public void closeMenuInstance(String playerName) {
+	public boolean closeMenuInstance(String playerName) {
 		
 		//get the MenuInstance
 		MenuInstance instance = playersToInstances.get(playerName);
-		
-		//check if null
 		if (instance == null){
-			return;
+			return false;
 		}
 		
 		for (Renderer renderer: instance.getAllRenderers()){
@@ -878,9 +920,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 			}
 		}
 		
-		
-		
 		this.plugin.getLogger().info("MenuInstance closed for player " + playerName);
+		return true;
 	}
 	
 	//--------------------------Methods for Renderers--------------------------
@@ -1004,28 +1045,28 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 * @param renderer the Renderer to be removed
 	 */
 	@Override
-	public void removeRenderer(Renderer renderer) {
+	public boolean removeRenderer(Renderer renderer) {
 		
 		if (renderer == null){
 			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
 			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, null);
-			return;
+			return false;
 		}
 		
 		if (!renderersByName.containsKey(renderer)){
 			Logger.log(2, Level.SEVERE, Message.NOSUCHRENDERER, renderer.getName());
 			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, renderer.getName());
-			return;
+			return false;
 		}
 		
 		renderersByName.remove(renderer);
-		
+		return true;
 	}
 	
 	//--------------------------Methods for Binds--------------------------
 
 	@Override
-	public void loadBinds() {
+	public boolean loadBinds() {
 		//create data folder if needed
 		if (!plugin.getDataFolder().exists()){
 			Logger.log(2, Level.INFO, "Creating Data Folder");
@@ -1046,13 +1087,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 		MenuServicePlugin.binds = YamlConfiguration.loadConfiguration(configFile);
 		if (MenuServicePlugin.binds == null){
 			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
-			return;
+			return false;
 		}
 		
+		return true;
 	}
 
 	@Override
-	public void saveBinds() {
+	public boolean saveBinds() {
 		
 		//Create file
 		File bindsFile = new File(this.plugin.getDataFolder(), "binds.yml");
@@ -1061,7 +1103,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			bindsFile.createNewFile();
 		} catch (IOException e) {
 			e.printStackTrace();
-			return;
+			return false;
 		}
 		
 		YamlConfiguration bindsConfig = YamlConfiguration.loadConfiguration(bindsFile);
@@ -1093,6 +1135,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			e.printStackTrace();
 		}
 		
+		return true;	
 	}
 	
 	@Override

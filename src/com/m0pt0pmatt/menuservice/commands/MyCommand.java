@@ -1,45 +1,44 @@
 package com.m0pt0pmatt.menuservice.commands;
 
+import java.lang.reflect.Method;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
 
 import com.m0pt0pmatt.menuservice.Keyword;
 import com.m0pt0pmatt.menuservice.Perm;
 
+/**
+ * This class represents a possible command for MenuService
+ * @author Matthew
+ *
+ */
 public class MyCommand {
 
-	private String name;
-	private List<String> arguments;
+	private Keyword name;
+	private List<Keyword> arguments;
 	private Perm permission;
+	private Method method;
 	
-	public MyCommand(String name, List<String> arguments, Perm permission){
+	public MyCommand(Keyword name, List<Keyword> arguments, Perm permission, Method method){
 		this.name = name;
 		this.arguments = arguments;
 		this.permission = permission;
-	}
-	
-	public String toString(){
-		String s = this.name + ":" + permission.toString();
-		for (String arg: arguments){
-			s = s + ":" + arg;
-		}
-		return s;
+		this.method = method;
 	}
 
-	public String getName() {
+	public Keyword getName() {
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(Keyword name) {
 		this.name = name;
 	}
 
-	public List<String> getArguments() {
+	public List<Keyword> getArguments() {
 		return arguments;
 	}
 
-	public void setArguments(List<String> arguments) {
+	public void setArguments(List<Keyword> arguments) {
 		this.arguments = arguments;
 	}
 	
@@ -50,6 +49,15 @@ public class MyCommand {
 	public void setPermission(Perm permission) {
 		this.permission = permission;
 	}
+	
+	public Method getMethod() {
+		return method;
+	}
+
+	public void setMethod(Method method) {
+		this.method = method;
+	}
+
 
 	public boolean matchesArguments(String[] args) {
 		if (args.length - 1 != arguments.size()){
@@ -58,15 +66,14 @@ public class MyCommand {
 		
 		for (int i = 0; i < args.length - 1; i++){
 
-			if (Keyword.is(Keyword.PLACEHOLDER, arguments.get(i))){
+			if (arguments.get(i).equals(Keyword.PLACEHOLDER)){
 				continue;
 			}
 			
-			if (Keyword.is(arguments.get(i))){
-				if (Keyword.is(Keyword.getKeyword(arguments.get(i)), args[i + 1])){
-					continue;
-				}
+			if (Keyword.is(arguments.get(i), args[i + 1])){
+				continue;
 			}
+			
 			return false;
 		}
 		return true;
@@ -82,7 +89,7 @@ public class MyCommand {
 		
 		for (int i = 0; i < args.length - 1; i++){
 
-			if (Keyword.is(Keyword.PLACEHOLDER, arguments.get(i))){
+			if (arguments.get(i).equals(Keyword.PLACEHOLDER)){
 				actuals.add(args[i + 1]);
 			}
 			
@@ -90,5 +97,13 @@ public class MyCommand {
 
 		return actuals.toArray(new String[1]);
 		
+	}
+	
+	public String toString(){
+		String s = this.name + ":" + permission.toString();
+		for (Keyword arg: arguments){
+			s = s + ":" + arg.getKeyword();
+		}
+		return s;
 	}
 }

@@ -15,7 +15,6 @@ import org.bukkit.Material;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.Keyword;
@@ -40,11 +39,10 @@ public class CommandHandler {
 	//The MenuService
 	private MenuService menuService;
 	
-	private Set<MyCommand> commands;
-	private Map<String, Method> methods;
+	//commands mapped from their name to the set of possible actual commands
+	private Map<Keyword, Set<MyCommand>> commands;
 	
 	protected static MenuManager menuManager;
-	
 	
 	/**
 	 * Creates the CommandHandler
@@ -52,8 +50,7 @@ public class CommandHandler {
 	 */
 	public CommandHandler(MenuService menuService, MenuServicePlugin plugin){
 		this.menuService = menuService;
-		commands = new HashSet<MyCommand>();
-		methods = new HashMap<String, Method>();
+		commands = new HashMap<Keyword, Set<MyCommand>>();
 		try {
 			this.addCommands();
 		} catch (Exception e) {
@@ -64,16 +61,16 @@ public class CommandHandler {
 		
 	}
 	
-	private Class<?>[] getFormalParameters(List<String> arguments){
+	private Class<?>[] getFormalParameters(List<Keyword> arguments){
 		
 		List<Class<?>> args = new LinkedList<Class<?>>();
 		
 		//add the sender argument
 		args.add(String.class);
 		
-		for (String o: arguments){
+		for (Keyword o: arguments){
 			
-			if (Keyword.is(Keyword.PLACEHOLDER, o)){
+			if (o.equals(Keyword.PLACEHOLDER)){
 				args.add(o.getClass());
 			}		
 		}
@@ -85,361 +82,196 @@ public class CommandHandler {
 	
 	private void addCommands() throws SecurityException, NoSuchMethodException{
 		
-		List<String> arguments;
+		List<Keyword> arguments;
 		MyCommand command;
+		Method method;
+		
+		//add the sets
+		commands.put(Keyword.HELP, new HashSet<MyCommand>());
+		commands.put(Keyword.LIST, new HashSet<MyCommand>());
+		commands.put(Keyword.OPEN, new HashSet<MyCommand>());
+		commands.put(Keyword.CLOSE, new HashSet<MyCommand>());
+		commands.put(Keyword.LOAD, new HashSet<MyCommand>());
+		commands.put(Keyword.SAVE, new HashSet<MyCommand>());
+		commands.put(Keyword.RELOAD, new HashSet<MyCommand>());
+		commands.put(Keyword.UNLOAD, new HashSet<MyCommand>());
+		commands.put(Keyword.BIND, new HashSet<MyCommand>());
+		commands.put(Keyword.UNBIND, new HashSet<MyCommand>());
+		
+		
+		//add commands to the sets
 		
 		//help
-		arguments = new LinkedList<String>();
-		command = new MyCommand(Keyword.HELP.getKeyword(), arguments, Perm.HELP);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.HELP, arguments, Perm.HELP, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//list menus
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENUS.getKeyword());
-		command = new MyCommand(Keyword.LIST.getKeyword(), arguments, Perm.LISTMENUS);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("listMenus", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENUS);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.LIST, arguments, Perm.LISTMENUS, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//list instances [menu]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.INSTANCES.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.LIST.getKeyword(), arguments, Perm.LISTINSTANCES);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("listInstances", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.INSTANCES);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.LIST, arguments, Perm.LISTINSTANCES, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//open menu [menu]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUSELF);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("openMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.OPEN, arguments, Perm.OPENMENUSELF, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//open menu [menu] (player)
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("openMenu", getFormalParameters(arguments)));
-		System.out.println(command.toString());
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.OPEN, arguments, Perm.OPENMENUOTHER, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//open menu [menu] instance [instance]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.INSTANCE.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENINSTANCESELF);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("openInstance", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.INSTANCE);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.OPEN, arguments, Perm.OPENINSTANCESELF, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//open menu [menu] instance [instance] (player)
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.INSTANCE.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENINSTANCEOTHER);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("openInstance", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.INSTANCE);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.OPEN, arguments, Perm.OPENINSTANCEOTHER, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//open player [player]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLAYER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENPLAYER);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("openPlayer", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLAYER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.OPEN, arguments, Perm.OPENPLAYER, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//close menu all
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.ALL.getKeyword());
-		command = new MyCommand(Keyword.CLOSE.getKeyword(), arguments, Perm.CLOSEMENU);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("closeAllMenus", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.ALL);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.CLOSE, arguments, Perm.CLOSEMENU, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//close menu [menu]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.CLOSE.getKeyword(), arguments, Perm.CLOSEMENU);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("closeMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.CLOSE, arguments, Perm.CLOSEMENU, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//close menu [menu] all
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.ALL.getKeyword());
-		command = new MyCommand(Keyword.CLOSE.getKeyword(), arguments, Perm.CLOSEMENU);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("closeMenuAll", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.ALL);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.CLOSE, arguments, Perm.CLOSEMENU, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//close menu [menu] (player)
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.CLOSE.getKeyword(), arguments, Perm.CLOSEMENU);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("closeMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.CLOSE, arguments, Perm.CLOSEMENU, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//close instance [menu] [instance]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.INSTANCE.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.CLOSE.getKeyword(), arguments, Perm.CLOSEINSTANCE);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("closeInstance", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.INSTANCE);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.CLOSE, arguments, Perm.CLOSEINSTANCE, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//close instance [menu] [instance] [player]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.MENU.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.CLOSE.getKeyword(), arguments, Perm.CLOSEINSTANCE);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("closeInstance", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.CLOSE, arguments, Perm.CLOSEINSTANCE, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//close player [player]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLAYER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.CLOSE.getKeyword(), arguments, Perm.CLOSEPLAYER);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("closePlayer", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLAYER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.CLOSE, arguments, Perm.CLOSEPLAYER, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//load [filename]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.LOAD.getKeyword(), arguments, Perm.LOADFROMMENUSERVICE);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("loadMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.LOAD, arguments, Perm.LOADFROMMENUSERVICE, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//load [filename] [plugin]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.LOAD.getKeyword(), arguments, Perm.LOADFROMOTHERPLUGIN);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("loadMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.LOAD, arguments, Perm.LOADFROMOTHERPLUGIN, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//save [menu]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.SAVE.getKeyword(), arguments, Perm.SAVE);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("saveMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.SAVE, arguments, Perm.SAVE, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//save [menu] filename [filename]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		arguments.add(Keyword.FILENAME.getKeyword());
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.SAVE.getKeyword(), arguments, Perm.SAVEOTHERFILE);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("saveMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.FILENAME);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.SAVE, arguments, Perm.SAVEOTHERFILE, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//reload [menu]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.RELOAD.getKeyword(), arguments, Perm.RELOAD);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("reloadMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.RELOAD, arguments, Perm.RELOAD, method);
+		commands.get(Keyword.HELP).add(command);
 		
 		//unload [menu]
-		arguments = new LinkedList<String>();
-		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-		command = new MyCommand(Keyword.UNLOAD.getKeyword(), arguments, Perm.UNLOAD);
-		commands.add(command);
-		methods.put(command.toString(), this.getClass().getMethod("unloadMenu", getFormalParameters(arguments)));
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.PLACEHOLDER);
+		method = menuService.getClass().getMethod("help", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.UNLOAD, arguments, Perm.UNLOAD, method);
+		commands.get(Keyword.HELP).add(command);
 		
-//		//bind menu [menu] material
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//bind menu [menu] material [material]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//bind menu [menu] entity
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//bind menu [menu] entity [entity]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//bind instance [instance] material
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//bind instance [instance] material [material]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//bind instance [instance] entity
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//bind instance [instance] entity [entity]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind menu [menu] all
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind menu [menu] material all
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind menu [menu] material [material]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind menu [menu] entity all
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind menu [menu] entity [entity]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind instance [instance] all
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind instance [instance] material all
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind instance [instance] material [material]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind instance [instance] entity all
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
-//		//unbind instance [instance] entity [entity]
-//		arguments = new LinkedList<String>();
-//		arguments.add(Keyword.SENDER.getKeyword());
-//		arguments.add(Keyword.MENU.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		arguments.add(Keyword.PLACEHOLDER.getKeyword());
-//		command = new MyCommand(Keyword.OPEN.getKeyword(), arguments, Perm.OPENMENUOTHER);
-//		commands.add(command);
-//		methods.put(command.toString(), this.getClass().getMethod("help", getFormalParameters(arguments)));
-//		
 	}
 	
 	/**
@@ -468,49 +300,56 @@ public class CommandHandler {
 			return help(sender.getName());
 		}
 		
+		//see if the first argument is a valid keyword
+		if (!Keyword.is(args[0])){
+			return false;
+		}
+		Keyword keyword = Keyword.getKeyword(args[0]);
+		
+		if (!commands.containsKey(keyword)){
+			return false;
+		}
+		
+		Set<MyCommand> possibleCommands = commands.get(keyword);
+		
 		//check if the keyword is valid
-		for (MyCommand command: commands){
-			
-			if (command.getName().equalsIgnoreCase(args[0])){
+		for (MyCommand command: possibleCommands){
 								
-				//check arguments
-				if (command.matchesArguments(args)){
+			//check arguments
+			if (command.matchesArguments(args)){
 
-					Method m = methods.get(command.toString());
-					if (m == null){
-												
-						//method was not found
-						Message.sendMessage(sender, MessageFormat.ERROR, Message.INTERNALMETHODNOTFOUND);
-						return false;
-					}
-					
-					//check permission
-					if (!Perm.has(sender, command.getPermission())){
-						
-						Message.sendMessage(sender, MessageFormat.NOPERMISSION, Message.NOPERMISSION, command.getPermission().name());
-						return false;
-					}
-					
-					//attempt to execute method
-					try {
-						Boolean ret = (Boolean) m.invoke(this, (Object[]) command.getActualArguments(args));
-						
-						//check if successful
-						if (!ret){
-							Message.sendMessage(sender, MessageFormat.ERROR, Message.ERRORINVOKINGMETHOD, command.getName());
-						}
-						return ret;
-					} catch (Exception e) {
-						
-						//an error occurred when invoking the method
-						Message.sendMessage(sender, MessageFormat.ERROR, Message.ERRORINVOKINGMETHOD, command.getName());
-						e.printStackTrace();
-						return false;
-					}		
+				if (command.getMethod() == null){
+											
+					//method was not found
+					Message.sendMessage(sender, MessageFormat.ERROR, Message.INTERNALMETHODNOTFOUND);
+					return false;
 				}
 				
+				//check permission
+				if (!Perm.has(sender, command.getPermission())){
+					
+					Message.sendMessage(sender, MessageFormat.NOPERMISSION, Message.NOPERMISSION, command.getPermission().name());
+					return false;
+				}
+				
+				//attempt to execute method
+				try {
+					Boolean ret = (Boolean) command.getMethod().invoke(this, (Object[]) command.getActualArguments(args));
+					
+					//check if successful
+					if (!ret){
+						Message.sendMessage(sender, MessageFormat.ERROR, Message.ERRORINVOKINGMETHOD, command.getName());
+					}
+					return ret;
+				} catch (Exception e) {
+					
+					//an error occurred when invoking the method
+					Message.sendMessage(sender, MessageFormat.ERROR, Message.ERRORINVOKINGMETHOD, command.getName());
+					e.printStackTrace();
+					return false;
+				}		
 			}
-			
+				
 		}
 		
 		//incorrect usage
@@ -601,21 +440,47 @@ public class CommandHandler {
 		return true;
 	}
 
+	/**
+	 * Lists menus for the given sender
+	 * @param sender
+	 * @return
+	 */
 	public boolean listMenus(String sender) {
+		
+		if (sender == null){
+			return false;
+		}
+		
 		for (Menu menu: menuService.getMenus()){
 			Message.sendMessage(sender, MessageFormat.OUTPUT, menu.getName() + ": " + menu.getPlugin());
 		}
 		return true;
 	}
 	
+	
+	/**
+	 * Lists the instances of the given Menu for the given sender
+	 * @param sender
+	 * @param menuName
+	 * @return
+	 */
 	public boolean listInstances(String sender, String menuName){
+
+		
+		//get the menu
 		Menu menu = menuService.getMenu(menuName);
 		if (menu == null){
 			Message.sendMessage(sender, MessageFormat.ERROR, Message.NOSUCHMENU);
 			return false;
 		}
 		
+		//get the instances
 		List<MenuInstance> instances = menuService.getMenuInstances(menu);
+		if (instances == null){
+			return false;
+		}
+		
+		//output the instances
 		for (MenuInstance instance: instances){
 			Message.sendMessage(sender, MessageFormat.OUTPUT, instance.getName());
 		}
@@ -623,8 +488,15 @@ public class CommandHandler {
 		return true;
 	}
 	
-	public boolean openMenu(String sender, String MenuName){
-		return false;
+	/**
+	 * Opens the given Menu for the given sender
+	 * Creates a new MenuInstance for the sender
+	 * @param sender
+	 * @param menuName
+	 * @return
+	 */
+	public boolean openMenu(String sender, String menuName){
+		return openMenu(sender, menuName, sender);
 	}
 	
 	/**
@@ -635,26 +507,23 @@ public class CommandHandler {
 	 */
 	public boolean openMenu(String sender, String menuName, String playerName){
 		
-		if (menuName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUNAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTOPENMENU, null);
-			return false;
-		}
-		
 		//get the Menu
 		Menu menu = menuService.getMenu(menuName);
 		if (menu == null){
 			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, Message.CANTOPENMENU, menuName);
 			return false;
 		}
 		
 		//get the instance
-		MenuInstance instance = menuService.createMenuInstance(menu, menuName + ": " + playerName);
-		if (instance == null){
-			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, menuName);
-			Logger.log(2, Level.SEVERE, Message.CANTOPENMENU, menuName);
-			return false;
+		MenuInstance instance;
+		if (menuService.hasMenuInstance(menu, menuService.getDefaultMenuInstanceName(menu, playerName))){
+			instance = menuService.getMenuInstance(menu, menuService.getDefaultMenuInstanceName(menu, playerName));
+		} else{
+			instance = menuService.createMenuInstance(menu, menuService.getDefaultMenuInstanceName(menu, playerName));
+			if (instance == null){
+				Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, menuName);
+				return false;
+			}
 		}
 		
 		//open the menu
@@ -662,11 +531,23 @@ public class CommandHandler {
 	}
 	
 	public boolean openInstance(String sender, String menuName, String instanceName){
-		return false;
+		return openInstance(sender, menuName, instanceName, sender);
 	}
 	
 	public boolean openInstance(String sender, String menuName, String instanceName, String playerName){
-		return false;
+		
+		//get the Menu
+		Menu menu = menuService.getMenu(menuName);
+		if (menu == null){
+			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
+			return false;
+		}
+		
+		if (!menuService.hasMenuInstance(menu, instanceName)){
+			return false;
+		}
+		
+		return menuService.openMenuInstance(menuService.getMenuInstance(menu, instanceName), playerName);
 	}
 	
 	public boolean openPlayer(String sender, String playerName){
@@ -674,20 +555,17 @@ public class CommandHandler {
 	}
 	
 	public boolean closeAllMenus(String sender){
-		return false;
+		return menuService.closeMenus();
 	}
 	
 	public boolean closeMenu(String sender, String menuName) {
-		
-		return false;
+		return closeMenu(sender, menuName, sender);
 	}
 
 	public boolean closeMenuAll(String sender, String menuName) {
 		
 		return false;
 	}
-	
-	
 	
 	public boolean closeMenu(String sender, String menuName, String playerName) {
 		//close the menu
