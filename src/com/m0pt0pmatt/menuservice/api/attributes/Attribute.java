@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.bukkit.inventory.ItemStack;
+
 /**
  * An enumeration of the built in Menu attributes.
  * Note that attributes are not limited to ones on this list. A menu can have any attribute.
@@ -21,21 +23,25 @@ public enum Attribute {
 	PLUGIN("plugin", String.class),
 	FILENAME("filename", String.class),
 	TYPE("type", String.class),
+	SIZE("size", Integer.class),
+	ITEM("item", ItemStack.class),
+	X("x", Integer.class),
+	Y("y", Integer.class),
 	COMPONENTS("components", ContainerAttribute.class),
-	REMOVEONEXIT("remove-on-exit", Boolean.class),
-	REMOVEONEMPTY("remove-on-empty", Boolean.class),
+	REMOVEONEXIT("removeOnExit", Boolean.class),
+	REMOVEONEMPTY("removeOnEmpty", Boolean.class),
 	DYNAMIC("dynamic", Boolean.class),
 	PERMANENT("permanent", Boolean.class),
 	MATERIAL_ID("material", Integer.class),
 	MATERIAL_NAME("material", String.class),
 	LORE("lore", List.class, String.class),
-	ACTIONTAGS("action-tags", List.class, Integer.class),
+	ACTIONTAGS("actionTags", List.class, Integer.class),
 	TEXT("text", String.class),
-	OPENCOMMAND("open-command", String.class),
-	TITLE("text", String.class),
+	OPENCOMMAND("openCommand", String.class),
+	TITLE("title", String.class),
 	ACTIONS("actions", ContainerAttribute.class),
-	LEFTCLICK("left-click", ContainerAttribute.class),
-	RIGHTCLICK("right-click", ContainerAttribute.class),
+	LEFTCLICK("leftClick", ContainerAttribute.class),
+	RIGHTCLICK("rightClick", ContainerAttribute.class),
 	COMMANDS("commands", List.class, String.class);
 	
 	private final String name;

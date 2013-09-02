@@ -56,10 +56,10 @@ public class Logger {
 			plugin.getLogger().log(level, msg);
 		}
 		
-		if (level == Level.SEVERE){
-			for (StackTraceElement e: Thread.currentThread().getStackTrace()){
-				System.out.println(e.toString());
-			}
-		}
+//		if (level == Level.SEVERE){
+//			for (StackTraceElement e: Thread.currentThread().getStackTrace()){
+//				System.out.println(e.toString());
+//			}
+//		}
 	}
 }

@@ -74,7 +74,10 @@ public class AbstractComponent implements Component{
 	@Override
 	public Object getAttribute(Attribute attribute) {
 		Object o = attributes.get(attribute.getName());
-		if (o.getClass().equals(attribute.getClass())){
+		if (o == null){
+			return null;
+		}
+		if (o.getClass().equals(attribute.getAttributeClass())){
 			return o;
 		}
 		return null;
@@ -92,7 +95,11 @@ public class AbstractComponent implements Component{
 	
 	@Override
 	public boolean hasAttribute(Attribute attribute){
-		return attributes.containsKey(attribute.getName());
+		Object o = getAttribute(attribute);
+		if (o == null){
+			return false;
+		}
+		return true;
 	}
 	
 	/**

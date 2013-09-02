@@ -31,6 +31,7 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
+import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
 /**
@@ -75,21 +76,21 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//set the inventory title
 		String title = null;
 		int size;
-		if (menu.hasAttribute("title")){
-			title = (String) menu.getParameteredAttribute("title", instance);
+		if (menu.hasAttribute(Attribute.TITLE)){
+			title = (String) menu.getAttribute(Attribute.TITLE);
 			if (title == null){
 				if (menu.getTag() != null){
 					title = menu.getTag();
 				}
 				else{
-					title = "";
+					title = " ";
 				}
 			}
 		}
 		
 		//set the inventory size
-		if (menu.hasAttribute("size")){
-			size = ((Integer) menu.getAttribute("size") * 9);
+		if (menu.hasAttribute(Attribute.SIZE)){
+			size = ((Integer) menu.getAttribute(Attribute.SIZE) * 9);
 		}
 		else{
 			size = 9 * 6;
@@ -106,8 +107,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		
 		//setup the item map if it isn't already specified
-		if (!instance.getParameters().containsKey("itemMap")){
-			instance.getParameters().put("itemMap", new HashMap<Integer, String>());
+		if (!instance.hasParameter("itemMap")){
+			instance.addParameter("itemMap", new HashMap<Integer, String>());
 		}
 		
 		//add components
@@ -129,11 +130,11 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//find the position, relative to the current position of the renderer
 		int x = -1;
 		int y = -1;
-		if (component.hasAttribute("x")){
-			x = (Integer) component.getAttribute("x");
+		if (component.hasAttribute(Attribute.X)){
+			x = (Integer) component.getAttribute(Attribute.X);
 		}
-		if (component.hasAttribute("y")){
-			y = (Integer) component.getAttribute("y");
+		if (component.hasAttribute(Attribute.Y)){
+			y = (Integer) component.getAttribute(Attribute.Y);
 		}
 		
 		
@@ -143,13 +144,17 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//create the correct material
 		Material material;
 		
-		if (component.hasAttribute("item") && component.getAttribute("item") instanceof ItemStack){
-			item = (ItemStack) component.getAttribute("item");
+		if (component.hasAttribute(Attribute.ITEM)){
+			item = (ItemStack) component.getAttribute(Attribute.ITEM);
 		} 
 		
 		else{
-			if (component.hasAttribute("material") && component.getAttribute("material") instanceof Integer){
-				material = Material.getMaterial((Integer) component.getAttribute("material"));
+			if (component.hasAttribute(Attribute.MATERIAL_ID)){
+				material = Material.getMaterial((Integer) component.getAttribute(Attribute.MATERIAL_ID));
+				item = new ItemStack(material);
+			}
+			else if (component.hasAttribute(Attribute.MATERIAL_NAME)){
+				material = Material.getMaterial((String) component.getAttribute(Attribute.MATERIAL_NAME));
 				item = new ItemStack(material);
 			}
 			else{
@@ -164,8 +169,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 
 		//change the title of the item
 		String text = component.getTag();
-		if (component.hasAttribute("text")){
-			text = (String) component.getAttribute("text");
+		if (component.hasAttribute(Attribute.TEXT)){
+			text = (String) component.getAttribute(Attribute.TEXT);
 		}
 		meta.setDisplayName(ChatColor.RESET.toString() + ChatColor.WHITE.toString() + text);
 		
@@ -554,9 +559,5 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		return false;
 	}
-	
-	
-
-	
 	
 }

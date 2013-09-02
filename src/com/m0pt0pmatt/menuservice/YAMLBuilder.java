@@ -124,8 +124,6 @@ class YAMLBuilder {
 			return null;
 		}
 		
-		
-		
 		//make the plugin data folder if it doesn't exist
 		if (!plugin.getDataFolder().exists()){
 			plugin.getDataFolder().mkdir();
@@ -152,6 +150,7 @@ class YAMLBuilder {
 		//from the configuration, gather the menu
 		Component menu = loadMenuComponent(yamlConfig, plugin);
 		if (menu instanceof Menu){
+			((Menu) menu).setChanged(false);
 			return (Menu) menu;
 		}
 		return null;

@@ -121,30 +121,12 @@ public class MenuComponent extends AbstractComponent implements Menu{
 	
 	//--------------------------Methods for reserved attributes--------------------------
 	/**
-	 * Returns the type of the Component
-	 * @return
-	 */
-	public String getType(){
-		setChanged(true);
-		return super.getType();
-	}
-	
-	/**
 	 * Sets the type of the Component
 	 * @param type
 	 */
 	public void setType(String type){
 		setChanged(true);
 		super.setType(type);
-	}
-	
-	/**
-	 * Returns the tag of the Component
-	 * @return
-	 */
-	public String getTag(){
-		setChanged(true);
-		return super.getTag();
 	}
 	
 	/**
@@ -392,6 +374,7 @@ public class MenuComponent extends AbstractComponent implements Menu{
 	@Override
 	public String getPlugin() {
 		Object type = this.getAttribute("plugin");
+		setChanged(false);
 		return (type instanceof String) ? (String) type : "no-plugin";
 	}
 

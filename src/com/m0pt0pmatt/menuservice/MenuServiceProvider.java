@@ -208,6 +208,7 @@ public class MenuServiceProvider implements MenuService, Listener {
 				}
 				
 				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
+				menu.setChanged(false);
 			}
 			
 		}
@@ -221,6 +222,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 	@Override
 	public boolean saveMenus() {
 		for (Menu menu: menusByName.values()){
+			
+			boolean state = menu.hasChanged();
 			
 			if (menu.hasAttribute(Attribute.DYNAMIC)){
 				if ((Boolean) menu.getAttribute(Attribute.DYNAMIC)){
@@ -236,9 +239,13 @@ public class MenuServiceProvider implements MenuService, Listener {
 				} else{
 					filename = menu.getTag() + ".yml";
 				}
-				yamlBuilder.saveYAML(plugin, menu, filename);
+				
+				//only save the Menu if changes have been made, otherwise there is no point
+				if (state){
+					yamlBuilder.saveYAML(plugin, menu, filename);
+				}
+				
 			}
-			
 			
 		}
 		
@@ -398,6 +405,7 @@ public class MenuServiceProvider implements MenuService, Listener {
 		Logger.log(2, Level.INFO, "Menu " + menu.getName() + " was created and added");
 		
 		String command = (String) menu.getAttribute("openCommand");
+		menu.setChanged(false);
 		if (command != null){
 			commandsToMenus.put(command, menu);
 			Logger.log(2, Level.INFO, "Run " + menu.getName() + " with the command: /" + command);
