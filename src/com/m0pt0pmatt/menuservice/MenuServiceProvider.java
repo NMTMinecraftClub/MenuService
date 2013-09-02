@@ -30,6 +30,7 @@ import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Renderer;
+import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.renderers.InventoryRenderer;
 import com.m0pt0pmatt.menuservice.renderers.TextRenderer;
 
@@ -39,7 +40,7 @@ import com.m0pt0pmatt.menuservice.renderers.TextRenderer;
  * @author Matthew Broomfield (m0pt0pmatt) <m0pt0pmatt17@gmail.com>
  *
  */
-public class MenuServiceProvider implements MenuService, Listener{
+public class MenuServiceProvider implements MenuService, Listener {
 
 	//Menus are kept for reference
 	private Map<String, Menu> menusByName;
@@ -99,7 +100,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		Logger.log(3, Level.INFO, "MenuServiceProvider registered in Bukkit");
-		
 		Logger.log(3, Level.INFO, "MenuServiceProvider initialized");
 	}
 	
@@ -116,6 +116,7 @@ public class MenuServiceProvider implements MenuService, Listener{
 			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, null);
 			return false;
 		}
+		
 		if (player == null){
 			Logger.log(2, Level.SEVERE, Message.NULLPLAYER, command);
 			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, command);
@@ -170,10 +171,11 @@ public class MenuServiceProvider implements MenuService, Listener{
 			
 			String menuName = materialsToMenus.get(item.getType());
 			Menu menu = menusByName.get(menuName);
-			//TODO: Add checks
+			if (menu == null){
+				return;
+			}
 			
 			this.openMenuInstance(this.createMenuInstance(menu, menu.getName() + ": " + event.getPlayer().getName()), event.getPlayer().getName());
-			return;
 		}
 	}
 	
@@ -185,7 +187,6 @@ public class MenuServiceProvider implements MenuService, Listener{
 	 */
 	@Override
 	public List<Menu> getMenus() {
-		
 		return new LinkedList<Menu>(menusByName.values());
 	}
 	
@@ -221,8 +222,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 	public boolean saveMenus() {
 		for (Menu menu: menusByName.values()){
 			
-			if (menu.hasAttribute("dynamic")){
-				if ((Boolean) menu.getAttribute("dynamic")){
+			if (menu.hasAttribute(Attribute.DYNAMIC)){
+				if ((Boolean) menu.getAttribute(Attribute.DYNAMIC)){
 					continue;
 				}
 			}
@@ -230,8 +231,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 			Plugin plugin = Bukkit.getPluginManager().getPlugin((String) menu.getAttribute("plugin"));
 			if (plugin != null){
 				String filename = null;
-				if (menu.hasAttribute("filename")){
-					filename = (String) menu.getAttribute("filename");
+				if (menu.hasAttribute(Attribute.FILENAME)){
+					filename = (String) menu.getAttribute(Attribute.FILENAME);
 				} else{
 					filename = menu.getTag() + ".yml";
 				}
@@ -260,8 +261,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		List<Menu> menusToReload = new LinkedList<Menu>();
 		
 		for (Menu menu: menusByName.values()){
-			if (menu.hasAttribute("dynamic")){
-				if ((Boolean)menu.getAttribute("dynamic") == true){
+			if (menu.hasAttribute(Attribute.DYNAMIC)){
+				if ((Boolean)menu.getAttribute(Attribute.DYNAMIC) == true){
 					continue;
 				}
 			}
@@ -280,8 +281,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		List<Menu> list = new LinkedList<Menu>();
 		
 		for (Menu menu: menusByName.values()){
-			if (menu.hasAttribute("permanent")){
-				if ((Boolean)menu.getAttribute("permanent") == true){
+			if (menu.hasAttribute(Attribute.PERMANENT)){
+				if ((Boolean)menu.getAttribute(Attribute.PERMANENT) == true){
 					continue;
 				}
 			}
@@ -354,8 +355,14 @@ public class MenuServiceProvider implements MenuService, Listener{
 	
 	@Override
 	public boolean hasMenu(String menuName) {
-		// TODO Auto-generated method stub
-		return false;
+		if (menuName == null){
+			return false;
+		}
+		Menu menu = this.getMenu(menuName);
+		if (menu == null){
+			return false;
+		}
+		return this.hasMenu(menu);
 	}
 	
 	/**
@@ -560,19 +567,35 @@ public class MenuServiceProvider implements MenuService, Listener{
 
 	@Override
 	public boolean unloadMenu(Menu menu) {
-		return false;
+		if (menu == null){
+			return false;
+		}
+		return this.removeMenu(menu);
 	}
 	
-	public boolean openMenu(Menu menu, String playerName){
-		return false;
+	public MenuInstance openMenu(Menu menu, String playerName){
+		if (menu == null){
+			return null;
+		}
+		if (playerName == null){
+			return null;
+		}
+		
+		MenuInstance instance = this.createMenuInstance(menu, this.getDefaultMenuInstanceName(menu, playerName));
+		if (instance == null){
+			return null;
+		}
+		
+		this.openMenuInstance(instance, playerName);
+		return instance;
 	}
 	
 	public boolean closeMenu(Menu menu, String playerName){
-		return false;
+		return this.closeMenuInstance(playerName);
 	}
 	
 	public boolean closeMenu(String menuName, String playerName){
-		return false;
+		return this.closeMenuInstance(playerName);
 	}
 	
 	//--------------------------Methods for all MenuInstances of a Menu--------------------------
@@ -587,7 +610,27 @@ public class MenuServiceProvider implements MenuService, Listener{
 	}
 	
 	public boolean closeAllMenuInstances(Menu menu){
-		return false;
+		
+		if (menu == null){
+			return false;
+		}
+		
+		if (menusToInstances.get(menu) == null){
+			return false;
+		}
+		
+		Iterator<MenuInstance> i = menusToInstances.get(menu).iterator();
+		while (i.hasNext()){
+			MenuInstance instance = i.next();
+			this.closeMenuInstance(instance);
+			if (instance.hasParameter("keepOnEmpty")){
+				if ((Boolean) instance.getParameter("keepOnEmpty") == true){
+					continue;
+				}
+			}
+			i.remove();
+		}
+		return true;
 	}
 	
 	//--------------------------Methods for a MenuInstance of a Menu--------------------------
@@ -877,8 +920,8 @@ public class MenuServiceProvider implements MenuService, Listener{
 		return true;
 	}
 	
-	public boolean closeMenuInstance(MenuInstance instance){
-		return false;
+	public boolean closeMenuInstance(MenuInstance instance){	
+		return this.removeMenuInstance(instance);
 	}
 	
 	/**

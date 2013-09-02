@@ -79,13 +79,13 @@ public class MyCommand {
 		return true;
 	}
 
-	public String[] getActualArguments(String[] args) {
+	public String[] getActualArguments(String sender, String[] args) {
 		if (args.length - 1 != arguments.size()){
 			return null;
 		}
 		
 		List<String> actuals = new LinkedList<String>();
-		actuals.add(Keyword.SENDER.getKeyword());
+		actuals.add(sender);
 		
 		for (int i = 0; i < args.length - 1; i++){
 

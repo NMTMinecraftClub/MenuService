@@ -25,12 +25,88 @@ import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
  */
 public interface Component {
 
+	//--------------------------Methods for all attributes--------------------------
 	/**
-	 * Sets the type of the Component
-	 * @param type
+	 * Returns the attributes of the Component
+	 * @return
 	 */
-	public void setType(String type);
+	public Map<String, Object> getAttributes();
 	
+	/**
+	 * Sets the attributes of the Component
+	 * @param attributes
+	 */
+	public void setAttributes(Map<String, Object> attributes);
+	
+	//--------------------------Methods for one attribute--------------------------
+	/**
+	 * Returns a given attribute of the Component
+	 * @param attribute the specified attribute
+	 * @return the attribute if it exists, otherwise null
+	 */
+	public Object getAttribute(Attribute attribute);
+	
+	/**
+	 * Returns a given attribute of the Component
+	 * @param attributeName the name of the specified attribute
+	 * @return the attribute if it exists, otherwise null
+	 */
+	public Object getAttribute(String attributeName);
+	
+	/**
+	 * checks if the Component has a given attribute
+	 * @param attribute the given Attribute
+	 * @return whether or not the Component has the given attribute
+	 */
+	public boolean hasAttribute(Attribute attribute);
+	
+	/**
+	 * checks if the Component has a given attribute
+	 * @param attributeName the name of the given Attribute
+	 * @return whether or not the Component has the given attribute
+	 */
+	public boolean hasAttribute(String attributeName);
+	
+	/**
+	 * Adds a attribute to the Component
+	 * @param attribute The type of attribute to be added
+	 * @param value the value of the attribute
+	 */
+	public void addAttribute(Attribute attribute, Object value);
+
+	/**
+	 * Adds a attribute to the Component
+	 * @param attributeName The name for the attribute
+	 * @param value the value of the attribute
+	 */
+	public void addAttribute(String attributeName, Object value);
+	
+	//--------------------------Methods for one container attribute--------------------------
+	/**
+	 * Returns a given attribute of the Component as a ContainerAttribute if possible
+	 * @param attribute the type of attribute
+	 * @return the attribute if it exists and is a ContainerAttribute, otherwise null
+	 */
+	public ContainerAttribute getContainerAttribute(Attribute attribute);
+	
+	/**
+	 * Returns a given attribute of the Component as a ContainerAttribute if possible
+	 * @param attributeName the name of the attribute
+	 * @return the attribute if it exists and is a ContainerAttribute, otherwise null
+	 */
+	public ContainerAttribute getContainerAttribute(String attributeName);
+	
+	//--------------------------Methods for parameterized attribute--------------------------
+	
+	/**
+	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
+	 * @param name the name of the attribute
+	 * @param instance The menuInstance whose paramters will be checked
+	 * @return if a parameter
+	 */
+	public Object getParameteredAttribute(String name, MenuInstance instance);
+	
+	//--------------------------Methods for reserved attributes--------------------------
 	/**
 	 * Returns the type of the Component
 	 * @return
@@ -38,16 +114,22 @@ public interface Component {
 	public String getType();
 	
 	/**
-	 * Sets the tag of the Component
-	 * @param tag
+	 * Sets the type of the Component
+	 * @param type
 	 */
-	public void setTag(String tag);
+	public void setType(String type);
 	
 	/**
 	 * Returns the tag of the Component
 	 * @return
 	 */
 	public String getTag();
+	
+	/**
+	 * Sets the tag of the Component
+	 * @param tag
+	 */
+	public void setTag(String tag);
 	
 	/**
 	 * Returns the Lore of the Component
@@ -61,59 +143,13 @@ public interface Component {
 	 */
 	public void setLore(List<String> lore);
 	
+	//--------------------------Methods for actions--------------------------
 	/**
-	 * Sets the attributes of the Component
-	 * @param attributes
-	 */
-	public void setAttributes(Map<String, Object> attributes);
-
-	/**
-	 * Returns the attributes of the Component
+	 * Returns an action
+	 * @param type
 	 * @return
 	 */
-	public Map<String, Object> getAttributes();
-
-	/**
-	 * Adds a attribute to the Component
-	 * @param name
-	 * @param value
-	 */
-	public void addAttribute(String name, Object value);
-	
-	public void addAttribute(Attribute attribute, Object value);
-	
-	/**
-	 * Returns a given attribute of the Component
-	 * @param name the name of the attribute
-	 * @return the attribute if it exists, otherwise null
-	 */
-	public Object getAttribute(String name);
-	
-	public Object getAttribute(Attribute attribute);
-	
-	/**
-	 * Returns a given attribute of the Component
-	 * @param name the name of the attribute
-	 * @return the attribute if it exists, otherwise null
-	 */
-	public ContainerAttribute getContainerAttribute(String name);
-	
-	public ContainerAttribute getContainerAttribute(Attribute attribute);
-	
-	/**
-	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
-	 * @param name the name of the attribute
-	 * @param instance The menuInstance whose paramters will be checked
-	 * @return if a parameter
-	 */
-	public Object getParameteredAttribute(String name, MenuInstance instance);
-
-	/**
-	 * checks if the Component has a given attribute
-	 * @param name
-	 * @return
-	 */
-	public boolean hasAttribute(String name);
+	public ContainerAttribute getAction(String type);
 	
 	/**
 	 * Adds action tags to a given interaction
@@ -155,12 +191,5 @@ public interface Component {
 	 * @return true if there exists an interaction, false otherwise
 	 */
 	public boolean hasInteraction(String type);
-	
-	/**
-	 * Returns an action
-	 * @param type
-	 * @return
-	 */
-	public ContainerAttribute getAction(String type);
 
 }

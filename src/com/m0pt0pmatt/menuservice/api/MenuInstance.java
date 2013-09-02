@@ -225,7 +225,7 @@ public final class MenuInstance {
 			listener.playerRemoved(this, playerName);
 		}
 		if (players.size() == 0){
-			if(this.hasParameter("exitOnEmpty")){
+			if(this.hasParameter("keepOnEmpty")){
 				if ((Boolean)this.getParameter("keepOnEmpty") == true){
 					return;
 				}

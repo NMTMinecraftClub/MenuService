@@ -51,15 +51,124 @@ public class AbstractComponent implements Component{
 		if (!attributes.containsKey("lore")) attributes.put("lore", new LinkedList<String>());
 	}
 	
+	//--------------------------Methods for all attributes--------------------------
 	/**
-	 * Sets the type of the Component
-	 * @param type
+	 * Returns the attributes of the Component
+	 * @return
 	 */
 	@Override
-	public void setType(String type){
-		attributes.put("type", type);
+	public Map<String, Object> getAttributes(){
+		return attributes;
 	}
 	
+	/**
+	 * Sets the attributes of the Component
+	 * @param attributes
+	 */
+	@Override
+	public void setAttributes(Map<String, Object> attributes){
+		this.attributes = attributes;
+	}
+	
+	//--------------------------Methods for one attribute--------------------------
+	@Override
+	public Object getAttribute(Attribute attribute) {
+		Object o = attributes.get(attribute.getName());
+		if (o.getClass().equals(attribute.getClass())){
+			return o;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns a given attribute of the Component
+	 * @param name
+	 * @return
+	 */
+	@Override
+	public Object getAttribute(String attributeName){
+		return attributes.get(attributeName);
+	}
+	
+	@Override
+	public boolean hasAttribute(Attribute attribute){
+		return attributes.containsKey(attribute.getName());
+	}
+	
+	/**
+	 * checks if the Component has a given attribute
+	 * @param name
+	 * @return
+	 */
+	@Override
+	public boolean hasAttribute(String attributeName){
+		return attributes.containsKey(attributeName);
+	}
+	
+	@Override
+	public void addAttribute(Attribute attribute, Object value) {
+		if (!value.getClass().equals(attribute.getAttributeClass())){
+			return;
+		}
+		
+		attributes.put(attribute.getName(), value);
+	}
+	
+	/**
+	 * Adds a attribute to the Component
+	 * @param name
+	 * @param value
+	 */
+	@Override
+	public void addAttribute(String attributeName, Object value) {
+		attributes.put(attributeName, value);
+	}
+	
+	//--------------------------Methods for one container attribute--------------------------
+	
+	@Override
+	public ContainerAttribute getContainerAttribute(Attribute attribute) {
+		Object object = getAttribute(attribute.getName());
+		if (object instanceof ContainerAttribute){
+			return (ContainerAttribute) object;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns a given attribute of the Component
+	 * @param name the name of the attribute
+	 * @return the attribute if it exists, otherwise null
+	 */
+	@Override
+	public ContainerAttribute getContainerAttribute(String attributeName){
+		Object attribute = getAttribute(attributeName);
+		if (attribute instanceof ContainerAttribute){
+			return (ContainerAttribute) attribute;
+		}
+		return null;
+	}
+	
+	//--------------------------Methods for parameterized attribute--------------------------
+	/**
+	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
+	 * @param name the name of the attribute
+	 * @param instance The menuInstance whose paramters will be checked
+	 * @return if a parameter
+	 */
+	@Override
+	public Object getParameteredAttribute(String attributeName, MenuInstance instance) {
+		Object attribute = getAttribute(attributeName);
+		if (attribute instanceof String){
+			String parameterName = (String) attribute;
+			if (parameterName.startsWith("^")){
+				attribute = instance.getParameter(parameterName.substring(1));
+			}
+		}
+		return attribute;
+	}
+	
+	//--------------------------Methods for reserved attributes--------------------------
 	/**
 	 * Returns the type of the Component
 	 * @return
@@ -71,12 +180,12 @@ public class AbstractComponent implements Component{
 	}
 	
 	/**
-	 * Sets the tag of the Component
-	 * @param tag
+	 * Sets the type of the Component
+	 * @param type
 	 */
 	@Override
-	public void setTag(String tag){
-		attributes.put("tag", tag);
+	public void setType(String type){
+		attributes.put("type", type);
 	}
 	
 	/**
@@ -90,121 +199,12 @@ public class AbstractComponent implements Component{
 	}
 	
 	/**
-	 * Sets the attributes of the Component
-	 * @param attributes
+	 * Sets the tag of the Component
+	 * @param tag
 	 */
 	@Override
-	public void setAttributes(Map<String, Object> attributes){
-		this.attributes = attributes;
-	}
-	
-	/**
-	 * Returns the attributes of the Component
-	 * @return
-	 */
-	@Override
-	public Map<String, Object> getAttributes(){
-		return attributes;
-	}
-
-	/**
-	 * Adds a attribute to the Component
-	 * @param name
-	 * @param value
-	 */
-	@Override
-	public void addAttribute(String name, Object value) {
-		attributes.put(name, value);
-	}
-	
-	@Override
-	public void addAttribute(Attribute attribute, Object value) {
-		if (!value.getClass().equals(attribute.getAttributeClass())){
-			return;
-		}
-		
-		attributes.put(attribute.getName(), value);
-		
-	}
-	
-	/**
-	 * Returns a given attribute of the Component
-	 * @param name
-	 * @return
-	 */
-	@Override
-	public Object getAttribute(String name){
-		return attributes.get(name);
-	}
-	
-	@Override
-	public Object getAttribute(Attribute attribute) {
-		Object o = attributes.get(attribute.getName());
-		if (o.getClass().equals(attribute.getClass())){
-			return o;
-		}
-		return null;
-	}
-	
-	/**
-	 * Returns a given attribute of the Component
-	 * @param name the name of the attribute
-	 * @return the attribute if it exists, otherwise null
-	 */
-	@Override
-	public ContainerAttribute getContainerAttribute(String name){
-		Object attribute = getAttribute(name);
-		if (attribute instanceof ContainerAttribute){
-			return (ContainerAttribute) attribute;
-		}
-		return null;
-	}
-	
-	@Override
-	public ContainerAttribute getContainerAttribute(Attribute a) {
-		Object attribute = getAttribute(a.getName());
-		if (attribute instanceof ContainerAttribute){
-			return (ContainerAttribute) attribute;
-		}
-		return null;
-	}
-	
-	
-	/**
-	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
-	 * @param name the name of the attribute
-	 * @param instance The menuInstance whose paramters will be checked
-	 * @return if a parameter
-	 */
-	@Override
-	public Object getParameteredAttribute(String name, MenuInstance instance) {
-		Object attribute = getAttribute(name);
-		if (attribute instanceof String){
-			String parameterName = (String) attribute;
-			if (parameterName.startsWith("^")){
-				attribute = instance.getParameter(parameterName.substring(1));
-			}
-		}
-		return attribute;
-	}
-	
-	/**
-	 * checks if the Component has a given attribute
-	 * @param name
-	 * @return
-	 */
-	@Override
-	public boolean hasAttribute(String name){
-		return attributes.containsKey(name);
-	}
-	
-	/**
-	 * Sets the Lore of the Component
-	 * @param lore
-	 */
-	@Override
-	public void setLore(List<String> lore){
-		attributes.put("lore", (lore == null) ? new LinkedList<String>() : lore);
+	public void setTag(String tag){
+		attributes.put("tag", tag);
 	}
 	
 	/**
@@ -223,8 +223,18 @@ public class AbstractComponent implements Component{
 		}
 		
 		return actions;
-	}	
+	}
+
+	/**
+	 * Sets the Lore of the Component
+	 * @param lore
+	 */
+	@Override
+	public void setLore(List<String> lore){
+		attributes.put("lore", (lore == null) ? new LinkedList<String>() : lore);
+	}
 	
+	//--------------------------Methods for actions--------------------------
 	/**
 	 * Adds action tags to a given interaction
 	 * @param type the type of interaction
@@ -332,9 +342,5 @@ public class AbstractComponent implements Component{
 		
 		return null;
 	}
-
-	
-
-	
 	
 }

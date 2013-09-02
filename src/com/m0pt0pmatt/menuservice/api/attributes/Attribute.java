@@ -1,5 +1,6 @@
 package com.m0pt0pmatt.menuservice.api.attributes;
 
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -45,18 +46,13 @@ public enum Attribute {
 	//a Map of possible names to the list of attributes that the name represents
 	private static final Map<String, Set<Attribute>> attributes = new HashMap<String, Set<Attribute>>();
 	
-	/**
-	 * Adds an attribute to the Map.
-	 */
-	private void add(){
-		
-		//make sure a set exists for the name
-		if (!attributes.containsKey(getName())){
-			attributes.put(getName(), new HashSet<Attribute>());
-		}
-		
-		//add the attribute
-		attributes.get(getName()).add(this);
+	static {
+        for(Attribute s : EnumSet.allOf(Attribute.class)){
+        	if (attributes.get(s.getName()) == null){
+        		attributes.put(s.getName(), new HashSet<Attribute>());
+        	}
+        	attributes.get(s.getName()).add(s);
+        }  	
 	}
 	
 	/**
@@ -70,8 +66,6 @@ public enum Attribute {
 		this.type = type;
 		isList = false;
 		elementType = null;
-		
-		add();
 	}
 	
 	/**
@@ -85,8 +79,6 @@ public enum Attribute {
 		this.type = type;
 		this.elementType = elementType;
 		isList = true;
-		
-		add();
 	}
 	
 	/**

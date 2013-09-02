@@ -20,7 +20,7 @@ import org.bukkit.plugin.Plugin;
  * @author Matthew Broomfield (m0pt0pmatt) <m0pt0pmatt17@gmail.com>
  *
  */
-public interface MenuService {
+public interface MenuService{
 
 	//--------------------------Methods for all Menus--------------------------
 	
@@ -123,7 +123,7 @@ public interface MenuService {
 	 */
 	public boolean unloadMenu(Menu menu);
 	
-	public boolean openMenu(Menu menu, String playerName);
+	public MenuInstance openMenu(Menu menu, String playerName);
 	
 	public boolean closeMenu(Menu menu, String playerName);
 	
