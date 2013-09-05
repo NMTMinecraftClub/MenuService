@@ -60,7 +60,7 @@ public class MainMenuListener implements ActionListener{
 			break;
 		case MAIN_RELOADALL:
 			menuService.reloadMenus();
-			instance.renderAll();
+			menuService.updateMenuInstance(instance);
 			Bukkit.getPlayer(playerName).sendMessage("All menus reloaded");
 			break;
 		case MAIN_UNLOADMENU:
@@ -68,7 +68,7 @@ public class MainMenuListener implements ActionListener{
 			break;
 		case MAIN_UNLOADALL:
 			menuService.unloadMenus();
-			instance.renderAll();
+			menuService.updateMenuInstance(instance);
 			Bukkit.getPlayer(playerName).sendMessage("All menus unloaded");
 			break;
 		case MAIN_LEFTBUTTON:

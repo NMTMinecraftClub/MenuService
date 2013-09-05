@@ -99,21 +99,6 @@ public class MainMenuRenderer extends InventoryRenderer implements Renderer, Lis
 	}
 	
 	/**
-	 * Renders the MenuInstance for all players who are currently viewing the MenuInstance
-	 * @param menuInstance the Menuinstance to render
-	 */
-	@Override
-	public void renderAllPlayers(MenuInstance instance) {
-		
-		//for every player in the instance
-		for (String player: instance.getPlayers()){
-			
-			//render the menu for the player
-			this.renderPlayer(instance, player);
-		}
-	}
-
-	/**
 	 * Returns the name of the Renderer.
 	 * No two Renderers can share the same name
 	 * @return the name of the Renderer

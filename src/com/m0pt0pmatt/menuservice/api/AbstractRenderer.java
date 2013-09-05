@@ -122,9 +122,6 @@ public abstract class AbstractRenderer implements Renderer{
 			//if the player is viewing the MenuInstance
 			if (entry.getValue().equals(instance)){
 				
-				//remove the player from the MenuInstance
-				instance.removePlayer(entry.getKey());
-				
 				//close the menu for the player
 				this.closeMenu(entry.getKey());
 				
@@ -239,6 +236,13 @@ public abstract class AbstractRenderer implements Renderer{
 			cSender = player;
 		}
 		return cSender;
+	}
+	
+	@Override
+	public void updateMenuInstance(MenuInstance instance) {
+		for (Entry<String, MenuInstance> entry: players.entrySet()){
+			this.renderPlayer(entry.getValue(), entry.getKey());
+		}
 	}
 	
 }

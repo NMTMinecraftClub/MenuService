@@ -780,7 +780,7 @@ public class MenuServiceProvider implements MenuService, Listener {
 		}
 		
 		//create the MenuInstance
-		MenuInstance instance = new MenuInstance(menu, instanceName, new LinkedList<String>(), parameters, new HashMap<String, Renderer>(), new HashMap<String, ActionListener>());
+		MenuInstance instance = new MenuInstance(this, menu, instanceName, parameters, new HashMap<String, Renderer>(), new HashMap<String, ActionListener>());
 		
 		//add the MenuInstance to the Menu
 		menusToInstances.get(menu).add(instance);
@@ -813,8 +813,13 @@ public class MenuServiceProvider implements MenuService, Listener {
 		menusToInstances.get(instance.getMenu()).remove(instance);
 		
 		//unregister all players with the menu instance
-		for (String playerName: instance.getPlayers()){
-			playersToInstances.remove(playerName);
+		Iterator<Entry<String, MenuInstance>> i = playersToInstances.entrySet().iterator();
+		while (i.hasNext()){
+			Entry<String, MenuInstance> entry = i.next();
+			
+			if (entry.getValue().equals(instance)){
+				i.remove();
+			}
 		}
 		
 		return true;
@@ -913,8 +918,7 @@ public class MenuServiceProvider implements MenuService, Listener {
 			}
 		}
 		
-		//add the player to the instance
-		instance.getPlayers().add(playerName);
+		//fire the listeners
 		for (ActionListener listener: instance.getActionListeners().values()){
 			listener.playerAdded(instance, playerName);
 		}
@@ -953,23 +957,20 @@ public class MenuServiceProvider implements MenuService, Listener {
 			renderer.closeMenu(playerName);
 		}
 		
-		//remove the player from the instance
-		instance.removePlayer(playerName);
-		
 		//unregister the player from the MenuInstance
 		this.playersToInstances.remove(playerName);
 		
-		//if there are no more players for the instance, notify the ActionListeners
-		if (instance.getPlayers().size() == 0){
-			for (ActionListener listener: instance.getActionListeners().values()){
-				listener.playerCountZero(instance, playerName);
-			}
-			if (instance.hasParameter("removeOnEmpty")){
-				if ((Boolean)instance.getParameter("removeOnEmpty")){
-					this.removeMenuInstance(instance);
-				}
-			}
-		}
+//		//if there are no more players for the instance, notify the ActionListeners
+//		if (instance.getPlayers().size() == 0){
+//			for (ActionListener listener: instance.getActionListeners().values()){
+//				listener.playerCountZero(instance, playerName);
+//			}
+//			if (instance.hasParameter("removeOnEmpty")){
+//				if ((Boolean)instance.getParameter("removeOnEmpty")){
+//					this.removeMenuInstance(instance);
+//				}
+//			}
+//		}
 		
 		this.plugin.getLogger().info("MenuInstance closed for player " + playerName);
 		return true;
@@ -1266,6 +1267,33 @@ public class MenuServiceProvider implements MenuService, Listener {
 		}
 		
 		materialsToMenus.remove(material);
+		return true;
+	}
+
+	@Override
+	public boolean updateMenuInstance(MenuInstance instance) {
+		if (instance == null){
+			return false;
+		}
+		
+		for (Renderer renderer: instance.getRenderers().values()){
+			renderer.updateMenuInstance(instance);
+		}
+		return true;
+	}
+
+	@Override
+	public boolean updateMenuInstance(String playerName) {
+		if (playerName == null){
+			return false;
+		}
+		
+		MenuInstance instance = playersToInstances.get(playerName);
+		if (instance == null){
+			return false;
+		}
+		
+		updateMenuInstance(instance);
 		return true;
 	}
 

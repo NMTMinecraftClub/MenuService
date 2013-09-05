@@ -30,6 +30,9 @@ public interface MenuService{
 	 */
 	public List<Menu> getMenus();
 	
+	/**
+	 * Loads all menus in the MenuService folder
+	 */
 	public boolean loadMenus();
 	
 	/**
@@ -226,6 +229,20 @@ public interface MenuService{
 	 * @param playerName the Name of the player
 	 */
 	public boolean closeMenuInstance(String playerName);
+	
+	/**
+	 * Updates the given MenuInstance for all players currently viewing the MenuInstance
+	 * @param instance
+	 * @return
+	 */
+	public boolean updateMenuInstance(MenuInstance instance);
+	
+	/**
+	 * Updates the MenuInstance for the given Player
+	 * @param playerName
+	 * @return
+	 */
+	public boolean updateMenuInstance(String playerName);
 	
 	//--------------------------Methods for Renderers--------------------------
 	

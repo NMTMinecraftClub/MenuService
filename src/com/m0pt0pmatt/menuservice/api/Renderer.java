@@ -17,13 +17,9 @@ public interface Renderer {
 	 * @param menuInstance the MenuInstance to render
 	 * @param playerName the name of the player
 	 */
-	public void renderPlayer(MenuInstance menuInstance, String playerName);
+	public void renderPlayer(MenuInstance instance, String playerName);
 	
-	/**
-	 * Renders the MenuInstance for all players who are currently viewing the MenuInstance
-	 * @param menuInstance the MenuInstance to render
-	 */
-	public void renderAllPlayers(MenuInstance menuInstance);
+	public void updateMenuInstance(MenuInstance instance);
 	
 	/**
 	 * Returns the name of the Renderer.
