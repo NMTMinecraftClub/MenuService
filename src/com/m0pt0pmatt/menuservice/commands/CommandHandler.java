@@ -272,6 +272,77 @@ public class CommandHandler {
 		command = new MyCommand(Keyword.UNLOAD, arguments, Perm.UNLOAD, method);
 		commands.get(Keyword.UNLOAD).add(command);
 		
+		//bind menu [menu] material
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.MATERIAL);
+		method = this.getClass().getMethod("bindMenuMaterial", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.BIND, arguments, Perm.BINDMENUMATERIAL, method);
+		commands.get(Keyword.BIND).add(command);
+		
+		//bind menu [menu] material [material]
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.MATERIAL);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = this.getClass().getMethod("bindMenuMaterial", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.BIND, arguments, Perm.BINDMENUMATERIAL, method);
+		commands.get(Keyword.BIND).add(command);
+		
+		//bind instance [instance] material
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.INSTANCE);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.MATERIAL);
+		method = this.getClass().getMethod("bindInstanceMaterial", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.BIND, arguments, Perm.BINDINSTANCEMATERIAL, method);
+		commands.get(Keyword.BIND).add(command);
+		
+		//bind instance [instance] material [material]
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.INSTANCE);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.MATERIAL);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = this.getClass().getMethod("bindInstanceMaterial", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.BIND, arguments, Perm.BINDINSTANCEMATERIAL, method);
+		commands.get(Keyword.BIND).add(command);
+		
+		//unbind menu [menu] all
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.ALL);
+		method = this.getClass().getMethod("unbindMenuAll", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.UNBIND, arguments, Perm.UNBINDMENUMATERIAL, method);
+		commands.get(Keyword.UNBIND).add(command);
+		
+		//unbind menu [menu] material all
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.MATERIAL);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = this.getClass().getMethod("unbindMenuMaterial", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.UNBIND, arguments, Perm.UNBINDMENUMATERIAL, method);
+		commands.get(Keyword.UNBIND).add(command);
+		
+		//unbind menu [menu] material [material]
+		arguments = new LinkedList<Keyword>();
+		arguments.add(Keyword.MENU);
+		arguments.add(Keyword.PLACEHOLDER);
+		arguments.add(Keyword.MATERIAL);
+		arguments.add(Keyword.PLACEHOLDER);
+		method = this.getClass().getMethod("unbindMenuMaterial", getFormalParameters(arguments));
+		command = new MyCommand(Keyword.UNBIND, arguments, Perm.UNBINDMENUMATERIAL, method);
+		commands.get(Keyword.UNBIND).add(command);
+
+		//unbind instance [instance] all
+		//unbind instance [instance] material all
+		//unbind instance [instance] material [material]
+		
 	}
 	
 	/**
@@ -398,23 +469,15 @@ public class CommandHandler {
 		
 		//bind menu [menu] material
 		//bind menu [menu] material [material]
-		//bind menu [menu] entity
-		//bind menu [menu] entity [entity]
 		//bind instance [instance] material
 		//bind instance [instance] material [material]
-		//bind instance [instance] entity
-		//bind instance [instance] entity [entity]
 		
 		//unbind menu [menu] all
 		//unbind menu [menu] material all
 		//unbind menu [menu] material [material]
-		//unbind menu [menu] entity all
-		//unbind menu [menu] entity [entity]
 		//unbind instance [instance] all
 		//unbind instance [instance] material all
 		//unbind instance [instance] material [material]
-		//unbind instance [instance] entity all
-		//unbind instance [instance] entity [entity]
 		
 		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "MenuService commands:");
 		Message.sendMessage(sender, MessageFormat.HELPMESSAGE, "/menuservice help");

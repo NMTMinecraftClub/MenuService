@@ -59,7 +59,26 @@ public enum Perm {
 	
 	UNLOAD("menuservice.unload.*"),
 	UNLOADMENUSERVICE("menuservice.unload.menuservice"),
-	UNLOADOTHERPLUGIN("menuservice.unload.otherplugin");
+	UNLOADOTHERPLUGIN("menuservice.unload.otherplugin"),
+	
+	BIND("menuservice.bind.*"),
+	BINDMENU("menuservice.bind.menu.*"),
+	BINDMENUMATERIAL("menuservice.bind.menu.material"),
+	BINDMENUENTITY("menuservice.bind.menu.entity"),
+	BINDINSTANCE("menuservice.bind.instance.*"),
+	BINDINSTANCEMATERIAL("menuservice.bind.instance.material"),
+	BINDINSTANCEENTITY("menuservice.bind.instance.entity"),
+	
+	UNBIND("menuservice.unbind.*"),
+	UNBINDMENU("menuservice.unbind.menu.*"),
+	UNBINDMENUALL("menuservice.unbind.menu.all"),
+	UNBINDMENUMATERIAL("menuservice.unbind.menu.material"),
+	UNBINDMENUENTITY("menuservice.unbind.menu.entity"),
+	UNBINDINSTANCE("menuservice.unbind.instance.*"),
+	UNBINDINSTANCEALL("menuservice.unbind.instance.all"),
+	UNBINDINSTANCEMATERIAL("menuservice.unbind.instance.material"),
+	UNBINDINSTANCEENTITY("menuservice.unbind.instance.entity"),
+	;
 	
 	private final String permission;
 	private Perm(String permission){
