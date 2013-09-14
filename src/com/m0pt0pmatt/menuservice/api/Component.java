@@ -111,7 +111,27 @@ public interface Component {
 	 * Returns the type of the Component
 	 * @return
 	 */
-	public String getType();
+	public ComponentType getType();
+	
+	/**
+	 * Checks the component if it is the given ComponentType
+	 * @param type
+	 * @return
+	 */
+	public boolean isType(ComponentType type);
+	
+	/**
+	 * Checks the component if it is the given ComponentType
+	 * @param type
+	 * @return
+	 */
+	public boolean isType(String type);
+	
+	/**
+	 * Sets the type of the Component
+	 * @param type
+	 */
+	public void setType(ComponentType type);
 	
 	/**
 	 * Sets the type of the Component

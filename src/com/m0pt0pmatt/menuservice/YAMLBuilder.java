@@ -14,6 +14,7 @@ import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.api.AbstractComponent;
 import com.m0pt0pmatt.menuservice.api.Component;
+import com.m0pt0pmatt.menuservice.api.ComponentType;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuComponent;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
@@ -74,7 +75,7 @@ class YAMLBuilder {
 			}
 		}
 		
-		if (component.getType().equalsIgnoreCase("menu")){
+		if (component.isType(ComponentType.MENU)){
 			saveMenu(config, (MenuComponent) component);
 		}
 		

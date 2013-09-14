@@ -167,6 +167,7 @@ public class AbstractComponent implements Component{
 	public Object getParameteredAttribute(String attributeName, MenuInstance instance) {
 		Object attribute = getAttribute(attributeName);
 		if (attribute instanceof String){
+			
 			String parameterName = (String) attribute;
 			if (parameterName.startsWith("^")){
 				attribute = instance.getParameter(parameterName.substring(1));
@@ -181,9 +182,37 @@ public class AbstractComponent implements Component{
 	 * @return
 	 */
 	@Override
-	public String getType(){
+	public ComponentType getType(){
 		Object type = attributes.get("type");
-		return (type instanceof String) ? (String) type : null;
+		return (type instanceof String) ? ComponentType.getComponentType((String) type ): null;
+	}
+	
+	@Override
+	public boolean isType(ComponentType type) {
+		ComponentType cType = this.getType();
+		if (cType == null){
+			return false;
+		}
+		if (cType.equals(type)){
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean isType(String type) {
+		Object cType = attributes.get("type");
+		if (cType instanceof String){
+			if (type.equals(cType)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public void setType(ComponentType type) {
+		this.setType(type.getType());
 	}
 	
 	/**
