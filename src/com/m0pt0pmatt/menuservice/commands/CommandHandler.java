@@ -291,57 +291,23 @@ public class CommandHandler {
 		command = new MyCommand(Keyword.BIND, arguments, Perm.BINDMENUMATERIAL, method);
 		commands.get(Keyword.BIND).add(command);
 		
-		//bind instance [instance] material
-		arguments = new LinkedList<Keyword>();
-		arguments.add(Keyword.INSTANCE);
-		arguments.add(Keyword.PLACEHOLDER);
-		arguments.add(Keyword.MATERIAL);
-		method = this.getClass().getMethod("bindInstanceMaterial", getFormalParameters(arguments));
-		command = new MyCommand(Keyword.BIND, arguments, Perm.BINDINSTANCEMATERIAL, method);
-		commands.get(Keyword.BIND).add(command);
-		
-		//bind instance [instance] material [material]
-		arguments = new LinkedList<Keyword>();
-		arguments.add(Keyword.INSTANCE);
-		arguments.add(Keyword.PLACEHOLDER);
-		arguments.add(Keyword.MATERIAL);
-		arguments.add(Keyword.PLACEHOLDER);
-		method = this.getClass().getMethod("bindInstanceMaterial", getFormalParameters(arguments));
-		command = new MyCommand(Keyword.BIND, arguments, Perm.BINDINSTANCEMATERIAL, method);
-		commands.get(Keyword.BIND).add(command);
-		
 		//unbind menu [menu] all
 		arguments = new LinkedList<Keyword>();
 		arguments.add(Keyword.MENU);
 		arguments.add(Keyword.PLACEHOLDER);
 		arguments.add(Keyword.ALL);
-		method = this.getClass().getMethod("unbindMenuAll", getFormalParameters(arguments));
+		method = this.getClass().getMethod("unbindMenu", getFormalParameters(arguments));
 		command = new MyCommand(Keyword.UNBIND, arguments, Perm.UNBINDMENUMATERIAL, method);
 		commands.get(Keyword.UNBIND).add(command);
 		
-		//unbind menu [menu] material all
+		//unbind menu material [material]
 		arguments = new LinkedList<Keyword>();
 		arguments.add(Keyword.MENU);
-		arguments.add(Keyword.PLACEHOLDER);
 		arguments.add(Keyword.MATERIAL);
 		arguments.add(Keyword.PLACEHOLDER);
-		method = this.getClass().getMethod("unbindMenuMaterial", getFormalParameters(arguments));
+		method = this.getClass().getMethod("unbindMaterial", getFormalParameters(arguments));
 		command = new MyCommand(Keyword.UNBIND, arguments, Perm.UNBINDMENUMATERIAL, method);
 		commands.get(Keyword.UNBIND).add(command);
-		
-		//unbind menu [menu] material [material]
-		arguments = new LinkedList<Keyword>();
-		arguments.add(Keyword.MENU);
-		arguments.add(Keyword.PLACEHOLDER);
-		arguments.add(Keyword.MATERIAL);
-		arguments.add(Keyword.PLACEHOLDER);
-		method = this.getClass().getMethod("unbindMenuMaterial", getFormalParameters(arguments));
-		command = new MyCommand(Keyword.UNBIND, arguments, Perm.UNBINDMENUMATERIAL, method);
-		commands.get(Keyword.UNBIND).add(command);
-
-		//unbind instance [instance] all
-		//unbind instance [instance] material all
-		//unbind instance [instance] material [material]
 		
 	}
 	
@@ -744,13 +710,40 @@ public class CommandHandler {
 		return menuService.unloadMenu(menu);
 	}
 	
+	public boolean bindMenuMaterial(String sender, String menuName){
+		
+		if (sender == null){
+			return false;
+		}
+		
+		Player player = Bukkit.getPlayer(sender);
+		if (player == null){
+			return false;
+		}
+		
+		Material material = player.getItemInHand().getType();
+		return this.bindMenuMaterial(sender, material, menuName);
+	}
+	
 	/**
 	 * Binds the Material to a Menu
 	 * @param material the Material to be binded
 	 * @param pluginName the name of the Plugin that the Menu belongs to
 	 * @param menuName the name of the Menu
 	 */
-	public boolean bindMenu(Material material, String menuName){
+	public boolean bindMenuMaterial(String sender, String materialName, String menuName){
+		
+		//check material
+		if (materialName == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMATERIAL, menuName);
+			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, menuName);
+			return false;
+		}
+		
+		return this.bindMenuMaterial(sender, Material.getMaterial(materialName), menuName);
+	}
+	
+	public boolean bindMenuMaterial(String sender, Material material, String menuName){
 		
 		//check menuName
 		if (menuName == null){
@@ -765,7 +758,7 @@ public class CommandHandler {
 			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, menuName);
 			return false;
 		}
-		
+				
 		//get the menu
 		Menu menu = menuService.getMenu(menuName);
 		if (menu == null){
@@ -773,12 +766,12 @@ public class CommandHandler {
 			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, menuName);
 			return false;
 		}
-		
+				
 		//bind the Material
 		return menuService.bindMenu(material, menu);
 	}
 	
-	public boolean unbindMenu(String menuName) {
+	public boolean unbindMenu(String sender, String menuName) {
 		
 		//check the menuname
 		if (menuName == null){
@@ -804,7 +797,25 @@ public class CommandHandler {
 	 * @param type the Material
 	 * @return true if successful, false if unseuccessful
 	 */
-	public boolean unbindMaterial(Material type) {
+	public boolean unbindMaterial(String sender, String materialName) {
+		
+		//check for null
+		if (materialName == null){
+			Logger.log(2, Level.SEVERE, Message.NULLMATERIAL, null);
+			Logger.log(2, Level.SEVERE, Message.CANTUNBINDMATERIAL, null);
+			return false;
+		}
+		
+		//unbind the material
+		return this.unbindMaterial(sender, Material.getMaterial(materialName));
+	}
+	
+	/**
+	 * Unbinds a Material from a Menu if it is binded
+	 * @param type the Material
+	 * @return true if successful, false if unseuccessful
+	 */
+	public boolean unbindMaterial(String sender, Material type) {
 		
 		//check for null
 		if (type == null){

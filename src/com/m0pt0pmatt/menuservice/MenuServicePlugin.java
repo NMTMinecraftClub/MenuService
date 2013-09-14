@@ -48,8 +48,6 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public static String bindsFileName = "binds.yml";
 	
-	
-	
 	/**
 	 * The config file that holds all the menu binds
 	 */
@@ -98,6 +96,39 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	}
 
 	/**
+	 * Ran when the plugin is disabled.
+	 * Saves menus to file.
+	 * Closes all menuInstances
+	 */
+	@Override
+	public void onDisable(){
+		
+		//save all the menus to file
+		Logger.log(1, Level.INFO, "Saving all menus to file");
+		menuService.saveMenus();
+		
+		//close all menuinstances
+		Logger.log(1, Level.INFO, "Closing all menus");
+		menuService.closeMenus();
+		
+		//save the config file
+		try {
+			config.save(new File(this.getDataFolder(), "config.yml"));
+			Logger.log(1, Level.INFO, "Saved " + configFileName);
+		} catch (IOException e) {
+			Logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
+		}
+		
+	}
+	
+	/**
+	 * Executed when a command is ran.
+	 */
+	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
+		return commandHandler.onCommand(sender, cmd, label, args);
+	}
+	
+	/**
 	 * Loads the config.yml file and all of its settings
 	 */
 	private void loadConfig() {
@@ -131,48 +162,6 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		}
 		
 	}
-	
-	
-	
-	
-
-	/**
-	 * Ran when the plugin is disabled.
-	 * Saves menus to file.
-	 * Closes all menuInstances
-	 */
-	@Override
-	public void onDisable(){
-		
-		//save all the menus to file
-		Logger.log(1, Level.INFO, "Saving all menus to file");
-		menuService.saveMenus();
-		
-		//close all menuinstances
-		Logger.log(1, Level.INFO, "Closing all menus");
-		menuService.closeMenus();
-		
-		//save the config file
-		try {
-			config.save(new File(this.getDataFolder(), "config.yml"));
-			Logger.log(1, Level.INFO, "Saved " + configFileName);
-		} catch (IOException e) {
-			Logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
-		}
-		
-	}
-	
-	
-	
-	
-	
-	/**
-	 * Executed when a command is ran.
-	 */
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-		return commandHandler.onCommand(sender, cmd, label, args);
-	}
-	
 	
 	/**
 	 * Catch when a player executes a command if a Menu should be opened
