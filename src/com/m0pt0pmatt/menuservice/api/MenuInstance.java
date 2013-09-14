@@ -20,9 +20,14 @@ import java.util.Set;
  */
 public final class MenuInstance {
 
+	private final MenuService menuService;
+	
+	//The Menu of the MenuInstance
 	private final Menu menu;
+	
+	//The name of the MenuInstance. This must be unique for all MenuInstances with the same Menu.
 	private String name;
-	private List<String> players;
+	
 	private Map<String, Object> parameters;
 	private Map<String, Renderer> renderers;
 	private Map<String, ActionListener> actionListeners;
@@ -34,10 +39,10 @@ public final class MenuInstance {
 	 * @param playerName 
 	 * @param parameters
 	 */
-	public MenuInstance(Menu menu, String name, List<String> players, Map<String, Object> parameters, Map<String, Renderer> renderers, Map<String, ActionListener> actionListeners) {
+	public MenuInstance(MenuService menuService, Menu menu, String name, Map<String, Object> parameters, Map<String, Renderer> renderers, Map<String, ActionListener> actionListeners) {
+		this.menuService = menuService;
 		this.menu = menu;
 		this.name = name;
-		this.players = players;
 		this.parameters = parameters;
 		this.renderers = renderers;
 		this.actionListeners = actionListeners;
@@ -50,12 +55,12 @@ public final class MenuInstance {
 	
 	public void highlightButton(String tag){
 		highlightedButtons.add(tag);
-		renderAll();
+		menuService.updateMenuInstance(this);
 	}
 	
 	public void unhighlightButton(String tag){
 		highlightedButtons.remove(tag);
-		renderAll();
+		menuService.updateMenuInstance(this);
 	}
 	
 	public Set<String> getHighlightedButtons(){
@@ -64,7 +69,7 @@ public final class MenuInstance {
 	
 	public void unhighlightAllButtons(){
 		highlightedButtons.clear();
-		renderAll();
+		menuService.updateMenuInstance(this);
 	}
 	
 	public void toggleHighlightedButton(String tag){
@@ -90,14 +95,6 @@ public final class MenuInstance {
 
 	public Menu getMenu() {
 		return menu;
-	}
-
-	public List<String> getPlayers() {
-		return players;
-	}
-	
-	public boolean hasPlayer(String playerName){
-		return players.contains(playerName);
 	}
 
 	/**
@@ -187,22 +184,6 @@ public final class MenuInstance {
 		return actionListeners.get(listenerName);
 	}
 	
-	public void renderAll(){
-		for (Renderer renderer: menu.getRenderers()){
-			renderer.renderAllPlayers(this);
-		}
-		for (Renderer renderer: renderers.values()){
-			renderer.renderAllPlayers(this);
-		}
-	}
-	
-	public void renderAll(List<Renderer> renderers){
-		for (Renderer renderer: renderers){
-			renderer.renderAllPlayers(this);
-		}
-		renderAll();
-	}
-	
 	public void renderPlayer(String playerName){
 		for (Renderer renderer: menu.getRenderers()){
 			renderer.renderPlayer(this, playerName);
@@ -217,20 +198,6 @@ public final class MenuInstance {
 			renderer.renderPlayer(this, playerName);
 		}
 		renderPlayer(playerName);
-	}
-	
-	public void removePlayer(String playerName){
-		players.remove(playerName);
-		for (ActionListener listener: actionListeners.values()){
-			listener.playerRemoved(this, playerName);
-		}
-		if (players.size() == 0){
-			if(this.hasParameter("keepOnEmpty")){
-				if ((Boolean)this.getParameter("keepOnEmpty") == true){
-					return;
-				}
-			}
-		}
 	}
 	
 }

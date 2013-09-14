@@ -50,31 +50,16 @@ public class TextRenderer extends AbstractRenderer implements Listener{
 	}
 
 	@Override
-	public void renderAllPlayers(MenuInstance menuInstance) {
-		if (menuInstance == null){
-			return;
-		}
-		
-		for (String playerName: menuInstance.getPlayers()){
-			this.renderPlayer(menuInstance, playerName);
-		}
-		
-	}
-
-	@Override
 	public String getName() {
 		return "text";
 	}
 
 	@Override
 	public void closeMenu(String playerName) {
-		MenuInstance instance = this.getPlayers().get(playerName);
 		
 		//remove the player from the Renderer
 		getPlayers().remove(playerName);
 		
-		//remove the player from the instance
-		instance.removePlayer(playerName);
 	}
 	
 	/**

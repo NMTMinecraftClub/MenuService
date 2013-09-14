@@ -150,6 +150,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		else{
 			if (component.hasAttribute(Attribute.MATERIAL_ID)){
+				
 				material = Material.getMaterial((Integer) component.getAttribute(Attribute.MATERIAL_ID));
 				item = new ItemStack(material);
 			}
@@ -257,38 +258,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	}
 	
 	/**
-	 * Renders the MenuInstance for all players who are currently viewing the MenuInstance
-	 * @param menuInstance the Menuinstance to render
-	 */
-	@Override
-	public void renderAllPlayers(MenuInstance instance) {
-		
-		if (instance == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, this.getName());
-			return;
-		}
-		
-		//create the inventory
-		Inventory inv = createInventory(instance);
-		if (inv == null){
-			Logger.log(2, Level.SEVERE, Message.NULLINVENTORY, this.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, this.getName());
-			return;
-		}
-		
-		//for each player, render the instance
-		for (String player: instance.getPlayers()){
-			Bukkit.getPlayer(player).openInventory(inv);
-			this.getPlayers().put(player, instance);
-			if (!instance.hasPlayer(player)){
-				instance.getPlayers().add(player);
-			}
-		}
-		
-	}
-	
-	/**
 	 * Renders a MenuInstance for a given player
 	 * @param menuInstance the MenuInstance to render
 	 * @param playerName the name of the player
@@ -321,9 +290,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		//add the player for bookkeeping
 		this.getPlayers().put(playerName, instance);
-		if (!instance.hasPlayer(playerName)){
-			instance.getPlayers().add(playerName);
-		}
 	}
 
 	/**
@@ -369,9 +335,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//remove the player from the Renderer
 		getPlayers().remove(playerName);
 		
-		//remove the player from the instance
-		instance.removePlayer(playerName);
-		
 	}
 	
 	/**
@@ -395,7 +358,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			}
 			
 			//remove the player
-			instance.getPlayers().remove(playerName);
 			getPlayers().remove(playerName);
 			getMenuService().closeMenuInstance(playerName);
 		}
