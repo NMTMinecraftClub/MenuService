@@ -1,4 +1,6 @@
-package com.m0pt0pmatt.menuservice.api;
+package com.m0pt0pmatt.menuservice.api.rendering;
+
+import com.m0pt0pmatt.menuservice.api.MenuInstance;
 
 /**
  * A Renderer will render (or present) a menu to a player.

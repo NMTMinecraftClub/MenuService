@@ -24,15 +24,15 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuInstance;
 import com.m0pt0pmatt.menuservice.api.MenuService;
-import com.m0pt0pmatt.menuservice.api.Renderer;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
-import com.m0pt0pmatt.menuservice.renderers.InventoryRenderer;
-import com.m0pt0pmatt.menuservice.renderers.TextRenderer;
+import com.m0pt0pmatt.menuservice.api.rendering.AbstractRenderer;
+import com.m0pt0pmatt.menuservice.api.rendering.InventoryRenderer;
+import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
+import com.m0pt0pmatt.menuservice.api.rendering.TextRenderer;
 
 /**
  * The MenuServiceProvider is the provider for the Bukkit service MenuService.
@@ -63,9 +63,6 @@ public class MenuServiceProvider implements MenuService, Listener {
 	//The plugin which loaded the MenuServiceProvider
 	private MenuServicePlugin plugin;
 	
-	//the Yaml File loader/saver
-	private YAMLBuilder yamlBuilder;
-	
 	private static final String delimeter = ":"; 
 	
 	/**
@@ -79,12 +76,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 		
 		//set the plugin for logging purposes
 		this.plugin = plugin;
-		Logger.log(3, Level.INFO, "Starting initialization of MenuServiceProvider");
-		
-		//initialize the Yaml Builder
-		yamlBuilder = new YAMLBuilder();
-		Logger.log(3, Level.INFO, "Yaml Builder initialized");
-		
+		MenuServicePlugin.logger.log(3, Level.INFO, "Starting initialization of MenuServiceProvider");
+				
 		//initialize maps
 		menusByName = Collections.synchronizedMap(new HashMap<String, Menu>());
 		renderersByName = Collections.synchronizedMap(new HashMap<String, Renderer>());
@@ -92,15 +85,15 @@ public class MenuServiceProvider implements MenuService, Listener {
 		menusToInstances = Collections.synchronizedMap(new HashMap<Menu, List<MenuInstance>>());
 		commandsToMenus = Collections.synchronizedMap(new HashMap<String, Menu>());
 		materialsToMenus = Collections.synchronizedMap(new HashMap<Material, String>());
-		Logger.log(3, Level.INFO, "Maps initialized");
+		MenuServicePlugin.logger.log(3, Level.INFO, "Maps initialized");
 		
 		//add Renderers
 		this.addRenderer(new InventoryRenderer(this, plugin));
 		this.addRenderer(new TextRenderer(this, plugin));
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
-		Logger.log(3, Level.INFO, "MenuServiceProvider registered in Bukkit");
-		Logger.log(3, Level.INFO, "MenuServiceProvider initialized");
+		MenuServicePlugin.logger.log(3, Level.INFO, "MenuServiceProvider registered in Bukkit");
+		MenuServicePlugin.logger.log(3, Level.INFO, "MenuServiceProvider initialized");
 	}
 	
 	/**
@@ -112,14 +105,14 @@ public class MenuServiceProvider implements MenuService, Listener {
 	protected boolean checkCommand(String command, Player player){
 
 		if (command == null){
-			Logger.log(2, Level.SEVERE, Message.NULLCOMMAND, null);
-			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLCOMMAND, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTEXECUTECOMMAND, null);
 			return false;
 		}
 		
 		if (player == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLAYER, command);
-			Logger.log(2, Level.SEVERE, Message.CANTEXECUTECOMMAND, command);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLPLAYER, command);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTEXECUTECOMMAND, command);
 			return false;
 		}
 		
@@ -191,68 +184,6 @@ public class MenuServiceProvider implements MenuService, Listener {
 	}
 	
 	/**
-	 * Loads menus stored in MenuService
-	 */
-	public boolean loadMenus() {
-		
-		//load menus in the MenuService folder
-		for (File file: plugin.getDataFolder().listFiles()){
-			
-			//make sure the file is not the config file and has the .yml extension
-			if ((!file.getName().equalsIgnoreCase("config.yml")) && (!file.getName().equalsIgnoreCase("binds.yml")) && file.getName().endsWith(".yml")){
-				
-				//load the menu
-				Menu menu = this.loadMenu(plugin, file.getName());
-				if (menu == null){
-					continue;
-				}
-				
-				Logger.log(2, Level.INFO, "Loaded file " + file.getName() + " from the MenuService folder");
-				menu.setChanged(false);
-			}
-			
-		}
-		
-		return true;
-	}
-	
-	/**
-	 * Saves all Menus to file
-	 */
-	@Override
-	public boolean saveMenus() {
-		for (Menu menu: menusByName.values()){
-			
-			boolean state = menu.hasChanged();
-			
-			if (menu.hasAttribute(Attribute.DYNAMIC)){
-				if ((Boolean) menu.getAttribute(Attribute.DYNAMIC)){
-					continue;
-				}
-			}
-			
-			Plugin plugin = Bukkit.getPluginManager().getPlugin((String) menu.getAttribute("plugin"));
-			if (plugin != null){
-				String filename = null;
-				if (menu.hasAttribute(Attribute.FILENAME)){
-					filename = (String) menu.getAttribute(Attribute.FILENAME);
-				} else{
-					filename = menu.getTag() + ".yml";
-				}
-				
-				//only save the Menu if changes have been made, otherwise there is no point
-				if (state){
-					yamlBuilder.saveYAML(plugin, menu, filename);
-				}
-				
-			}
-			
-		}
-		
-		return true;
-	}
-	
-	/**
 	 * Closes all Menus
 	 */
 	@Override
@@ -262,26 +193,6 @@ public class MenuServiceProvider implements MenuService, Listener {
 		}
 		return true;
 	}
-	
-	@Override
-	public boolean reloadMenus() {
-		List<Menu> menusToReload = new LinkedList<Menu>();
-		
-		for (Menu menu: menusByName.values()){
-			if (menu.hasAttribute(Attribute.DYNAMIC)){
-				if ((Boolean)menu.getAttribute(Attribute.DYNAMIC) == true){
-					continue;
-				}
-			}
-			menusToReload.add(menu);
-		}
-		
-		for (Menu menu: menusToReload){
-			this.reloadMenu(menu);
-		}
-		return true;
-	}
-
 
 	@Override
 	public List<Menu> unloadMenus() {
@@ -315,16 +226,16 @@ public class MenuServiceProvider implements MenuService, Listener {
 		
 		//check for null menuName
 		if (menuName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTGETMENU, null);
 			return null;
 		}
 		
 		//get the menu
 		Menu menu = menusByName.get(menuName);
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENU, menuName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHMENU, menuName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTGETMENU, menuName);
 			return null;
 		}
 		
@@ -342,8 +253,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 		
 		//check menu
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTHASMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTHASMENU, null);
 		}
 		
 		//see if MenuService contains the menu
@@ -382,8 +293,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 		
 		//check menu
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTADDMENU, null);
 			return false;
 		}
 		
@@ -395,20 +306,20 @@ public class MenuServiceProvider implements MenuService, Listener {
 		
 		//check if menu exists
 		if (menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, Message.MENUALREADYEXISTS, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTADDMENU, menu.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.MENUALREADYEXISTS, menu.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTADDMENU, menu.getName());
 			return false;
 		}
 		
 		menusByName.put(menu.getName(), menu);
 		menusToInstances.put(menu, new LinkedList<MenuInstance>());
-		Logger.log(2, Level.INFO, "Menu " + menu.getName() + " was created and added");
+		MenuServicePlugin.logger.log(2, Level.INFO, "Menu " + menu.getName() + " was created and added");
 		
 		String command = (String) menu.getAttribute("openCommand");
 		menu.setChanged(false);
 		if (command != null){
 			commandsToMenus.put(command, menu);
-			Logger.log(2, Level.INFO, "Run " + menu.getName() + " with the command: /" + command);
+			MenuServicePlugin.logger.log(2, Level.INFO, "Run " + menu.getName() + " with the command: /" + command);
 		}
 		
 		//add a default renderer if it has none
@@ -429,8 +340,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 		
 		//check menu
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENU, null);
 			return false;
 		}
 		
@@ -469,109 +380,24 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public Menu removeMenu(String menuName) {
 		
 		if (menuName == null){
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENU, null);
 			return null;
 		}
 		
 		//get the menu
 		Menu menu = menusByName.get(menuName);
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menuName);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENU, menuName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHMENU, menuName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENU, menuName);
 			return null;
 		}
 		
-		Logger.log(2, Level.INFO, Message.MENUREMOVED);
+		MenuServicePlugin.logger.log(2, Level.INFO, OutputMessage.MENUREMOVED);
 		return menu;
 	}
 	
-	/**
-	 * Creates a new Menu from the given Plugin and fileName.
-	 * 
-	 * Since Menus are stored based on the plugin that owns them, 
-	 * the plugin needs to be referenced so the correct file location can be found.
-	 * 
-	 * The fileName is the name of the config file for the Menu.
-	 * 
-	 * After the Menu is loaded, it is stored in the MenuService
-	 * 
-	 * @param plugin The Plugin which the Menu belongs to
-	 * @param fileName The name of the Menu's config file
-	 */
-	@Override
-	public Menu loadMenu(Plugin plugin, String fileName) {
-		
-		//check the filename
-		if (fileName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLFILENAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, null);
-			return null;
-		}
-				
-		//check the plugin
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, fileName);
-			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
-			return null;
-		}		
-		
-		//load the file
-		Menu menu = yamlBuilder.loadMenu(plugin, fileName);
-
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHFILE, fileName);
-			Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
-			return null;
-		}
-		
-		//add the menu
-		if (this.addMenu(menu)){
-			Logger.log(2, Level.INFO, "Menu " + menu.getName() + " loaded"); 
-			return menu;
-		}
-		
-		Logger.log(2, Level.SEVERE, Message.CANTLOADMENU, fileName);
-		return menu;
-	}
 	
-	/**
-	 * Saves a Menu to file
-	 * @param plugin the Plugin which will hold the menu
-	 * @param menu the Menu to be saved
-	 * @param fileName the name of the file to store the menu in
-	 * @return true if successful, false is unsuccessful
-	 */
-	@Override
-	public boolean saveMenu(Menu menu) {
-		
-		//check the menu
-		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, null);
-			return false;
-		}
-		
-		//check the plugin
-		Plugin plugin = Bukkit.getPluginManager().getPlugin(menu.getPlugin());
-		if (plugin == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLUGIN, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTSAVEMENU, menu.getName());
-			return false;
-		}
-		
-		//save the Menu
-		return this.yamlBuilder.saveYAML(plugin, menu, menu.getFileName());
-	}
-	
-	@Override
-	public boolean reloadMenu(Menu menu) {
-		String name = menu.getName();
-		String pluginName = menu.getPlugin();
-		this.removeMenu(menu);
-		this.loadMenu(Bukkit.getPluginManager().getPlugin(pluginName), name);
-		return true;
-	}
 
 	@Override
 	public boolean unloadMenu(Menu menu) {
@@ -668,22 +494,22 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public MenuInstance getMenuInstance(Menu menu, String instanceName) {
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCENAME, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTGETMENUINSTANCE, null);
 			return null;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, instanceName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTGETMENUINSTANCE, instanceName);
 			return null;
 		}
 		
 
 		List<MenuInstance> instances = menusToInstances.get(menu);
 		if (instances == null){
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTGETMENUINSTANCE, instanceName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTGETMENUINSTANCE, menu.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTGETMENUINSTANCE, instanceName);
 			return null;
 		}
 		
@@ -706,14 +532,14 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean hasMenuInstance(Menu menu, String instanceName) {
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCENAME, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTHASMENUINSTANCE, null);
 			return false;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, instanceName);
-			Logger.log(2, Level.SEVERE, Message.CANTHASMENUINSTANCE, instanceName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, instanceName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTHASMENUINSTANCE, instanceName);
 			return false;
 		}
 		
@@ -758,14 +584,14 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public MenuInstance createMenuInstance(Menu menu, String instanceName, Map<String, Object> parameters) {
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEMENUINSTANCE, null);
 			return null;
 		}
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCENAME, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, menu.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCENAME, menu.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEMENUINSTANCE, menu.getName());
 			return null;
 		}
 		
@@ -774,8 +600,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 		}
 		
 		if (!menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTCREATEMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEMENUINSTANCE, null);
 			return null;
 		}
 		
@@ -785,7 +611,7 @@ public class MenuServiceProvider implements MenuService, Listener {
 		//add the MenuInstance to the Menu
 		menusToInstances.get(menu).add(instance);
 		
-		Logger.log(2, Level.INFO, "MenuInstance " + instanceName + " was created");
+		MenuServicePlugin.logger.log(2, Level.INFO, "MenuInstance " + instanceName + " was created");
 
 		return instance;
 	}
@@ -798,14 +624,14 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean removeMenuInstance(MenuInstance instance) {
 		
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENUINSTANCE, null);
 			return false;
 		}
 		
 		if (!menusToInstances.containsKey(instance.getMenu())){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, instance.getMenu().getName());
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHMENU, instance.getMenu().getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENUINSTANCE, instance.getName());
 			return false;
 		}
 		
@@ -835,21 +661,21 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public MenuInstance removeMenuInstance(Menu menu, String instanceName) {
 		
 		if (instanceName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENUINSTANCE, null);
 			return null;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENUINSTANCE, null);
 			return null;
 		}
 		
 		MenuInstance instance =  this.getMenuInstance(menu, instanceName);
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVEMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVEMENUINSTANCE, null);
 			return null;
 		}
 		
@@ -873,28 +699,28 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean openMenuInstance(MenuInstance instance, String playerName) {
 		
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTOPENMENUINSTANCE, null);
 			return false;
 		}
 		
 		if (playerName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLAYERNAME, instance.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLPLAYERNAME, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTOPENMENUINSTANCE, instance.getName());
 			return false;
 		}
 		
 		Menu menu = instance.getMenu();
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, instance.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTOPENMENUINSTANCE, instance.getName());
 			return false;
 		}
 		
 		Player player = Bukkit.getPlayer(playerName);
 		if (player == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHPLAYER, instance.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHPLAYER, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTOPENMENUINSTANCE, instance.getName());
 			return false;
 		}
 		
@@ -904,8 +730,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 				permissions = (List<String>) menu.getAttribute("permissions");
 			}
 			catch (ClassCastException e){
-				Logger.log(2, Level.SEVERE, Message.CANTCASTATTRIBUTE, "permissions");
-				Logger.log(2, Level.SEVERE, Message.CANTOPENMENUINSTANCE, instance.getName());
+				MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCASTATTRIBUTE, "permissions");
+				MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTOPENMENUINSTANCE, instance.getName());
 				return false;
 			}
 			if (permissions != null){
@@ -987,8 +813,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public Renderer getRenderer(String rendererName) {
 		
 		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTGETRENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLRENDERERNAME, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTGETRENDERER, null);
 		}
 		
 		return renderersByName.get(rendererName);
@@ -1003,8 +829,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean hasRenderer(Renderer renderer) {
 		
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
-			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLRENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTHASRENDERER, null);
 			return false;
 		}
 		
@@ -1020,8 +846,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean hasRenderer(String rendererName) {
 		
 		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTHASRENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLRENDERERNAME, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTHASRENDERER, null);
 			return false;
 		}
 		
@@ -1039,29 +865,29 @@ public class MenuServiceProvider implements MenuService, Listener {
 		
 		//check for null
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
-			Logger.log(2, Level.SEVERE, Message.CANTADDRENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLRENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTADDRENDERER, null);
 			return false;
 		}
 		
 		//check to make sure a MenuProvider of the same name isn't already loaded
 		if (renderersByName.containsKey(renderer.getName())){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHRENDERER, renderer.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTADDRENDERER, renderer.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHRENDERER, renderer.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTADDRENDERER, renderer.getName());
 			return false;
 		}
 		
 		//make sure Renderer is an extension of an AbstractRenderer
 		if (!(renderer instanceof AbstractRenderer)){
-			Logger.log(2, Level.SEVERE, Message.RENDERERNOTABSTRACTRENDERER, renderer.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTADDRENDERER, renderer.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.RENDERERNOTABSTRACTRENDERER, renderer.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTADDRENDERER, renderer.getName());
 			return false;
 		}
 		
 		//add the Renderer
 		renderersByName.put(renderer.getName(), renderer);
 		
-		Logger.log(2, Level.INFO, "Renderer " + renderer.getName() + " was added");
+		MenuServicePlugin.logger.log(2, Level.INFO, "Renderer " + renderer.getName() + " was added");
 		
 		return true;
 	}
@@ -1075,15 +901,15 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public Renderer removeRenderer(String rendererName) {
 		
 		if (rendererName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERERNAME, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLRENDERERNAME, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVERENDERER, null);
 			return null;
 		}
 		
 		Renderer renderer = renderersByName.get(rendererName);
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHRENDERER, rendererName);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, rendererName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHRENDERER, rendererName);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVERENDERER, rendererName);
 			return null;
 		}
 		
@@ -1100,14 +926,14 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean removeRenderer(Renderer renderer) {
 		
 		if (renderer == null){
-			Logger.log(2, Level.SEVERE, Message.NULLRENDERER, null);
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLRENDERER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVERENDERER, null);
 			return false;
 		}
 		
 		if (!renderersByName.containsKey(renderer)){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHRENDERER, renderer.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTREMOVERENDERER, renderer.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHRENDERER, renderer.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTREMOVERENDERER, renderer.getName());
 			return false;
 		}
 		
@@ -1121,7 +947,7 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean loadBinds() {
 		//create data folder if needed
 		if (!plugin.getDataFolder().exists()){
-			Logger.log(2, Level.INFO, "Creating Data Folder");
+			MenuServicePlugin.logger.log(2, Level.INFO, "Creating Data Folder");
 			plugin.getDataFolder().mkdir();
 		}
 		
@@ -1131,14 +957,14 @@ public class MenuServiceProvider implements MenuService, Listener {
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				Logger.log(1, Level.SEVERE, "Unable to create binds file!");
+				MenuServicePlugin.logger.log(1, Level.SEVERE, "Unable to create binds file!");
 			}
 		}
 		
 		//load the configuration file
 		MenuServicePlugin.binds = YamlConfiguration.loadConfiguration(configFile);
 		if (MenuServicePlugin.binds == null){
-			Logger.log(1, Level.SEVERE, "Unable to load binds file!");
+			MenuServicePlugin.logger.log(1, Level.SEVERE, "Unable to load binds file!");
 			return false;
 		}
 		
@@ -1205,20 +1031,20 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean bindMenu(Material material, Menu menu) {
 		
 		if (material == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMATERIAL, null);
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMATERIAL, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTBINDMENUMATERIAL, null);
 			return false;
 		}
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, material.toString());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTBINDMENUMATERIAL, material.toString());
 			return false;
 		}
 		
 		if (!menusByName.containsKey(menu.getName())){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHMENU, menu.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTBINDMENUMATERIAL, material.toString());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHMENU, menu.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTBINDMENUMATERIAL, material.toString());
 			return false;
 		}
 		
@@ -1235,8 +1061,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean unbindMenu(Menu menu) {
 		
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENU, null);
-			Logger.log(2, Level.SEVERE, Message.CANTUNBINDMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENU, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTUNBINDMENU, null);
 			return false;
 		}
 		
@@ -1261,8 +1087,8 @@ public class MenuServiceProvider implements MenuService, Listener {
 	public boolean unbindMenu(Material material) {
 		
 		if (material == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMATERIAL, null);
-			Logger.log(2, Level.SEVERE, Message.CANTUNBINDMATERIAL, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMATERIAL, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTUNBINDMATERIAL, null);
 			return false;
 		}
 		

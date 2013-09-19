@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -16,7 +14,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.m0pt0pmatt.menuservice.api.MenuService;
-import com.m0pt0pmatt.menuservice.commands.CommandHandler;
+import com.m0pt0pmatt.pluginutils.Logger;
 
 /**
  * MenuService is a plugin that allows other plugins to implement abstract menu
@@ -26,17 +24,9 @@ import com.m0pt0pmatt.menuservice.commands.CommandHandler;
  */
 public class MenuServicePlugin extends JavaPlugin implements Listener{
 	
-	/**
-	 * The inventoryListener allows menus to be shown to players and interacted with players
-	 */
 	public static MenuServiceProvider menuService;
 	
-	/**
-	 * The commandHandler handles all commands for the plugin
-	 */
-	private static CommandHandler commandHandler;
-	
-	
+	public static Logger logger;
 	
 	/**
 	 * The config file for the plugin
@@ -69,30 +59,23 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public void onEnable(){
 				
-		Logger.setPlugin(this);
+		logger = new Logger(this);
 		
 		//setup the MenuService Provider
 		menuService = new MenuServiceProvider(this);
-		commandHandler = new CommandHandler(menuService, this);	
 		
-		Logger.log(3, Level.INFO, "MenuService initialized");
+		logger.log(3, Level.INFO, "MenuService initialized");
 		
 		//register the MenuServiceProvider as the provider for the MenuService
 		Bukkit.getServicesManager().register(MenuService.class, menuService, this, ServicePriority.Normal);
-		Logger.log(3, Level.INFO, "MenuService registered for the server");
+		logger.log(3, Level.INFO, "MenuService registered for the server");
 		
 		//load the config file
 		loadConfig();
-		Logger.log(1, Level.INFO, "Loaded " + configFileName);
-		
-		//load all menus in the MenuService folder
-		menuService.loadMenus();
-		
-		menuService.loadBinds();
+		logger.log(1, Level.INFO, "Loaded " + configFileName);
 		
 		//register the plugin so it can listen to open menus
 		Bukkit.getPluginManager().registerEvents(this, this);	
-		
 	}
 
 	/**
@@ -103,29 +86,18 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	@Override
 	public void onDisable(){
 		
-		//save all the menus to file
-		Logger.log(1, Level.INFO, "Saving all menus to file");
-		menuService.saveMenus();
-		
 		//close all menuinstances
-		Logger.log(1, Level.INFO, "Closing all menus");
+		logger.log(1, Level.INFO, "Closing all menus");
 		menuService.closeMenus();
 		
 		//save the config file
 		try {
 			config.save(new File(this.getDataFolder(), "config.yml"));
-			Logger.log(1, Level.INFO, "Saved " + configFileName);
+			logger.log(1, Level.INFO, "Saved " + configFileName);
 		} catch (IOException e) {
-			Logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
+			logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
 		}
 		
-	}
-	
-	/**
-	 * Executed when a command is ran.
-	 */
-	public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args){
-		return commandHandler.onCommand(sender, cmd, label, args);
 	}
 	
 	/**
@@ -135,7 +107,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//create data folder if needed
 		if (!this.getDataFolder().exists()){
-			Logger.log(2, Level.INFO, "Creating Data Folder");
+			logger.log(2, Level.INFO, "Creating Data Folder");
 			this.getDataFolder().mkdir();
 		}
 		
@@ -145,20 +117,20 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				Logger.log(1, Level.SEVERE, "Unable to create config file!");
+				logger.log(1, Level.SEVERE, "Unable to create config file!");
 			}
 		}
 		
 		//load the configuration file
 		config = YamlConfiguration.loadConfiguration(configFile);
 		if (config == null){
-			Logger.log(1, Level.SEVERE, "Unable to load config file!");
+			logger.log(1, Level.SEVERE, "Unable to load config file!");
 		}
 		
 		//check for verbose level
 		if (config.contains("verbose")){
 			verbose = config.getInt("verbose");
-			Logger.log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
+			logger.log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
 		}
 		
 	}

@@ -1,4 +1,4 @@
-package com.m0pt0pmatt.menuservice.renderers;
+package com.m0pt0pmatt.menuservice.api.rendering;
 
 import java.util.List;
 
@@ -11,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 import com.m0pt0pmatt.menuservice.MenuServicePlugin;
-import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
 import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;

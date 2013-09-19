@@ -1,4 +1,4 @@
-package com.m0pt0pmatt.menuservice.renderers;
+package com.m0pt0pmatt.menuservice.api.rendering;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -19,11 +19,10 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.Message;
-import com.m0pt0pmatt.menuservice.Logger;
 import com.m0pt0pmatt.menuservice.MenuServicePlugin;
-import com.m0pt0pmatt.menuservice.api.AbstractRenderer;
+import com.m0pt0pmatt.menuservice.OutputMessage;
 import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
@@ -48,7 +47,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	 * @param menuService
 	 * @param plugin
 	 */
-	public InventoryRenderer(MenuService menuService, MenuServicePlugin plugin){
+	public InventoryRenderer(MenuService menuService, Plugin plugin){
 		super(menuService);
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
@@ -61,15 +60,15 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	private Inventory createInventory(MenuInstance instance){
 				
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, null);
-			Logger.log(2, Level.SEVERE, Message.CANTCREATEINVENTORY, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCE, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEINVENTORY, null);
 			return null;
 		}
 		
 		Menu menu = instance.getMenu();
 		if (menu == null){
-			Logger.log(2, Level.SEVERE, Message.EMPTYMENUFORINSTANCE, instance.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTCREATEINVENTORY, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.EMPTYMENUFORINSTANCE, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEINVENTORY, instance.getName());
 			return null;
 		}
 		
@@ -102,7 +101,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		Inventory inventory = Bukkit.createInventory(null, size, title);
 		if (inventory == null){
-			Logger.log(2, Level.SEVERE, Message.CANTCREATEINVENTORY, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEINVENTORY, instance.getName());
 			return null;
 		}
 		
@@ -266,21 +265,21 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void renderPlayer(MenuInstance instance, String playerName) {
 		
 		if (instance == null){
-			Logger.log(2, Level.SEVERE, Message.NULLMENUINSTANCE, this.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, null);
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCE, this.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTRENDERINSTANCEPLAYER, null);
 			return;
 		}
 		
 		if (playerName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLAYERNAME, this.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLPLAYERNAME, this.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
 			return;
 		}
 		
 		Inventory inv = createInventory(instance);
 		if (inv == null){
-			Logger.log(2, Level.SEVERE, Message.NULLINVENTORY, this.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTRENDERINSTANCEPLAYER, instance.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLINVENTORY, this.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
 			return;
 		}
 		
@@ -310,8 +309,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	public void closeMenu(String playerName) {
 		
 		if (playerName == null){
-			Logger.log(2, Level.SEVERE, Message.NULLPLAYERNAME, this.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTCLOSEMENU, this.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLPLAYERNAME, this.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCLOSEMENU, this.getName());
 			return;
 		}
 				
@@ -324,8 +323,8 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		//get the player
 		Player player = Bukkit.getPlayer(playerName);
 		if (player == null){
-			Logger.log(2, Level.SEVERE, Message.NOSUCHPLAYER, this.getName());
-			Logger.log(2, Level.SEVERE, Message.CANTCLOSEMENU, this.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHPLAYER, this.getName());
+			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCLOSEMENU, this.getName());
 			return;
 		}
 		

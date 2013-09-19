@@ -1,8 +1,6 @@
 package com.m0pt0pmatt.menuservice;
 
-import org.bukkit.Bukkit;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
+import com.m0pt0pmatt.pluginutils.Message;
 
 /**
  * Messages to be displayed to the terminal.
@@ -10,7 +8,7 @@ import org.bukkit.entity.Player;
  * @author mbroomfield
  *
  */
-public enum Message {
+public enum OutputMessage implements Message{
 
 	//null input
 	NULLPLUGIN ("Error: The specified Plugin was null"),
@@ -102,7 +100,7 @@ public enum Message {
 	
 	private final String message;
 	
-	private Message(String message){
+	private OutputMessage(String message){
 		this.message = message;
 	}
 	
@@ -110,125 +108,5 @@ public enum Message {
 		return message;
 	}
 	
-	//--------------Static message sending methods-----------------
-	/**
-	 * Sends a formatted string to a player
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(String playerName, MessageFormat type, String message){
-		Player player = Bukkit.getPlayer(playerName);
-		sendMessage(player, type, message);
-	}
 	
-	/**
-	 * Sends a formatted string to a player
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(String playerName, MessageFormat type, Message message){
-		sendMessage(playerName, type, message.getMessage());
-	}
-	
-	/**
-	 * Sends a formatted string to a player
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(String playerName, MessageFormat type, String message, Object data){
-		Player player = Bukkit.getPlayer(playerName);
-		sendMessage(player, type, message.replaceFirst("%", data.toString()));
-	}
-	
-	/**
-	 * Sends a formatted string to a CommandSender
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(CommandSender sender, MessageFormat type, String message){
-		if (sender instanceof Player){
-			sendMessage((Player) sender, type, message);
-			return;
-		}
-		
-		if (type.getLabel() == null){
-			sender.sendMessage(message);
-		} else{
-			sender.sendMessage("[" + type.getLabel() + "] " + message);
-		}
-		
-	}
-	
-	/**
-	 * Sends a formatted string to a CommandSender
-	 * The first % in the message is replaced by data.toString()
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 * @data data the data
-	 */
-	public static void sendMessage(CommandSender sender, MessageFormat type, String message, Object data){
-		sendMessage(sender, type, message.replaceFirst("%", data.toString()));
-	}
-	
-	/**
-	 * Sends a formatted string to a CommandSender
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(CommandSender sender, MessageFormat type, Message message){
-		sendMessage(sender, type, message.getMessage());
-	}
-	
-	/**
-	 * Sends a formatted string to a CommandSender
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(CommandSender sender, MessageFormat type, Message message, Object data){
-		sendMessage(sender, type, message.getMessage(), data);
-	}	
-	
-	/**
-	 * Sends a formatted string to a player
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(Player player, MessageFormat type, Message message){
-		sendMessage(player, type, message.getMessage());
-	}
-	
-	/**
-	 * Sends a formatted string to a player
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 */
-	public static void sendMessage(Player player, MessageFormat type, String message){
-		
-		if (type.getLabelColor() == null || type.getLabel() == null){
-			player.sendMessage(type.getMessageColor() + message);
-		} else{
-			player.sendMessage(type.getLabelColor() + "[" + type.getLabel() + "] " + type.getMessageColor() + message);
-		}
-	}
-	
-	/**
-	 * Sends a formatted string to a player
-	 * The first % in the message is replaced by data.toString()
-	 * @param player the player to send the message to
-	 * @param type the MessageFormat of the message
-	 * @param message the actual message
-	 * @data data the data
-	 */
-	public static void sendMessage(Player player, MessageFormat type, String message, Object data){
-		sendMessage(player, type, message.replaceFirst("%", data.toString()));
-	}
 }

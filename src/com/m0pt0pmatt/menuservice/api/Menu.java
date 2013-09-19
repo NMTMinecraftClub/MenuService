@@ -3,6 +3,8 @@ package com.m0pt0pmatt.menuservice.api;
 import java.util.List;
 import java.util.Map;
 
+import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
+
 /**
  * A Menu represents an abstract menu which can be rendered multiple ways to multiple players.
  * 

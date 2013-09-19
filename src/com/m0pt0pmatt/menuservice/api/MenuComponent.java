@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
+import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
 
 /**
  * A MenuComponent is a MenuComponent which implements a Menu.

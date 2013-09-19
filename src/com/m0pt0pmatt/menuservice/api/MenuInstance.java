@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
+
 /**
  * A MenuInstance represents a single MenuImpletation for a given player.
  * 

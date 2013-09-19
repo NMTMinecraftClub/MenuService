@@ -1,4 +1,4 @@
-package com.m0pt0pmatt.menuservice.api;
+package com.m0pt0pmatt.menuservice.api.rendering;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,6 +11,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.m0pt0pmatt.menuservice.api.Component;
+import com.m0pt0pmatt.menuservice.api.MenuInstance;
+import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
 /**

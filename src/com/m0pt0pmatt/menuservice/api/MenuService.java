@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
-import org.bukkit.plugin.Plugin;
+
+import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
 
 /**
  * The MenuService interface is the absolute API for the MenuService Plugin.
@@ -31,27 +32,12 @@ public interface MenuService{
 	public List<Menu> getMenus();
 	
 	/**
-	 * Loads all menus in the MenuService folder
-	 */
-	public boolean loadMenus();
-	
-	/**
-	 * Saves all Menus to file
-	 */
-	public boolean saveMenus();
-	
-	/**
 	 * Closes all Menus
 	 */
 	public boolean closeMenus();
 	
 	/**
-	 * Reloads all Menus
-	 */
-	public boolean reloadMenus();
-	
-	/**
-	 * Unloads all Menus
+	 * Removes all Menus
 	 */
 	public List<Menu> unloadMenus();
 	
@@ -97,28 +83,6 @@ public interface MenuService{
 	 * @return The Menu if it exists, null otherwise
 	 */
 	public Menu removeMenu(String menuName);
-	
-	/**
-	 * Creates a new Menu from the given Plugin and fileName.
-	 * Since Menus are stored based on the plugin that owns them, 
-	 * the plugin needs to be referenced so the correct file location can be found.
-	 * The fileName is the name of the config file for the Menu.
-	 * After the Menu is loaded, it is stored in the MenuService
-	 * 
-	 * @param plugin The Plugin which the Menu belongs to
-	 * @param fileName The name of the Menu's config file
-	 * @return The Menu if loaded, null otherwise
-	 */
-	public Menu loadMenu(Plugin plugin, String fileName);
-	
-	/**
-	 * Saves a menu to file
-	 * @param menu the Menu to be saved
-	 * @return true if the Menu was saved, false otherwise
-	 */
-	public boolean saveMenu(Menu menu);
-	
-	public boolean reloadMenu(Menu menu);
 	
 	/**
 	 * Removes the Menu and saves it to file
