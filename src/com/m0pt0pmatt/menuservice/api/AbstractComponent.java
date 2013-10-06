@@ -156,26 +156,6 @@ public class AbstractComponent implements Component{
 		return null;
 	}
 	
-	//--------------------------Methods for parameterized attribute--------------------------
-	/**
-	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
-	 * @param name the name of the attribute
-	 * @param instance The menuInstance whose paramters will be checked
-	 * @return if a parameter
-	 */
-	@Override
-	public Object getParameteredAttribute(String attributeName, MenuInstance instance) {
-		Object attribute = getAttribute(attributeName);
-		if (attribute instanceof String){
-			
-			String parameterName = (String) attribute;
-			if (parameterName.startsWith("^")){
-				attribute = instance.getParameter(parameterName.substring(1));
-			}
-		}
-		return attribute;
-	}
-	
 	//--------------------------Methods for reserved attributes--------------------------
 	/**
 	 * Returns the type of the Component

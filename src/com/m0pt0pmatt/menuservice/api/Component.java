@@ -96,16 +96,6 @@ public interface Component {
 	 */
 	public ContainerAttribute getContainerAttribute(String attributeName);
 	
-	//--------------------------Methods for parameterized attribute--------------------------
-	
-	/**
-	 * Returns a given attribute of the Component, checking if the value of the attribute is a MenuInstance parameter
-	 * @param name the name of the attribute
-	 * @param instance The menuInstance whose paramters will be checked
-	 * @return if a parameter
-	 */
-	public Object getParameteredAttribute(String name, MenuInstance instance);
-	
 	//--------------------------Methods for reserved attributes--------------------------
 	/**
 	 * Returns the type of the Component

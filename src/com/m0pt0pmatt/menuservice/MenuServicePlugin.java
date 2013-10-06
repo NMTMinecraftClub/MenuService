@@ -6,15 +6,12 @@ import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.m0pt0pmatt.menuservice.api.MenuService;
-import com.m0pt0pmatt.pluginutils.Logger;
+import com.m0pt0pmatt.pluginutils.BukkitUtil;
 
 /**
  * MenuService is a plugin that allows other plugins to implement abstract menu
@@ -25,8 +22,6 @@ import com.m0pt0pmatt.pluginutils.Logger;
 public class MenuServicePlugin extends JavaPlugin implements Listener{
 	
 	public static MenuServiceProvider menuService;
-	
-	public static Logger logger;
 	
 	/**
 	 * The config file for the plugin
@@ -58,21 +53,20 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 * Sets up internal attributes, loads configuration
 	 */
 	public void onEnable(){
-				
-		logger = new Logger(this);
 		
 		//setup the MenuService Provider
 		menuService = new MenuServiceProvider(this);
 		
-		logger.log(3, Level.INFO, "MenuService initialized");
+		
+		BukkitUtil.logger.log(3, Level.INFO, "MenuService initialized");
 		
 		//register the MenuServiceProvider as the provider for the MenuService
 		Bukkit.getServicesManager().register(MenuService.class, menuService, this, ServicePriority.Normal);
-		logger.log(3, Level.INFO, "MenuService registered for the server");
+		BukkitUtil.logger.log(3, Level.INFO, "MenuService registered for the server");
 		
 		//load the config file
 		loadConfig();
-		logger.log(1, Level.INFO, "Loaded " + configFileName);
+		BukkitUtil.logger.log(1, Level.INFO, "Loaded " + configFileName);
 		
 		//register the plugin so it can listen to open menus
 		Bukkit.getPluginManager().registerEvents(this, this);	
@@ -87,15 +81,14 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	public void onDisable(){
 		
 		//close all menuinstances
-		logger.log(1, Level.INFO, "Closing all menus");
-		menuService.closeMenus();
+		BukkitUtil.logger.log(1, Level.INFO, "Closing all menus");
 		
 		//save the config file
 		try {
 			config.save(new File(this.getDataFolder(), "config.yml"));
-			logger.log(1, Level.INFO, "Saved " + configFileName);
+			BukkitUtil.logger.log(1, Level.INFO, "Saved " + configFileName);
 		} catch (IOException e) {
-			logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
+			BukkitUtil.logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
 		}
 		
 	}
@@ -107,7 +100,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//create data folder if needed
 		if (!this.getDataFolder().exists()){
-			logger.log(2, Level.INFO, "Creating Data Folder");
+			BukkitUtil.logger.log(2, Level.INFO, "Creating Data Folder");
 			this.getDataFolder().mkdir();
 		}
 		
@@ -117,38 +110,22 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				logger.log(1, Level.SEVERE, "Unable to create config file!");
+				BukkitUtil.logger.log(1, Level.SEVERE, "Unable to create config file!");
 			}
 		}
 		
 		//load the configuration file
 		config = YamlConfiguration.loadConfiguration(configFile);
 		if (config == null){
-			logger.log(1, Level.SEVERE, "Unable to load config file!");
+			BukkitUtil.logger.log(1, Level.SEVERE, "Unable to load config file!");
 		}
 		
 		//check for verbose level
 		if (config.contains("verbose")){
 			verbose = config.getInt("verbose");
-			logger.log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
+			BukkitUtil.logger.log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
 		}
 		
 	}
-	
-	/**
-	 * Catch when a player executes a command if a Menu should be opened
-	 * @param event
-	 */
-	@EventHandler
-    public void onCommand(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        String command = event.getMessage();
-                
-        if(menuService.checkCommand(command.substring(1), player)){
-            event.setCancelled(true);
-        }
-    }
-
-	
 	
 }

@@ -4,13 +4,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -21,13 +19,10 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.MenuServicePlugin;
-import com.m0pt0pmatt.menuservice.OutputMessage;
-import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Menu;
-import com.m0pt0pmatt.menuservice.api.MenuInstance;
+import com.m0pt0pmatt.menuservice.api.MenuPart;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
@@ -40,7 +35,15 @@ import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
  * @author mbroomfield
  *
  */
-public class InventoryRenderer extends AbstractRenderer implements Listener{
+public class InventoryRenderer implements Renderer, Listener{
+	
+	private Map<Menu, InventoryImplementation> implementations;
+	private Map<String, InventoryImplementation> players;
+	
+	public InventoryRenderer(){
+		implementations = new HashMap<Menu, InventoryImplementation>();
+		players = new HashMap<String, InventoryImplementation>();
+	}
 	
 	/**
 	 * Creates the InventoryRenderer
@@ -48,83 +51,42 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	 * @param plugin
 	 */
 	public InventoryRenderer(MenuService menuService, Plugin plugin){
-		super(menuService);
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
+	
+	@Override
+	public void draw(Menu menu, MenuPart p, String playerName) {
+		if (!implementations.containsKey(menu)){
+			implementations.put(menu, new InventoryImplementation(menu));
+		}
+		
+		InventoryImplementation implementation = implementations.get(menu);
+		
+		this.renderMenuPart(implementation, p);
+		
+		Player player = Bukkit.getPlayer(playerName);
+		
+		//open the inventory
+		player.closeInventory();
+		player.openInventory(implementation.getInventory());
+		
+		players.put(playerName, implementation);
+	}
 
-	/**
-	 * Creates an Inventory and stores it as a parameter for the MenuInstance
-	 * @param instance the MenuInstance to create the Inventory for
-	 * @return the Inventory created
-	 */
-	private Inventory createInventory(MenuInstance instance){
-				
-		if (instance == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCE, null);
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEINVENTORY, null);
-			return null;
-		}
-		
-		Menu menu = instance.getMenu();
-		if (menu == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.EMPTYMENUFORINSTANCE, instance.getName());
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEINVENTORY, instance.getName());
-			return null;
-		}
-		
-		//set the inventory title
-		String title = null;
-		int size;
-		if (menu.hasAttribute(Attribute.TITLE)){
-			title = (String) menu.getAttribute(Attribute.TITLE);
-			if (title == null){
-				if (menu.getTag() != null){
-					title = menu.getTag();
-				}
-				else{
-					title = " ";
-				}
-			}
-		}
-		
-		//set the inventory size
-		if (menu.hasAttribute(Attribute.SIZE)){
-			size = ((Integer) menu.getAttribute(Attribute.SIZE) * 9);
-		}
-		else{
-			size = 9 * 6;
-		}
-		
-		//create the inventory
-		if (title.length() > 32){
-			title = title.substring(0, 31);
-		}
-		Inventory inventory = Bukkit.createInventory(null, size, title);
-		if (inventory == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCREATEINVENTORY, instance.getName());
-			return null;
-		}
-		
-		//setup the item map if it isn't already specified
-		if (!instance.hasParameter("itemMap")){
-			instance.addParameter("itemMap", new HashMap<Integer, String>());
-		}
-		
-		//add components
-		for (Component component: menu.getComponents().values()){
-			renderMenuComponent(inventory, component, instance);
-		}
-		
-		//add the created inventory as a parameter
-		if (instance.hasParameter("inventory")){
-			instance.removeParameter("inventory");
-		}
-		instance.addParameter("inventory", inventory);		
-		return inventory;
+	@Override
+	public void undraw(Menu menu, MenuPart p, String playerName) {
+		// TODO Auto-generated method stub
 	}
 	
-	@SuppressWarnings("unchecked")
-	private void renderMenuComponent(Inventory inventory, Component component, MenuInstance instance){
+	private void renderMenuPart(InventoryImplementation implementation, MenuPart part){
+		for (Component c: part.getComponents()){
+			renderComponent(implementation, c);
+		}
+	}
+	
+	private void renderComponent(InventoryImplementation implementation, Component component){
+		
+		Inventory inventory = implementation.getInventory();
 		
 		//find the position, relative to the current position of the renderer
 		int x = -1;
@@ -188,13 +150,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		meta.setLore(newLore);
 		
-		//highlight the item if needed
-		if (instance.isHighlighted(component.getTag())){
-			meta.addEnchant(Enchantment.WATER_WORKER, 1, true);
-		} else{
-			meta.removeEnchant(Enchantment.WATER_WORKER);
-		}
-		
 		//set the metadata
 		item.setItemMeta(meta);
 		
@@ -205,8 +160,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		
 		//set the location in the item map
-		((Map<Integer, String>)(instance.getParameters().get("itemMap"))).put(spot, component.getTag());
-			
+		implementation.setLocation(spot, component);			
 	}
 
 	/**
@@ -255,41 +209,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		
 		return (9 * y) + x;
 	}
-	
-	/**
-	 * Renders a MenuInstance for a given player
-	 * @param menuInstance the MenuInstance to render
-	 * @param playerName the name of the player
-	 */
-	@Override
-	public void renderPlayer(MenuInstance instance, String playerName) {
-		
-		if (instance == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLMENUINSTANCE, this.getName());
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTRENDERINSTANCEPLAYER, null);
-			return;
-		}
-		
-		if (playerName == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLPLAYERNAME, this.getName());
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
-			return;
-		}
-		
-		Inventory inv = createInventory(instance);
-		if (inv == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLINVENTORY, this.getName());
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTRENDERINSTANCEPLAYER, instance.getName());
-			return;
-		}
-		
-		//open the inventory
-		Bukkit.getPlayer(playerName).closeInventory();
-		Bukkit.getPlayer(playerName).openInventory(inv);
-		
-		//add the player for bookkeeping
-		this.getPlayers().put(playerName, instance);
-	}
 
 	/**
 	 * Returns the name of the Renderer.
@@ -299,41 +218,6 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	@Override
 	public String getName() {
 		return "inventory";
-	}
-	
-	/**
-	 * Closes whatever MenuInstance a player is viewing, assuming that the Renderer is providing for that player
-	 * @param playerName the name of the player
-	 */
-	@Override
-	public void closeMenu(String playerName) {
-		
-		if (playerName == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NULLPLAYERNAME, this.getName());
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCLOSEMENU, this.getName());
-			return;
-		}
-				
-		//get the MenuInstance
-		MenuInstance instance = this.getPlayers().get(playerName);
-		if (instance == null){
-			return;
-		}
-
-		//get the player
-		Player player = Bukkit.getPlayer(playerName);
-		if (player == null){
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.NOSUCHPLAYER, this.getName());
-			MenuServicePlugin.logger.log(2, Level.SEVERE, OutputMessage.CANTCLOSEMENU, this.getName());
-			return;
-		}
-		
-		//close the player's inventory
-		player.closeInventory();
-		
-		//remove the player from the Renderer
-		getPlayers().remove(playerName);
-		
 	}
 	
 	/**
@@ -347,18 +231,10 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		String playerName = event.getPlayer().getName();
 		
 		//if the player was viewing a MenuInstance that's being provided for
-		if (getPlayers().containsKey(playerName)){
+		if (players.containsKey(playerName)){
 			
-			//get the instance
-			MenuInstance instance = getPlayers().get(playerName);
-			
-			if (instance == null){
-				return;
-			}
-			
-			//remove the player
-			getPlayers().remove(playerName);
-			getMenuService().closeMenuInstance(playerName);
+			players.get(playerName).removePlayer(playerName);
+			players.remove(playerName);
 		}
 		
 	}
@@ -373,7 +249,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 				
 		//check if player was viewing a menu
 		String playerName = event.getWhoClicked().getName();
-		if (!getPlayers().containsKey(playerName)){
+		if (!players.containsKey(playerName)){
 			return;
 		}
 		
@@ -381,25 +257,11 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			return;
 		}
 		
-		//get the instance and the menu
-		MenuInstance instance = getPlayers().get(playerName);
-		if (instance == null){
-			return;
-		}
-		
-		Menu menu = instance.getMenu();
-		if (menu == null){
-			return;
-		}
-		
-		instance.addParameter(playerName + ":" + "slot", event.getSlot());
-		
-		//get the item map
-		@SuppressWarnings("unchecked")
-		Map<Integer, String> itemMap = (Map<Integer, String>) instance.getParameters().get("itemMap");
+		//get the implementation
+		InventoryImplementation implementation = players.get(playerName);
 		
 		//get the component
-		Component component = menu.getComponents().get(itemMap.get(event.getSlot()));
+		Component component = implementation.getComponent(event.getSlot());
 		if (component == null){
 			event.setResult(org.bukkit.event.Event.Result.DENY);
 	        event.setCancelled(true);
@@ -414,7 +276,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			for (Object action: actions.getAttributes().values()){
 				if (action instanceof ContainerAttribute){
 					
-					executeAction((ContainerAttribute) action, event, instance, component);
+					executeAction((ContainerAttribute) action, event, implementation, component);
 				}
 			}
 		}
@@ -433,7 +295,7 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 	 * @param component the Component
 	 */
 	@SuppressWarnings({ "unchecked" })
-	private void executeAction(ContainerAttribute action, InventoryClickEvent event, MenuInstance instance, Component component){
+	private void executeAction(ContainerAttribute action, InventoryClickEvent event, InventoryImplementation implementation, Component component){
 		
 		Player player = (Player) event.getWhoClicked();
 		
@@ -465,10 +327,9 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 			
 			//execute each tag for each ActionListener tied to the instance
 			for (Integer tag: actionTags){
-			
-				for (ActionListener listener: instance.getActionListeners().values()){
-					String plugin = instance.getMenu().getPlugin();
-					listener.handleAction(new ActionEvent(new Action(plugin, tag, event.getWhoClicked().getName(), instance, action.getName())));
+				ActionEvent e = new ActionEvent(tag, event.getWhoClicked().getName(), action.getName());
+				for (ActionListener listener: implementation.getActionListeners()){
+					listener.handleAction(e);
 				}			
 			}
 		}
@@ -519,6 +380,87 @@ public class InventoryRenderer extends AbstractRenderer implements Listener{
 		}
 		
 		return false;
+	}
+	
+	/**
+	 * Checks if the player has permission to interact with the component
+	 * @param player
+	 * @param component
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean hasPermissions(Player player, Component component){
+		if (component.hasAttribute("permissions")){
+			List<String> permissions = null;
+			try{
+				permissions = (List<String>) component.getAttribute("permissions");
+			} catch (ClassCastException e){
+				return true;
+			}
+			if (permissions == null){
+				return true;
+			}
+			for (String permission: permissions){
+				if (!player.hasPermission(permission)){
+					return false;
+				}
+			}
+
+		}
+
+		return true;
+	}
+
+	/**
+	 * Checks if a player can activate a given action
+	 * @param player
+	 * @param action
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	protected boolean hasPermissions(Player player, ContainerAttribute action){
+		if (action.hasAttribute("permissions")){
+			List<String> permissions = null;
+			try{
+				permissions = (List<String>) action.getAttribute("permissions");
+			} catch (ClassCastException e){
+				return true;
+			}
+			if (permissions == null){
+				return true;
+			}
+			for (String permission: permissions){
+				if (!player.hasPermission(permission)){
+					return false;
+				}
+			}
+
+		}
+
+		return true;
+	}
+
+	/**
+	 * Retrieves the CommandSender for the given placeholder
+	 * @param player the player who interacted with the action
+	 * @param sender the placeholder
+	 * @return
+	 */
+	protected CommandSender getCommandSender(Player player, String sender){
+		CommandSender cSender;
+		if (sender == null){
+			cSender = null;
+		} else if (sender.equals("<server>")){
+			cSender = Bukkit.getServer().getConsoleSender();
+		} else if (sender.equals("<player>")){
+			cSender = player;
+		} else {
+			cSender = Bukkit.getPlayer(sender);
+		}
+		if (cSender == null){
+			cSender = player;
+		}
+		return cSender;
 	}
 	
 }
