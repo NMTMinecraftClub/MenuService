@@ -40,7 +40,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	private Map<Menu, InventoryImplementation> implementations;
 	private Map<String, InventoryImplementation> players;
 	
-	public InventoryRenderer(){
+	private InventoryRenderer(){
 		implementations = new HashMap<Menu, InventoryImplementation>();
 		players = new HashMap<String, InventoryImplementation>();
 	}
@@ -51,11 +51,12 @@ public class InventoryRenderer implements Renderer, Listener{
 	 * @param plugin
 	 */
 	public InventoryRenderer(MenuService menuService, Plugin plugin){
+		this();
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
 	@Override
-	public void draw(Menu menu, MenuPart p, String playerName) {
+	public void draw(Menu menu, MenuPart p) {
 		if (!implementations.containsKey(menu)){
 			implementations.put(menu, new InventoryImplementation(menu));
 		}
@@ -63,19 +64,37 @@ public class InventoryRenderer implements Renderer, Listener{
 		InventoryImplementation implementation = implementations.get(menu);
 		
 		this.renderMenuPart(implementation, p);
-		
-		Player player = Bukkit.getPlayer(playerName);
-		
-		//open the inventory
-		player.closeInventory();
-		player.openInventory(implementation.getInventory());
-		
-		players.put(playerName, implementation);
+				
 	}
 
 	@Override
-	public void undraw(Menu menu, MenuPart p, String playerName) {
+	public void undraw(Menu menu, MenuPart p) {
 		// TODO Auto-generated method stub
+	}
+	
+	@Override
+	public void openMenu(Menu menu, String playerName) {
+		
+		if (!implementations.containsKey(menu)){
+			for (MenuPart p: menu.getParts()){
+				this.draw(menu, p);
+			}
+		}
+		
+		Player player = Bukkit.getPlayer(playerName);
+		
+		
+		//open the inventory
+		player.closeInventory();
+		player.openInventory(implementations.get(menu).getInventory());
+		players.put(playerName, implementations.get(menu));
+	}
+
+	@Override
+	public void closeMenu(Menu menu, String playerName) {
+		Player player = Bukkit.getPlayer(playerName);
+		player.closeInventory();
+		players.remove(playerName);
 	}
 	
 	private void renderMenuPart(InventoryImplementation implementation, MenuPart part){
@@ -462,5 +481,7 @@ public class InventoryRenderer implements Renderer, Listener{
 		}
 		return cSender;
 	}
+
+	
 	
 }

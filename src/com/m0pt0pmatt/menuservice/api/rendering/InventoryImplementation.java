@@ -1,5 +1,6 @@
 package com.m0pt0pmatt.menuservice.api.rendering;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -24,6 +25,9 @@ public class InventoryImplementation implements MenuImplementation{
 	
 	public InventoryImplementation(Menu menu){
 		
+		this.menu = menu;
+		this.components = new HashMap<Integer, Component>();
+		
 		//get the title
 		String title = null;
 		title = (String) menu.getTitle();
@@ -36,7 +40,7 @@ public class InventoryImplementation implements MenuImplementation{
 		}
 		
 		//determine size
-		int size = 1;
+		int size = menu.getSize();
 		for (MenuPart part: menu.getParts()){
 			for (Component c: part.getComponents()){
 				if (c.hasAttribute(Attribute.Y)){
@@ -46,8 +50,10 @@ public class InventoryImplementation implements MenuImplementation{
 			}
 		}
 		
+		if (size > 6) size = 6;
+		
 		//create inventory
-		inventory = Bukkit.createInventory(null, size, title);
+		inventory = Bukkit.createInventory(null, size * 9, title);
 		
 	}
 

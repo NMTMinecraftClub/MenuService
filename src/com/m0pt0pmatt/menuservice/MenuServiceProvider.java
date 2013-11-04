@@ -8,7 +8,6 @@ import com.m0pt0pmatt.menuservice.api.rendering.InventoryRenderer;
 import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
 
 
-
 /**
  * The MenuServiceProvider is the provider for the Bukkit service MenuService.
  * It is the implementation of the MenuService API
@@ -22,8 +21,6 @@ public class MenuServiceProvider implements MenuService{
 	
 	public MenuServiceProvider(MenuServicePlugin plugin){
 		renderers = new HashMap<String, Renderer>();
-		Renderer r = new InventoryRenderer(this, plugin);
-		renderers.put(r.getName(), r);
 	}
 	
 	@Override

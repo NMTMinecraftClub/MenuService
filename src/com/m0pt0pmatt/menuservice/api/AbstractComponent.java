@@ -49,6 +49,8 @@ public class AbstractComponent implements Component{
 		if (!attributes.containsKey("tag")) attributes.put("tag", "no-tag");
 		if (!attributes.containsKey("actions")) attributes.put("actions", new LinkedList<Integer>());
 		if (!attributes.containsKey("lore")) attributes.put("lore", new LinkedList<String>());
+		
+		this.attributes = attributes;
 	}
 	
 	//--------------------------Methods for all attributes--------------------------

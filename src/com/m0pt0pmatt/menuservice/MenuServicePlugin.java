@@ -11,6 +11,7 @@ import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.m0pt0pmatt.menuservice.api.MenuService;
+import com.m0pt0pmatt.menuservice.api.rendering.InventoryRenderer;
 import com.m0pt0pmatt.pluginutils.BukkitUtil;
 
 /**
@@ -48,17 +49,16 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public int verbose = 3;
 	
+	public void onLoad(){
+		//setup the MenuService Provider
+		menuService = new MenuServiceProvider(this);
+	}
+	
 	/**
 	 * Executed when the plugin is enabled.
 	 * Sets up internal attributes, loads configuration
 	 */
 	public void onEnable(){
-		
-		//setup the MenuService Provider
-		menuService = new MenuServiceProvider(this);
-		
-		
-		BukkitUtil.logger.log(3, Level.INFO, "MenuService initialized");
 		
 		//register the MenuServiceProvider as the provider for the MenuService
 		Bukkit.getServicesManager().register(MenuService.class, menuService, this, ServicePriority.Normal);
@@ -70,6 +70,9 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//register the plugin so it can listen to open menus
 		Bukkit.getPluginManager().registerEvents(this, this);	
+		
+		//add renderers
+		menuService.addRenderer(new InventoryRenderer(menuService, this));
 	}
 
 	/**

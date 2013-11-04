@@ -22,8 +22,12 @@ public interface Renderer {
 	 */
 	public String getName();
 
-	public void draw(Menu menu, MenuPart p, String playerName);
+	public void openMenu(Menu menu, String playerName);
+	
+	public void closeMenu(Menu menu, String playerName);
+	
+	public void draw(Menu menu, MenuPart part);
 
-	public void undraw(Menu menu, MenuPart p, String playerName);
+	public void undraw(Menu menu, MenuPart part);
 	
 }

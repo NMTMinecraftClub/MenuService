@@ -23,11 +23,21 @@ public final class Menu{
 	private List<String> players;
 	private Set<String> commands;
 	private String title;
+	private int size;
 
 	public Menu(){
 		parts = new LinkedList<MenuPart>();
 		players = new LinkedList<String>();
 		commands = new HashSet<String>();
+		size = 1;
+	}
+	
+	public int getSize(){
+		return size;
+	}
+	
+	public void setSize(int size){
+		this.size = size;
 	}
 
 	public String getTitle() {
@@ -70,29 +80,6 @@ public final class Menu{
 		parts.remove(part);
 	}
 	
-	public void openMenu(String playerName){
-		this.players.add(playerName);
-		for (MenuPart p: parts){
-			p.getRenderer().draw(this, p, playerName);
-		}
-	}
-	
-	public void closeMenu(String playerName){
-		for (MenuPart p: parts){
-			p.getRenderer().undraw(this, p, playerName);
-		}
-		players.remove(playerName);
-	}
-	
-	public void closeMenu(){
-		for (MenuPart p: parts){
-			for (String playerName: players){
-				p.getRenderer().undraw(this, p, playerName);
-			}
-		}
-		players.clear();
-	}
-	
 	/**
 	 * Catch when a player executes a command if a Menu should be opened
 	 * @param event
@@ -104,7 +91,9 @@ public final class Menu{
         
         if (commands.contains(command)){
             event.setCancelled(true);
-            this.openMenu(player.getName());
+            player.sendMessage("currently, commands are broken with menus");
+            player.sendMessage("this code should be moved to easymenus");
+            //this.openMenu(player.getName());
         }
     }
 
