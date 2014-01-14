@@ -1,14 +1,12 @@
 package com.m0pt0pmatt.menuservice;
 
-import com.m0pt0pmatt.pluginutils.UtilMessage;
-
 /**
  * Messages to be displayed to the terminal.
  * These are here so they can be adjusted easily.
  * @author mbroomfield
  *
  */
-public enum OutputMessage implements UtilMessage{
+public enum OutputMessage /*implements UtilMessage*/{
 
 	//null input
 	NULLPLUGIN ("Error: The specified Plugin was null"),
