@@ -1,12 +1,14 @@
 package com.m0pt0pmatt.menuservice;
 
+import com.bukkittoolkit.formatting.FormattedMessage;
+
 /**
  * Messages to be displayed to the terminal.
  * These are here so they can be adjusted easily.
  * @author mbroomfield
  *
  */
-public enum OutputMessage /*implements UtilMessage*/{
+public enum OutputMessage implements FormattedMessage{
 
 	//null input
 	NULLPLUGIN ("Error: The specified Plugin was null"),

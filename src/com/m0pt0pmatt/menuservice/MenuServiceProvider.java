@@ -4,9 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.m0pt0pmatt.menuservice.api.MenuService;
-import com.m0pt0pmatt.menuservice.api.rendering.InventoryRenderer;
 import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
-
 
 /**
  * The MenuServiceProvider is the provider for the Bukkit service MenuService.

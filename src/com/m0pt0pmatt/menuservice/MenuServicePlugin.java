@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bukkittoolkit.formatting.Formatting;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.rendering.InventoryRenderer;
 
@@ -61,11 +62,11 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//register the MenuServiceProvider as the provider for the MenuService
 		Bukkit.getServicesManager().register(MenuService.class, menuService, this, ServicePriority.Normal);
-		//BukkitUtil.logger.log(3, Level.INFO, "MenuService registered for the server");
+		Formatting.logger.log(3, Level.INFO, "MenuService registered for the server");
 		
 		//load the config file
 		loadConfig();
-		//BukkitUtil.logger.log(1, Level.INFO, "Loaded " + configFileName);
+		Formatting.logger.log(1, Level.INFO, "Loaded " + configFileName);
 		
 		//register the plugin so it can listen to open menus
 		Bukkit.getPluginManager().registerEvents(this, this);	
@@ -83,14 +84,14 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	public void onDisable(){
 		
 		//close all menuinstances
-		//BukkitUtil.logger.log(1, Level.INFO, "Closing all menus");
+		Formatting.logger.log(1, Level.INFO, "Closing all menus");
 		
 		//save the config file
 		try {
 			config.save(new File(this.getDataFolder(), "config.yml"));
-			//BukkitUtil.logger.log(1, Level.INFO, "Saved " + configFileName);
+			Formatting.logger.log(1, Level.INFO, "Saved " + configFileName);
 		} catch (IOException e) {
-			//BukkitUtil.logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
+			Formatting.logger.log(1, Level.SEVERE, "Unable to save " + configFileName);
 		}
 		
 	}
@@ -102,7 +103,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		//create data folder if needed
 		if (!this.getDataFolder().exists()){
-			//BukkitUtil.logger.log(2, Level.INFO, "Creating Data Folder");
+			Formatting.logger.log(2, Level.INFO, "Creating Data Folder");
 			this.getDataFolder().mkdir();
 		}
 		
@@ -112,20 +113,20 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 			try {
 				configFile.createNewFile();
 			} catch (IOException e) {
-				//BukkitUtil.logger.log(1, Level.SEVERE, "Unable to create config file!");
+				Formatting.logger.log(1, Level.SEVERE, "Unable to create config file!");
 			}
 		}
 		
 		//load the configuration file
 		config = YamlConfiguration.loadConfiguration(configFile);
 		if (config == null){
-			//BukkitUtil.logger.log(1, Level.SEVERE, "Unable to load config file!");
+			Formatting.logger.log(1, Level.SEVERE, "Unable to load config file!");
 		}
 		
 		//check for verbose level
 		if (config.contains("verbose")){
 			verbose = config.getInt("verbose");
-			//BukkitUtil.logger.log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
+			Formatting.logger.log(2, Level.INFO, "Loaded verbosity level. Level is now " + verbose);
 		}
 		
 	}
