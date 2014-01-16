@@ -1,4 +1,5 @@
-package com.m0pt0pmatt.menuservice.api;
+package com.m0pt0pmatt.menuservice.api.actions;
+
 
 /**
  * An ActionListener is the interface for catching user input from a Menu.

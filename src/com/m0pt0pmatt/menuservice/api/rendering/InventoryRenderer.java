@@ -1,9 +1,9 @@
 package com.m0pt0pmatt.menuservice.api.rendering;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -19,12 +19,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.api.ActionEvent;
-import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuPart;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
+import com.m0pt0pmatt.menuservice.api.actions.Action;
+import com.m0pt0pmatt.menuservice.api.actions.ActionEvent;
+import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
+import com.m0pt0pmatt.menuservice.api.actions.DefaultAction;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
@@ -117,7 +119,6 @@ public class InventoryRenderer implements Renderer, Listener{
 			y = (Integer) component.getAttribute(Attribute.Y);
 		}
 		
-		
 		//create the itemstack
 		ItemStack item;
 		
@@ -156,18 +157,18 @@ public class InventoryRenderer implements Renderer, Listener{
 		meta.setDisplayName(ChatColor.RESET.toString() + ChatColor.WHITE.toString() + text);
 		
 		//set the lore
-		if (meta.hasLore()){
-			meta.getLore().clear();
-		}
-		List<String> lore = component.getLore();
-		List<String> newLore = new LinkedList<String>();
-		if (lore != null){
-			for (String l: lore){
-				l = ChatColor.RESET.toString() + ChatColor.GRAY.toString() + l;
-				newLore.add(l);
-			}
-		}
-		meta.setLore(newLore);
+//		if (meta.hasLore()){
+//			meta.getLore().clear();
+//		}
+//		List<String> lore = component.getLore();
+//		List<String> newLore = new LinkedList<String>();
+//		if (lore != null){
+//			for (String l: lore){
+//				l = ChatColor.RESET.toString() + ChatColor.GRAY.toString() + l;
+//				newLore.add(l);
+//			}
+//		}
+//		meta.setLore(newLore);
 		
 		//set the metadata
 		item.setItemMeta(meta);
@@ -287,18 +288,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	        return;
 		}
 		
-		//get the actions
-		ContainerAttribute actions = component.getContainerAttribute("actions");
-		if (actions != null){
-
-			//run each action
-			for (Object action: actions.getAttributes().values()){
-				if (action instanceof ContainerAttribute){
-					
-					executeAction((ContainerAttribute) action, event, implementation, component);
-				}
-			}
-		}
+		executeAction(event, implementation, component);
 		
 		//cancel the clicking of the item
 		event.setResult(org.bukkit.event.Event.Result.DENY);
@@ -308,20 +298,21 @@ public class InventoryRenderer implements Renderer, Listener{
 	
 	/**
 	 * Executes an Action on a given Component
-	 * @param action the ContainerAttrubute that specifies the Action
 	 * @param event the InventoryClickEvent
 	 * @param instance the MenuInstance of the Action
 	 * @param component the Component
 	 */
-	@SuppressWarnings({ "unchecked" })
-	private void executeAction(ContainerAttribute action, InventoryClickEvent event, InventoryImplementation implementation, Component component){
+	private void executeAction(InventoryClickEvent event, InventoryImplementation implementation, Component component){
 		
 		Player player = (Player) event.getWhoClicked();
 		
-		//check if this action is correct for the player's interaction
-		if (!isCorrectAction(event, action)){
-			return;
-		}
+		//get the action
+		Action action = getCorrectAction(event);
+		if (action == null) return;
+		
+		//get the list of action tags
+		Set<Integer> tags = component.getActionTags(action);
+		if (tags == null || tags.isEmpty()) return;
 		
 		//check if the player has permission to interact with the component
 		if (!hasPermissions(player, component)){
@@ -330,75 +321,32 @@ public class InventoryRenderer implements Renderer, Listener{
 		}
 		
 		//check if the player has permission to activate the action
-		if (!hasPermissions(player, action)){
-			player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
-			return;
+		//if (!hasPermissions(player, action)){
+		//	player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
+		//	return;
+		//}
+		
+		//execute each tag for each ActionListener tied to the instance
+		for (Integer tag: tags){
+			ActionEvent e = new ActionEvent(action, tag, event.getWhoClicked().getName());
+			for (ActionListener listener: implementation.getActionListeners()){
+				listener.handleAction(e);
+			}			
 		}
 		
-		//get the list of action tags
-		List<Integer> actionTags = null;
-		try{
-			actionTags = ((List<Integer>)action.getAttribute("tags"));
-		} catch (ClassCastException e){
-			return;
-		}
-		if (actionTags != null){
-			
-			//execute each tag for each ActionListener tied to the instance
-			for (Integer tag: actionTags){
-				ActionEvent e = new ActionEvent(tag, event.getWhoClicked().getName(), action.getName());
-				for (ActionListener listener: implementation.getActionListeners()){
-					listener.handleAction(e);
-				}			
-			}
-		}
-		
-		//get the list of commands
-		List<String> commands = null;
-		try {
-			commands = ((List<String>)action.getAttribute("commands"));
-		} catch (ClassCastException e){
-			return;
-		}
-		
-		if (commands != null){
-			
-			//get the command sender
-			String sender = (String) action.getAttribute("sender");
-			CommandSender cSender = this.getCommandSender(player, sender);
-			if (cSender == null){
-				return;
-			}
-			
-			//execute the string of commands
-			for (String command: commands){
-				
-				//replace placeholders
-				command = command.replaceAll("<player>", event.getWhoClicked().getName());
-				command = command.replaceAll("<sender>", cSender.getName());
-
-				//execute the command
-				Bukkit.dispatchCommand(cSender, command);	
-			}
-		}
 	}
 
-	/**
-	 * Checks if the player's interaction matches the interaction of the Action
-	 * @param event the InventoryClickEvent
-	 * @param action the ContainerAttribute that specifies the action
-	 * @return
-	 */
-	private boolean isCorrectAction(InventoryClickEvent event, ContainerAttribute action){
-		
+	private Action getCorrectAction(InventoryClickEvent event) {
 		//check left click
-		if (event.isLeftClick() && (action.getName().equalsIgnoreCase("leftClick"))){
-			return true;
-		} else if (event.isRightClick() && (action.getName().equalsIgnoreCase("rightClick"))){
-			return true;
+		if (event.isLeftClick()){
+			return DefaultAction.LEFT_CLICK;
+		} 
+		else if (event.isRightClick()){
+			return DefaultAction.RIGHT_CLICK;
 		}
-		
-		return false;
+		else{
+			return null;
+		}
 	}
 	
 	/**

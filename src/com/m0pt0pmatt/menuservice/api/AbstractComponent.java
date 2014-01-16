@@ -1,11 +1,12 @@
 package com.m0pt0pmatt.menuservice.api;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
 
+import com.m0pt0pmatt.menuservice.api.actions.Action;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
@@ -19,20 +20,23 @@ import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
  */
 public class AbstractComponent implements Component{
 	
+	private ComponentType type;
+	
+	private String tag;
+	
 	//The attributes of the component
 	private Map<String, Object> attributes;
+	
+	private Map<Action, Set<Integer>> actionTags;
 	
 	/**
 	 * Creates a new AbstractComponent, giving default values to all variables
 	 */
 	public AbstractComponent(){
 		
-		this.attributes = new TreeMap<String, Object>();
+		this.attributes = new HashMap<String, Object>();
 		
-		//give default values
-		attributes.put("type", "no-type");
-		attributes.put("tag", "no-tag");
-		attributes.put("lore", new LinkedList<String>());
+		actionTags = new HashMap<Action, Set<Integer>>();
 	}
 	
 	/**
@@ -133,17 +137,6 @@ public class AbstractComponent implements Component{
 		attributes.put(attributeName, value);
 	}
 	
-	//--------------------------Methods for one container attribute--------------------------
-	
-	@Override
-	public ContainerAttribute getContainerAttribute(Attribute attribute) {
-		Object object = getAttribute(attribute.getName());
-		if (object instanceof ContainerAttribute){
-			return (ContainerAttribute) object;
-		}
-		return null;
-	}
-	
 	/**
 	 * Returns a given attribute of the Component
 	 * @param name the name of the attribute
@@ -165,8 +158,7 @@ public class AbstractComponent implements Component{
 	 */
 	@Override
 	public ComponentType getType(){
-		Object type = attributes.get("type");
-		return (type instanceof String) ? ComponentType.getComponentType((String) type ): null;
+		return type;
 	}
 	
 	@Override
@@ -182,28 +174,8 @@ public class AbstractComponent implements Component{
 	}
 
 	@Override
-	public boolean isType(String type) {
-		Object cType = attributes.get("type");
-		if (cType instanceof String){
-			if (type.equals(cType)){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	@Override
 	public void setType(ComponentType type) {
-		this.setType(type.getType());
-	}
-	
-	/**
-	 * Sets the type of the Component
-	 * @param type
-	 */
-	@Override
-	public void setType(String type){
-		attributes.put("type", type);
+		this.type = type;
 	}
 	
 	/**
@@ -212,8 +184,7 @@ public class AbstractComponent implements Component{
 	 */
 	@Override
 	public String getTag(){
-		Object tag =  attributes.get("tag");
-		return (tag instanceof String) ? (String) tag : null;
+		return tag;
 	}
 	
 	/**
@@ -222,143 +193,36 @@ public class AbstractComponent implements Component{
 	 */
 	@Override
 	public void setTag(String tag){
-		attributes.put("tag", tag);
-	}
-	
-	/**
-	 * Returns the Lore of the Component
-	 * @return
-	 */
-	@Override
-	@SuppressWarnings("unchecked")
-	public List<String> getLore(){
-		List<String> actions;
-		
-		try {
-			actions = (List<String>) attributes.get("lore");
-		} catch (ClassCastException e){
-			return null;
-		}
-		
-		return actions;
+		this.tag = tag;
 	}
 
-	/**
-	 * Sets the Lore of the Component
-	 * @param lore
-	 */
 	@Override
-	public void setLore(List<String> lore){
-		attributes.put("lore", (lore == null) ? new LinkedList<String>() : lore);
-	}
-	
-	//--------------------------Methods for actions--------------------------
-	/**
-	 * Adds action tags to a given interaction
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 */
-	@Override
-	public void addAction(String type, List<Integer> tags) {
-		addAction(type, tags, new LinkedList<String>(), "<player>", new LinkedList<String>());
+	public void addAction(Action action, Integer tag) {
+		if (!actionTags.containsKey(action)){
+			actionTags.put(action, new HashSet<Integer>());
+		}
 		
-	}
-	
-	/**
-	 * Adds action tags and permission to the given interaction
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 * @param permissions the permission to add
-	 */
-	@Override
-	public void addAction(String type, List<Integer> tags, List<String> permissions) {
-		addAction(type, tags, new LinkedList<String>(), "<player>", permissions);
+		actionTags.get(action).add(tag);
 		
 	}
 
-	/**
-	 * Adds action tags and commands to the given interaction.
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 * @param commands the commands to add
-	 * @param commandSender the Entity which executes the commands
-	 */
 	@Override
-	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender) {
-		addAction(type, tags, commands, commandSender, new LinkedList<String>());
+	public void removeAction(Action action, Integer tag) {
+		if (!actionTags.containsKey(action)){
+			actionTags.put(action, new HashSet<Integer>());
+		}
+		
+		actionTags.get(action).remove(tag);
 	}
 
-	/**
-	 * Adds action tags, commands, and permissions to the given interaction.
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 * @param commands the commands to add
-	 * @param commandSender the Entity which executes the commands
-	 * @param permissions the permission to add
-	 */
 	@Override
-	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender, List<String> permissions) {
-		
-		if (!this.hasAttribute("actions")){
-			addAttribute("actions", new ContainerAttribute("actions", new HashMap<String, Object>()));
-		}
-		
-		ContainerAttribute actions = (ContainerAttribute) getAttribute("actions");
-		
-		HashMap<String, Object> typeMap = new HashMap<String, Object>();                                            
-		typeMap.put("tags", tags);
-		typeMap.put("commands", commands);
-		typeMap.put("sender", commandSender);
-		typeMap.put("permissions", permissions);
-		actions.getAttributes().put("leftClick", new ContainerAttribute(type, typeMap));                   
-		
-		
+	public void removeAction(Action action) {
+		actionTags.remove(action);
 	}
 
-	/**
-	 * Checks if the component has an action for the given interaction
-	 * @param type the type of interaction
-	 * @return true if there exists an interaction, false otherwise
-	 */
 	@Override
-	public boolean hasInteraction(String type) {
-		if (!this.hasAttribute("actions")){
-			return false;
-		}
-		
-		ContainerAttribute actions = this.getContainerAttribute("actions");
-		if (actions == null){
-			return false;
-		}
-		
-		if (actions.hasAttribute(type)){
-			return true;
-		}
-		
-		return false;
-	}
-
-	/**
-	 * Returns an action
-	 * @param type
-	 * @return
-	 */
-	@Override
-	public ContainerAttribute getAction(String type) {
-		if (!this.hasAttribute("actions")){
-			return null;
-		}
-		
-		ContainerAttribute actions = this.getContainerAttribute("actions");
-		if (actions == null){
-			return null;
-		}
-		
-		if (actions.hasAttribute(type)){
-			return (ContainerAttribute) actions.getAttribute(type);
-		}
-		
-		return null;
+	public Set<Integer> getActionTags(Action action) {
+		return actionTags.get(action);
 	}
 	
 }

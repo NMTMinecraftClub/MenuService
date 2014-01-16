@@ -1,4 +1,4 @@
-package com.m0pt0pmatt.menuservice.api;
+package com.m0pt0pmatt.menuservice.api.actions;
 
 /**
  * An Action object represents an instance of an action being invoked by a player.
@@ -25,7 +25,7 @@ public final class ActionEvent {
 	private String playerName;
 	
 	//The type of interaction (leftClick, rightClick, etc)
-	private String interaction;
+	private Action action;
 	
 	/**
 	 * Creates an Action object
@@ -35,10 +35,10 @@ public final class ActionEvent {
 	 * @param instance The MenuInstance for the Action
 	 * @param interaction 
 	 */
-	public ActionEvent(int actionTag, String playerName, String interaction){
+	public ActionEvent(Action action, int actionTag, String playerName){
 		this.actionTag = actionTag;
 		this.playerName = playerName;
-		this.interaction = interaction;
+		this.action = action;
 	}
 	
 	/**
@@ -57,12 +57,8 @@ public final class ActionEvent {
 		return playerName;
 	}
 	
-	/**
-	 * Returns the type of interaction for this action (leftClick, rightClick, etc)
-	 * @return the type of interaction for this action (leftClick, rightClick, etc)
-	 */
-	public String getInteraction() {
-		return interaction;
+	public Action getAction() {
+		return action;
 	}
 	
 }

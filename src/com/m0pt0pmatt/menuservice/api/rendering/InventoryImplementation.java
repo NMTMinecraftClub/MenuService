@@ -8,11 +8,11 @@ import java.util.Map;
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
-import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuImplementation;
 import com.m0pt0pmatt.menuservice.api.MenuPart;
+import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 
 public class InventoryImplementation implements MenuImplementation{

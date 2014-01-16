@@ -1,8 +1,9 @@
 package com.m0pt0pmatt.menuservice.api;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import com.m0pt0pmatt.menuservice.api.actions.Action;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
@@ -81,19 +82,6 @@ public interface Component {
 	 */
 	public void addAttribute(String attributeName, Object value);
 	
-	//--------------------------Methods for one container attribute--------------------------
-	/**
-	 * Returns a given attribute of the Component as a ContainerAttribute if possible
-	 * @param attribute the type of attribute
-	 * @return the attribute if it exists and is a ContainerAttribute, otherwise null
-	 */
-	public ContainerAttribute getContainerAttribute(Attribute attribute);
-	
-	/**
-	 * Returns a given attribute of the Component as a ContainerAttribute if possible
-	 * @param attributeName the name of the attribute
-	 * @return the attribute if it exists and is a ContainerAttribute, otherwise null
-	 */
 	public ContainerAttribute getContainerAttribute(String attributeName);
 	
 	//--------------------------Methods for reserved attributes--------------------------
@@ -111,23 +99,10 @@ public interface Component {
 	public boolean isType(ComponentType type);
 	
 	/**
-	 * Checks the component if it is the given ComponentType
-	 * @param type
-	 * @return
-	 */
-	public boolean isType(String type);
-	
-	/**
 	 * Sets the type of the Component
 	 * @param type
 	 */
 	public void setType(ComponentType type);
-	
-	/**
-	 * Sets the type of the Component
-	 * @param type
-	 */
-	public void setType(String type);
 	
 	/**
 	 * Returns the tag of the Component
@@ -135,71 +110,15 @@ public interface Component {
 	 */
 	public String getTag();
 	
-	/**
-	 * Sets the tag of the Component
-	 * @param tag
-	 */
 	public void setTag(String tag);
 	
-	/**
-	 * Returns the Lore of the Component
-	 * @return
-	 */
-	public List<String> getLore();
-
-	/**
-	 * Sets the Lore of the Component
-	 * @param lore
-	 */
-	public void setLore(List<String> lore);
+	//Methods for actions
 	
-	//--------------------------Methods for actions--------------------------
-	/**
-	 * Returns an action
-	 * @param type
-	 * @return
-	 */
-	public ContainerAttribute getAction(String type);
+	public void addAction(Action action, Integer tag);
 	
-	/**
-	 * Adds action tags to a given interaction
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 */
-	public void addAction(String type, List<Integer> tags);
+	public void removeAction(Action action, Integer tag);
 	
-	/**
-	 * Adds action tags and permission to the given interaction
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 * @param permissions the permission to add
-	 */
-	public void addAction(String type, List<Integer> tags, List<String> permissions);
+	public void removeAction(Action action);
 	
-	/**
-	 * Adds action tags and commands to the given interaction.
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 * @param commands the commands to add
-	 * @param commandSender the Entity which executes the commands
-	 */
-	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender);
-	
-	/**
-	 * Adds action tags, commands, and permissions to the given interaction.
-	 * @param type the type of interaction
-	 * @param tags the action tags to add
-	 * @param commands the commands to add
-	 * @param commandSender the Entity which executes the commands
-	 * @param permissions the permission to add
-	 */
-	public void addAction(String type, List<Integer> tags, List<String> commands, String commandSender, List<String> permissions);
-	
-	/**
-	 * Checks if the component has an action for the given interaction
-	 * @param type the type of interaction
-	 * @return true if there exists an interaction, false otherwise
-	 */
-	public boolean hasInteraction(String type);
-
+	public Set<Integer> getActionTags(Action action);
 }

@@ -2,6 +2,8 @@ package com.m0pt0pmatt.menuservice.api;
 
 import java.util.List;
 
+import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
+
 /**
  * A MenuPart is a collection of components and a means to interact with them.
  * @author Matthew
