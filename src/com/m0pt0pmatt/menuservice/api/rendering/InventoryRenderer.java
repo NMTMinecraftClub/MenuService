@@ -24,7 +24,6 @@ import com.m0pt0pmatt.menuservice.api.MenuPart;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.actions.Action;
-import com.m0pt0pmatt.menuservice.api.actions.ActionEvent;
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.actions.DefaultAction;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
@@ -71,7 +70,6 @@ public class InventoryRenderer implements Renderer, Listener{
 
 	@Override
 	public void undraw(Menu menu, MenuPart p) {
-		// TODO Auto-generated method stub
 	}
 	
 	@Override
@@ -328,9 +326,8 @@ public class InventoryRenderer implements Renderer, Listener{
 		
 		//execute each tag for each ActionListener tied to the instance
 		for (Integer tag: tags){
-			ActionEvent e = new ActionEvent(action, tag, event.getWhoClicked().getName());
 			for (ActionListener listener: implementation.getActionListeners()){
-				listener.handleAction(e);
+				listener.handleAction(action, tag, event.getWhoClicked().getName(), component);
 			}			
 		}
 		

@@ -1,5 +1,7 @@
 package com.m0pt0pmatt.menuservice.api.actions;
 
+import com.m0pt0pmatt.menuservice.api.Component;
+
 
 /**
  * An ActionListener is the interface for catching user input from a Menu.
@@ -18,9 +20,8 @@ public interface ActionListener {
 	
 	/**
 	 * Executed when an action is activated.
-	 * @param event
 	 */
-	public void handleAction(ActionEvent event);
+	public void handleAction(Action action, int actionTag, String playerName, Component component);
 	
 	/**
 	 * Executed when a player is added to the MenuInstance
