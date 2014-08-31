@@ -25,7 +25,6 @@ import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.actions.Action;
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
-import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
 /**
  * InventoryRenderer is a built in Renderer for MenuService.
@@ -298,35 +297,6 @@ public class InventoryRenderer implements Renderer, Listener{
 			List<String> permissions = null;
 			try{
 				permissions = (List<String>) component.getAttribute("permissions");
-			} catch (ClassCastException e){
-				return true;
-			}
-			if (permissions == null){
-				return true;
-			}
-			for (String permission: permissions){
-				if (!player.hasPermission(permission)){
-					return false;
-				}
-			}
-
-		}
-
-		return true;
-	}
-
-	/**
-	 * Checks if a player can activate a given action
-	 * @param player
-	 * @param action
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	protected boolean hasPermissions(Player player, ContainerAttribute action){
-		if (action.hasAttribute("permissions")){
-			List<String> permissions = null;
-			try{
-				permissions = (List<String>) action.getAttribute("permissions");
 			} catch (ClassCastException e){
 				return true;
 			}

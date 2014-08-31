@@ -4,7 +4,6 @@ import java.util.Map;
 
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
-import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
 /**
  * A MenuComponent is a part of a Menu.
@@ -84,9 +83,7 @@ public interface Component {
 	 * @param value the value of the attribute
 	 */
 	public void addAttribute(String attributeName, Object value);
-	
-	public ContainerAttribute getContainerAttribute(String attributeName);
-	
+		
 	//--------------------------Methods for reserved attributes--------------------------
 	/**
 	 * Returns the type of the Component

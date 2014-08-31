@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
-import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
 /**
  * A AbstractComponent is a basic implementation of a Component.
@@ -141,20 +140,6 @@ public class AbstractComponent implements Component{
 	@Override
 	public void addAttribute(String attributeName, Object value) {
 		attributes.put(attributeName, value);
-	}
-	
-	/**
-	 * Returns a given attribute of the Component
-	 * @param name the name of the attribute
-	 * @return the attribute if it exists, otherwise null
-	 */
-	@Override
-	public ContainerAttribute getContainerAttribute(String attributeName){
-		Object attribute = getAttribute(attributeName);
-		if (attribute instanceof ContainerAttribute){
-			return (ContainerAttribute) attribute;
-		}
-		return null;
 	}
 	
 	//--------------------------Methods for reserved attributes--------------------------
