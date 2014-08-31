@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.m0pt0pmatt.menuservice.api.actions.Action;
+import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
@@ -26,6 +27,10 @@ import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
  */
 public interface Component {
 
+	public ActionListener getListener();
+	public void setListener(ActionListener listener);
+	public boolean hasListener();
+	
 	//--------------------------Methods for all attributes--------------------------
 	/**
 	 * Returns the attributes of the Component

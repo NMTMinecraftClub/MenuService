@@ -11,7 +11,6 @@ import org.bukkit.inventory.Inventory;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuImplementation;
-import com.m0pt0pmatt.menuservice.api.MenuPart;
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 
@@ -41,12 +40,10 @@ public class InventoryImplementation implements MenuImplementation{
 		
 		//determine size
 		int size = menu.getSize();
-		for (MenuPart part: menu.getParts()){
-			for (Component c: part.getComponents()){
-				if (c.hasAttribute(Attribute.Y)){
-					int y = (Integer) c.getAttribute(Attribute.Y);
-					if (size < y) size = y;
-				}
+		for (Component c: menu.getComponents()){
+			if (c.hasAttribute(Attribute.Y)){
+				int y = (Integer) c.getAttribute(Attribute.Y);
+				if (size < y) size = y;
 			}
 		}
 		
@@ -84,7 +81,7 @@ public class InventoryImplementation implements MenuImplementation{
 
 	public List<ActionListener> getActionListeners() {
 		List<ActionListener> listeners = new LinkedList<ActionListener>();
-		for (MenuPart part: menu.getParts()){
+		for (Component part: menu.getComponents()){
 			if (part.hasListener()) listeners.add(part.getListener());
 		}
 		return listeners;

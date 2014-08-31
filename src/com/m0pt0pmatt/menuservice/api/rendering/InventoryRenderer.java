@@ -21,7 +21,6 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.api.Menu;
-import com.m0pt0pmatt.menuservice.api.MenuPart;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.actions.Action;
@@ -58,26 +57,22 @@ public class InventoryRenderer implements Renderer, Listener{
 	}
 	
 	@Override
-	public void draw(Menu menu, MenuPart p) {
+	public void draw(Menu menu, Component p) {
 		if (!implementations.containsKey(menu)){
 			implementations.put(menu, new InventoryImplementation(menu));
 		}
 		
 		InventoryImplementation implementation = implementations.get(menu);
 		
-		this.renderMenuPart(implementation, p);
+		this.renderComponent(implementation, p);
 				
-	}
-
-	@Override
-	public void undraw(Menu menu, MenuPart p) {
 	}
 	
 	@Override
 	public void openMenu(Menu menu, UUID playerName) {
 		
 		if (!implementations.containsKey(menu)){
-			for (MenuPart p: menu.getParts()){
+			for (Component p: menu.getComponents()){
 				this.draw(menu, p);
 			}
 		}
@@ -96,12 +91,6 @@ public class InventoryRenderer implements Renderer, Listener{
 		Player player = Bukkit.getPlayer(playerName);
 		player.closeInventory();
 		players.remove(playerName);
-	}
-	
-	private void renderMenuPart(InventoryImplementation implementation, MenuPart part){
-		for (Component c: part.getComponents()){
-			renderComponent(implementation, c);
-		}
 	}
 	
 	private void renderComponent(InventoryImplementation implementation, Component component){
@@ -425,6 +414,12 @@ public class InventoryRenderer implements Renderer, Listener{
 			cSender = player;
 		}
 		return cSender;
+	}
+
+	@Override
+	public void undraw(Menu menu, Component component) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	

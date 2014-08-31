@@ -2,8 +2,8 @@ package com.m0pt0pmatt.menuservice.api.rendering;
 
 import java.util.UUID;
 
+import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
-import com.m0pt0pmatt.menuservice.api.MenuPart;
 
 /**
  * A Renderer will render (or present) a menu to a player.
@@ -28,8 +28,8 @@ public interface Renderer {
 	
 	public void closeMenu(Menu menu, UUID playerName);
 	
-	public void draw(Menu menu, MenuPart part);
+	public void draw(Menu menu, Component component);
 
-	public void undraw(Menu menu, MenuPart part);
+	public void undraw(Menu menu, Component component);
 	
 }

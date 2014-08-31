@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.m0pt0pmatt.menuservice.api.actions.Action;
+import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
@@ -21,7 +22,7 @@ import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 public class AbstractComponent implements Component{
 	
 	private ComponentType type;
-	
+	private ActionListener actionListener;
 	private String tag;
 	
 	//The attributes of the component
@@ -55,6 +56,19 @@ public class AbstractComponent implements Component{
 		if (!attributes.containsKey("lore")) attributes.put("lore", new LinkedList<String>());
 		
 		this.attributes = attributes;
+	}
+	
+	public ActionListener getListener() {
+		return actionListener;
+	}
+	public void setListener(ActionListener actionListener) {
+		this.actionListener = actionListener;
+	}
+	public boolean hasListener() {
+		if (actionListener == null){
+			return false;
+		}
+		return true;
 	}
 	
 	//--------------------------Methods for all attributes--------------------------

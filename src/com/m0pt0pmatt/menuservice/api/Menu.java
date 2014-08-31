@@ -19,14 +19,14 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
  */
 public final class Menu{
 
-	private List<MenuPart> parts;
+	private Set<Component> components;
 	private List<String> players;
 	private Set<String> commands;
 	private String title;
 	private int size;
 
 	public Menu(){
-		parts = new LinkedList<MenuPart>();
+		components = new HashSet<Component>();
 		players = new LinkedList<String>();
 		commands = new HashSet<String>();
 		size = 1;
@@ -50,34 +50,29 @@ public final class Menu{
 	
 	//--------------------------Methods for all menuparts--------------------------
 
-	public List<MenuPart> getParts() {
-		return parts;
+	public Set<Component> getComponents() {
+		return components;
 	}
 
 
-	public void setParts(List<MenuPart> parts) {
-		this.parts = parts;
+	public void setParts(Set<Component> components) {
+		this.components = components;
 	}
 
 	//--------------------------Methods for one menupart--------------------------
 	
-	public MenuPart getPart(int index) {
-		return parts.get(index);
+	public boolean hasPart(Component part) {
+		return components.contains(part);
 	}
 	
 	
-	public boolean hasPart(MenuPart part) {
-		return parts.contains(part);
-	}
-	
-	
-	public void addPart(MenuPart part) {
-		parts.add(part);
+	public void addPart(Component part) {
+		components.add(part);
 	}
 
 	
-	public void removePart(MenuPart part) {
-		parts.remove(part);
+	public void removePart(Component part) {
+		components.remove(part);
 	}
 	
 	/**
