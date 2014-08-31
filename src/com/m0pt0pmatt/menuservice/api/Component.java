@@ -1,9 +1,7 @@
 package com.m0pt0pmatt.menuservice.api;
 
 import java.util.Map;
-import java.util.Set;
 
-import com.m0pt0pmatt.menuservice.api.actions.Action;
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
@@ -116,14 +114,4 @@ public interface Component {
 	public String getTag();
 	
 	public void setTag(String tag);
-	
-	//Methods for actions
-	
-	public void addAction(Action action, Integer tag);
-	
-	public void removeAction(Action action, Integer tag);
-	
-	public void removeAction(Action action);
-	
-	public Set<Integer> getActionTags(Action action);
 }

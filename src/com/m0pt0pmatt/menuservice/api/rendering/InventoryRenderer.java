@@ -3,7 +3,6 @@ package com.m0pt0pmatt.menuservice.api.rendering;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -25,7 +24,6 @@ import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.actions.Action;
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
-import com.m0pt0pmatt.menuservice.api.actions.DefaultAction;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 
@@ -275,7 +273,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	        return;
 		}
 		
-		executeAction(event, implementation, component);
+		executeAction(event, component);
 		
 		//cancel the clicking of the item
 		event.setResult(org.bukkit.event.Event.Result.DENY);
@@ -289,7 +287,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	 * @param instance the MenuInstance of the Action
 	 * @param component the Component
 	 */
-	private void executeAction(InventoryClickEvent event, InventoryImplementation implementation, Component component){
+	private void executeAction(InventoryClickEvent event, Component component){
 		
 		Player player = (Player) event.getWhoClicked();
 		
@@ -297,38 +295,27 @@ public class InventoryRenderer implements Renderer, Listener{
 		Action action = getCorrectAction(event);
 		if (action == null) return;
 		
-		//get the list of action tags
-		Set<Integer> tags = component.getActionTags(action);
-		if (tags == null || tags.isEmpty()) return;
-		
 		//check if the player has permission to interact with the component
 		if (!hasPermissions(player, component)){
 			player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
 			return;
 		}
 		
-		//check if the player has permission to activate the action
-		//if (!hasPermissions(player, action)){
-		//	player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
-		//	return;
-		//}
-		
 		//execute each tag for each ActionListener tied to the instance
-		for (Integer tag: tags){
-			for (ActionListener listener: implementation.getActionListeners()){
-				listener.handleAction(action, tag, event.getWhoClicked().getName(), component);
-			}			
-		}
+		ActionListener listener = component.getListener();
+		if (listener != null){
+			listener.handleAction(action, event.getWhoClicked().getName(), component);
+		}	
 		
 	}
 
 	private Action getCorrectAction(InventoryClickEvent event) {
 		//check left click
 		if (event.isLeftClick()){
-			return DefaultAction.LEFT_CLICK;
+			return Action.LEFT_CLICK;
 		} 
 		else if (event.isRightClick()){
-			return DefaultAction.RIGHT_CLICK;
+			return Action.RIGHT_CLICK;
 		}
 		else{
 			return null;

@@ -1,12 +1,9 @@
 package com.m0pt0pmatt.menuservice.api;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Set;
 
-import com.m0pt0pmatt.menuservice.api.actions.Action;
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
@@ -28,16 +25,11 @@ public class AbstractComponent implements Component{
 	//The attributes of the component
 	private Map<String, Object> attributes;
 	
-	private Map<Action, Set<Integer>> actionTags;
-	
 	/**
 	 * Creates a new AbstractComponent, giving default values to all variables
 	 */
 	public AbstractComponent(){
-		
 		this.attributes = new HashMap<String, Object>();
-		
-		actionTags = new HashMap<Action, Set<Integer>>();
 	}
 	
 	/**
@@ -208,35 +200,6 @@ public class AbstractComponent implements Component{
 	@Override
 	public void setTag(String tag){
 		this.tag = tag;
-	}
-
-	@Override
-	public void addAction(Action action, Integer tag) {
-		if (!actionTags.containsKey(action)){
-			actionTags.put(action, new HashSet<Integer>());
-		}
-		
-		actionTags.get(action).add(tag);
-		
-	}
-
-	@Override
-	public void removeAction(Action action, Integer tag) {
-		if (!actionTags.containsKey(action)){
-			actionTags.put(action, new HashSet<Integer>());
-		}
-		
-		actionTags.get(action).remove(tag);
-	}
-
-	@Override
-	public void removeAction(Action action) {
-		actionTags.remove(action);
-	}
-
-	@Override
-	public Set<Integer> getActionTags(Action action) {
-		return actionTags.get(action);
 	}
 	
 }

@@ -21,7 +21,7 @@ public interface ActionListener {
 	/**
 	 * Executed when an action is activated.
 	 */
-	public void handleAction(Action action, int actionTag, String playerName, Component component);
+	public void handleAction(Action action, String playerName, Component component);
 	
 	/**
 	 * Executed when a player is added to the MenuInstance
