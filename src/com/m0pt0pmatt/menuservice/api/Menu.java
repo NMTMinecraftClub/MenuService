@@ -1,6 +1,7 @@
 package com.m0pt0pmatt.menuservice.api;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -73,6 +74,18 @@ public final class Menu{
 	
 	public void removePart(Component part) {
 		components.remove(part);
+	}
+	
+	public void removeAllPartsWithTag(String tag){
+		
+		Iterator<Component> i = components.iterator();
+		while(i.hasNext()){
+			Component component = i.next();
+			
+			if (component.hasTag(tag)){
+				i.remove();
+			}
+		}
 	}
 	
 	/**

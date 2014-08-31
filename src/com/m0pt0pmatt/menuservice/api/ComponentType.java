@@ -7,7 +7,6 @@ import java.util.Map;
 
 public enum ComponentType {
 
-	MENU("menu"),
 	BUTTON("button"),
 	LABEL("label");
 	

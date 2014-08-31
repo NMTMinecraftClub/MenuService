@@ -1,8 +1,10 @@
 package com.m0pt0pmatt.menuservice.api;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.Set;
 
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
@@ -19,16 +21,19 @@ public class Component{
 	
 	private ComponentType type;
 	private ActionListener actionListener;
-	private String tag;
+	private String name;
 	
 	//The attributes of the component
 	private Map<String, Object> attributes;
+	
+	private Set<String> tags;
 	
 	/**
 	 * Creates a new AbstractComponent, giving default values to all variables
 	 */
 	public Component(){
 		this.attributes = new HashMap<String, Object>();
+		this.tags = new HashSet<String>();
 	}
 	
 	/**
@@ -47,6 +52,21 @@ public class Component{
 		if (!attributes.containsKey("lore")) attributes.put("lore", new LinkedList<String>());
 		
 		this.attributes = attributes;
+		this.tags = new HashSet<String>();
+	}
+	
+	public Component(Map<String, Object> attributes, Set<String> tags){
+		//if the given attributes was null, create a new Map. Else use the provided attributes
+		attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
+		
+		//make sure the attributes have default values
+		if (!attributes.containsKey("type")) attributes.put("type", "no-type");
+		if (!attributes.containsKey("tag")) attributes.put("tag", "no-tag");
+		if (!attributes.containsKey("actions")) attributes.put("actions", new LinkedList<Integer>());
+		if (!attributes.containsKey("lore")) attributes.put("lore", new LinkedList<String>());
+		
+		this.attributes = attributes;
+		this.tags = tags;
 	}
 	
 	public ActionListener getListener() {
@@ -162,16 +182,36 @@ public class Component{
 	 * Returns the tag of the Component
 	 * @return
 	 */
-	public String getTag(){
-		return tag;
+	public String getName(){
+		return name;
 	}
 	
 	/**
 	 * Sets the tag of the Component
 	 * @param tag
 	 */
-	public void setTag(String tag){
-		this.tag = tag;
+	public void setName(String name){
+		this.name = name;
+	}
+	
+	public Set<String> getTags(){
+		return tags;
+	}
+	
+	public void setTags(Set<String> tags){
+		this.tags = tags;
+	}
+	
+	public void addTag(String tag){
+		this.tags.add(tag);
+	}
+	
+	public void removeTag(String tag){
+		this.tags.remove(tag);
+	}
+	
+	public boolean hasTag(String tag){
+		return tags.contains(tag);
 	}
 	
 }
