@@ -1,5 +1,7 @@
 package com.m0pt0pmatt.menuservice.api.rendering;
 
+import java.util.UUID;
+
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuPart;
 
@@ -22,9 +24,9 @@ public interface Renderer {
 	 */
 	public String getName();
 
-	public void openMenu(Menu menu, String playerName);
+	public void openMenu(Menu menu, UUID playerName);
 	
-	public void closeMenu(Menu menu, String playerName);
+	public void closeMenu(Menu menu, UUID playerName);
 	
 	public void draw(Menu menu, MenuPart part);
 

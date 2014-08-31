@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -39,11 +40,11 @@ import com.m0pt0pmatt.menuservice.api.attributes.ContainerAttribute;
 public class InventoryRenderer implements Renderer, Listener{
 	
 	private Map<Menu, InventoryImplementation> implementations;
-	private Map<String, InventoryImplementation> players;
+	private Map<UUID, InventoryImplementation> players;
 	
 	private InventoryRenderer(){
 		implementations = new HashMap<Menu, InventoryImplementation>();
-		players = new HashMap<String, InventoryImplementation>();
+		players = new HashMap<UUID, InventoryImplementation>();
 	}
 	
 	/**
@@ -73,7 +74,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	}
 	
 	@Override
-	public void openMenu(Menu menu, String playerName) {
+	public void openMenu(Menu menu, UUID playerName) {
 		
 		if (!implementations.containsKey(menu)){
 			for (MenuPart p: menu.getParts()){
@@ -91,7 +92,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	}
 
 	@Override
-	public void closeMenu(Menu menu, String playerName) {
+	public void closeMenu(Menu menu, UUID playerName) {
 		Player player = Bukkit.getPlayer(playerName);
 		player.closeInventory();
 		players.remove(playerName);
@@ -129,7 +130,6 @@ public class InventoryRenderer implements Renderer, Listener{
 		
 		else{
 			if (component.hasAttribute(Attribute.MATERIAL_ID)){
-				
 				material = Material.getMaterial((Integer) component.getAttribute(Attribute.MATERIAL_ID));
 				item = new ItemStack(material);
 			}
@@ -410,7 +410,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	 * @param sender the placeholder
 	 * @return
 	 */
-	protected CommandSender getCommandSender(Player player, String sender){
+	protected CommandSender getCommandSender(Player player, UUID sender){
 		CommandSender cSender;
 		if (sender == null){
 			cSender = null;
