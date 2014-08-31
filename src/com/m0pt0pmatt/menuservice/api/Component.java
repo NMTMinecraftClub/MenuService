@@ -1,114 +1,177 @@
 package com.m0pt0pmatt.menuservice.api;
 
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
 import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 
 /**
- * A MenuComponent is a part of a Menu.
- * Components must have a type. This allows Renderers to know how to render them.
- * Components also must have a tag. This allows them to be distinguished in a Menu.
- * 
- * Components can have any number of attributes. Attributes can be any Object.
- * Attributes help Renderers add detail to the Component.
- * 
- * One of the most important attributes of a Component is its List of action tags.
- * Action tags are integers. When the player interacts with a Component, actions are thrown.
- * This allows ActionListeners to react to certain actions.
- * Action tags are used for ActionListeners to know how to react.
- * A single Component can have unlimited action tags.
+ * A AbstractComponent is a basic implementation of a Component.
+ * A AbstractComponent is designed to be extended for other ComponentTypes, but this is not necessary.
+ * A AbstractComponent handles all attributes that every Component will have.
  * 
  * @author mbroomfield
  *
  */
-public interface Component {
-
-	public ActionListener getListener();
-	public void setListener(ActionListener listener);
-	public boolean hasListener();
+public class Component{
+	
+	private ComponentType type;
+	private ActionListener actionListener;
+	private String tag;
+	
+	//The attributes of the component
+	private Map<String, Object> attributes;
+	
+	/**
+	 * Creates a new AbstractComponent, giving default values to all variables
+	 */
+	public Component(){
+		this.attributes = new HashMap<String, Object>();
+	}
+	
+	/**
+	 * Creates a new AbstractComponent with the given attributes
+	 * @param attributes
+	 */
+	public Component(Map<String, Object> attributes) {
+		
+		//if the given attributes was null, create a new Map. Else use the provided attributes
+		attributes = (attributes == null) ? new HashMap<String, Object>() : attributes;
+		
+		//make sure the attributes have default values
+		if (!attributes.containsKey("type")) attributes.put("type", "no-type");
+		if (!attributes.containsKey("tag")) attributes.put("tag", "no-tag");
+		if (!attributes.containsKey("actions")) attributes.put("actions", new LinkedList<Integer>());
+		if (!attributes.containsKey("lore")) attributes.put("lore", new LinkedList<String>());
+		
+		this.attributes = attributes;
+	}
+	
+	public ActionListener getListener() {
+		return actionListener;
+	}
+	public void setListener(ActionListener actionListener) {
+		this.actionListener = actionListener;
+	}
+	public boolean hasListener() {
+		if (actionListener == null){
+			return false;
+		}
+		return true;
+	}
 	
 	//--------------------------Methods for all attributes--------------------------
 	/**
 	 * Returns the attributes of the Component
 	 * @return
 	 */
-	public Map<String, Object> getAttributes();
+	public Map<String, Object> getAttributes(){
+		return attributes;
+	}
 	
 	/**
 	 * Sets the attributes of the Component
 	 * @param attributes
 	 */
-	public void setAttributes(Map<String, Object> attributes);
+	public void setAttributes(Map<String, Object> attributes){
+		this.attributes = attributes;
+	}
 	
 	//--------------------------Methods for one attribute--------------------------
-	/**
-	 * Returns a given attribute of the Component
-	 * @param attribute the specified attribute
-	 * @return the attribute if it exists, otherwise null
-	 */
-	public Object getAttribute(Attribute attribute);
+	public Object getAttribute(Attribute attribute) {
+		Object o = attributes.get(attribute.getName());
+		if (o == null){
+			return null;
+		}
+		if (o.getClass().equals(attribute.getAttributeClass())){
+			return o;
+		}
+		return null;
+	}
 	
 	/**
 	 * Returns a given attribute of the Component
-	 * @param attributeName the name of the specified attribute
-	 * @return the attribute if it exists, otherwise null
+	 * @param name
+	 * @return
 	 */
-	public Object getAttribute(String attributeName);
+	public Object getAttribute(String attributeName){
+		return attributes.get(attributeName);
+	}
+	
+	public boolean hasAttribute(Attribute attribute){
+		Object o = getAttribute(attribute);
+		if (o == null){
+			return false;
+		}
+		return true;
+	}
 	
 	/**
 	 * checks if the Component has a given attribute
-	 * @param attribute the given Attribute
-	 * @return whether or not the Component has the given attribute
+	 * @param name
+	 * @return
 	 */
-	public boolean hasAttribute(Attribute attribute);
+	public boolean hasAttribute(String attributeName){
+		return attributes.containsKey(attributeName);
+	}
 	
-	/**
-	 * checks if the Component has a given attribute
-	 * @param attributeName the name of the given Attribute
-	 * @return whether or not the Component has the given attribute
-	 */
-	public boolean hasAttribute(String attributeName);
-	
-	/**
-	 * Adds a attribute to the Component
-	 * @param attribute The type of attribute to be added
-	 * @param value the value of the attribute
-	 */
-	public void addAttribute(Attribute attribute, Object value);
-
-	/**
-	 * Adds a attribute to the Component
-	 * @param attributeName The name for the attribute
-	 * @param value the value of the attribute
-	 */
-	public void addAttribute(String attributeName, Object value);
+	public void addAttribute(Attribute attribute, Object value) {
+		if (!value.getClass().equals(attribute.getAttributeClass())){
+			return;
+		}
 		
+		attributes.put(attribute.getName(), value);
+	}
+	
+	/**
+	 * Adds a attribute to the Component
+	 * @param name
+	 * @param value
+	 */
+	public void addAttribute(String attributeName, Object value) {
+		attributes.put(attributeName, value);
+	}
+	
 	//--------------------------Methods for reserved attributes--------------------------
 	/**
 	 * Returns the type of the Component
 	 * @return
 	 */
-	public ComponentType getType();
+	public ComponentType getType(){
+		return type;
+	}
 	
-	/**
-	 * Checks the component if it is the given ComponentType
-	 * @param type
-	 * @return
-	 */
-	public boolean isType(ComponentType type);
-	
-	/**
-	 * Sets the type of the Component
-	 * @param type
-	 */
-	public void setType(ComponentType type);
+	public boolean isType(ComponentType type) {
+		ComponentType cType = this.getType();
+		if (cType == null){
+			return false;
+		}
+		if (cType.equals(type)){
+			return true;
+		}
+		return false;
+	}
+
+	public void setType(ComponentType type) {
+		this.type = type;
+	}
 	
 	/**
 	 * Returns the tag of the Component
 	 * @return
 	 */
-	public String getTag();
+	public String getTag(){
+		return tag;
+	}
 	
-	public void setTag(String tag);
+	/**
+	 * Sets the tag of the Component
+	 * @param tag
+	 */
+	public void setTag(String tag){
+		this.tag = tag;
+	}
+	
 }
