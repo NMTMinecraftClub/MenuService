@@ -108,52 +108,16 @@ public class InventoryRenderer implements Renderer, Listener{
 		//create the itemstack
 		ItemStack item;
 		
-		//create the correct material
-		Material material;
-		
 		if (component.hasAttribute(Attribute.ITEM)){
 			item = (ItemStack) component.getAttribute(Attribute.ITEM);
 		} 
 		
 		else{
-			if (component.hasAttribute(Attribute.MATERIAL_ID)){
-				material = Material.getMaterial((Integer) component.getAttribute(Attribute.MATERIAL_ID));
-				item = new ItemStack(material);
-			}
-			else if (component.hasAttribute(Attribute.MATERIAL_NAME)){
-				material = Material.getMaterial((String) component.getAttribute(Attribute.MATERIAL_NAME));
-				item = new ItemStack(material);
-			}
-			else{
-				material = Material.WOOL;
-				item = new ItemStack(Material.WOOL);
-			}
-			
+			item = new ItemStack(Material.WOOL);
 		}
 		
 		//make meta changes
 		ItemMeta meta = item.getItemMeta();
-
-		//change the title of the item
-		String text = component.getTag();
-		if (component.hasAttribute(Attribute.TEXT)){
-			text = (String) component.getAttribute(Attribute.TEXT);
-		}
-		meta.setDisplayName(ChatColor.RESET.toString() + ChatColor.WHITE.toString() + text);
-		
-		//set the lore
-//		if (meta.hasLore()){
-//			meta.getLore().clear();
-//		}
-//		List<String> lore = component.getLore();
-//		List<String> newLore = new LinkedList<String>();
-//		if (lore != null){
-//			for (String l: lore){
-//				l = ChatColor.RESET.toString() + ChatColor.GRAY.toString() + l;
-//				newLore.add(l);
-//			}
-//		}
-//		meta.setLore(newLore);
 		
 		//set the metadata
 		item.setItemMeta(meta);

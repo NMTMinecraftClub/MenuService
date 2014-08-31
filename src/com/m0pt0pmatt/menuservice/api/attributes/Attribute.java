@@ -19,35 +19,13 @@ import org.bukkit.inventory.ItemStack;
 public enum Attribute {
 
 	TAG("tag", String.class),
-	NAME("tag", String.class),
-	PLUGIN("plugin", String.class),
 	FILENAME("filename", String.class),
-	TYPE("type", String.class),
-	SIZE("size", Integer.class),
 	ITEM("item", ItemStack.class),
 	X("x", Integer.class),
-	Y("y", Integer.class),
-	COMPONENTS("components", ContainerAttribute.class),
-	REMOVEONEXIT("removeOnExit", Boolean.class),
-	REMOVEONEMPTY("removeOnEmpty", Boolean.class),
-	DYNAMIC("dynamic", Boolean.class),
-	PERMANENT("permanent", Boolean.class),
-	MATERIAL_ID("material", Integer.class),
-	MATERIAL_NAME("material", String.class),
-	LORE("lore", List.class, String.class),
-	ACTIONTAGS("actionTags", List.class, Integer.class),
-	TEXT("text", String.class),
-	OPENCOMMAND("openCommand", String.class),
-	TITLE("title", String.class),
-	ACTIONS("actions", ContainerAttribute.class),
-	LEFTCLICK("leftClick", ContainerAttribute.class),
-	RIGHTCLICK("rightClick", ContainerAttribute.class),
-	COMMANDS("commands", List.class, String.class);
+	Y("y", Integer.class);
 	
 	private final String name;
 	private final Class<?> type;
-	private final boolean isList;
-	private final Class<?> elementType;
 	
 	//a Map of possible names to the list of attributes that the name represents
 	private static final Map<String, Set<Attribute>> attributes = new HashMap<String, Set<Attribute>>();
@@ -67,24 +45,8 @@ public enum Attribute {
 	 * @param type
 	 */
 	private Attribute(String name, Class<?> type){
-
 		this.name = name;
 		this.type = type;
-		isList = false;
-		elementType = null;
-	}
-	
-	/**
-	 * Creates a list attribute. Use this constructor only if the attribute is a list
-	 * @param name
-	 * @param type
-	 * @param elementType
-	 */
-	private Attribute(String name, Class<?> type, Class<?> elementType){
-		this.name = name;
-		this.type = type;
-		this.elementType = elementType;
-		isList = true;
 	}
 	
 	/**
@@ -101,25 +63,6 @@ public enum Attribute {
 	 */
 	public Class<?> getAttributeClass(){
 		return type;
-	}
-	
-	/**
-	 * Returns whether or not the Attribute is a list
-	 * @return true if the Attribute is a list, false otherwise
-	 */
-	public boolean isList(){
-		return isList;
-	}
-	
-	/**
-	 * Returns the Class of the elements of the list of the Attribute
-	 * @return null if the Attribute is not a list, otherwise the Class of the elements of the list of the Attribute
-	 */
-	public Class<?> getElementClass(){
-		if (!isList){
-			return null;
-		}
-		return elementType;
 	}
 	
 	/**
