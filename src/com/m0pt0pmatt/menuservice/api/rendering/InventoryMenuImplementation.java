@@ -1,9 +1,11 @@
 package com.m0pt0pmatt.menuservice.api.rendering;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
@@ -34,9 +36,13 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	
 	private Map<Integer, Component> components;
 	
+	private Set<UUID> players;
+	
 	public InventoryMenuImplementation(Menu menu, Plugin plugin){
 		
 		super(menu);
+		
+		players = new HashSet<UUID>();
 		
 		this.components = new HashMap<Integer, Component>();
 		
@@ -169,6 +175,10 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		
 		final UUID uuid = event.getPlayer().getUniqueId();
 		
+		if (!players.contains(uuid)){
+			return;
+		}
+		
 		//if the player was viewing a MenuInstance that's being provided for
 		if (menu.getPlayers().containsKey(uuid)){
 			
@@ -183,6 +193,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 						@Override
 						public void run() {
 							openMenu(uuid);
+							System.out.println("REOPEN MENU");
 						}
 						
 					};
@@ -303,11 +314,14 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 
 	@Override
 	public void openMenu(UUID uuid) {
+		players.add(uuid);
+		closeMenu(uuid);
 		Bukkit.getPlayer(uuid).openInventory(inventory);
 	}
 
 	@Override
 	public void closeMenu(UUID uuid) {
+		players.remove(uuid);
 		Bukkit.getPlayer(uuid).closeInventory();
 	}
 
