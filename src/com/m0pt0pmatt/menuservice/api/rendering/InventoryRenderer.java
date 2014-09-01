@@ -19,12 +19,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
+import com.m0pt0pmatt.menuservice.api.Action;
+import com.m0pt0pmatt.menuservice.api.ActionListener;
+import com.m0pt0pmatt.menuservice.api.Attribute;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
-import com.m0pt0pmatt.menuservice.api.actions.Action;
-import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
-import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
+import com.m0pt0pmatt.menuservice.api.Renderer;
 
 /**
  * InventoryRenderer is a built in Renderer for MenuService.
@@ -66,7 +67,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	}
 	
 	@Override
-	public void openMenu(Menu menu, UUID playerName) {
+	public void openMenu(Menu menu, UUID uuid) {
 		
 		if (!implementations.containsKey(menu)){
 			for (Component p: menu.getComponents()){
@@ -74,20 +75,20 @@ public class InventoryRenderer implements Renderer, Listener{
 			}
 		}
 		
-		Player player = Bukkit.getPlayer(playerName);
+		Player player = Bukkit.getPlayer(uuid);
 		
 		
 		//open the inventory
 		player.closeInventory();
 		player.openInventory(implementations.get(menu).getInventory());
-		players.put(playerName, implementations.get(menu));
+		players.put(uuid, implementations.get(menu));
 	}
 
 	@Override
-	public void closeMenu(Menu menu, UUID playerName) {
-		Player player = Bukkit.getPlayer(playerName);
+	public void closeMenu(Menu menu, UUID uuid) {
+		Player player = Bukkit.getPlayer(uuid);
 		player.closeInventory();
-		players.remove(playerName);
+		players.remove(uuid);
 	}
 	
 	private void renderComponent(InventoryImplementation implementation, Component component){
@@ -196,13 +197,13 @@ public class InventoryRenderer implements Renderer, Listener{
 	@EventHandler
 	public void inventoryClose(InventoryCloseEvent event){
 		
-		String playerName = event.getPlayer().getName();
+		UUID uuid = event.getPlayer().getUniqueId();
 		
 		//if the player was viewing a MenuInstance that's being provided for
-		if (players.containsKey(playerName)){
+		if (players.containsKey(uuid)){
 			
-			players.get(playerName).removePlayer(playerName);
-			players.remove(playerName);
+			players.get(uuid).removePlayer(uuid);
+			players.remove(uuid);
 		}
 		
 	}
@@ -216,8 +217,8 @@ public class InventoryRenderer implements Renderer, Listener{
 	public void inventoryClick(InventoryClickEvent event){	
 				
 		//check if player was viewing a menu
-		String playerName = event.getWhoClicked().getName();
-		if (!players.containsKey(playerName)){
+		UUID uuid = event.getWhoClicked().getUniqueId();
+		if (!players.containsKey(uuid)){
 			return;
 		}
 		
@@ -226,7 +227,7 @@ public class InventoryRenderer implements Renderer, Listener{
 		}
 		
 		//get the implementation
-		InventoryImplementation implementation = players.get(playerName);
+		InventoryImplementation implementation = players.get(uuid);
 		
 		//get the component
 		Component component = implementation.getComponent(event.getSlot());
@@ -339,10 +340,7 @@ public class InventoryRenderer implements Renderer, Listener{
 
 	@Override
 	public void undraw(Menu menu, Component component) {
-		// TODO Auto-generated method stub
 		
 	}
-
-	
 	
 }

@@ -1,4 +1,4 @@
-package com.m0pt0pmatt.menuservice.api.attributes;
+package com.m0pt0pmatt.menuservice.api;
 
 import java.util.EnumSet;
 import java.util.HashMap;

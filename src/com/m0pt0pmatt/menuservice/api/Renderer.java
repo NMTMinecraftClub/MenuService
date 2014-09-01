@@ -1,9 +1,6 @@
-package com.m0pt0pmatt.menuservice.api.rendering;
+package com.m0pt0pmatt.menuservice.api;
 
 import java.util.UUID;
-
-import com.m0pt0pmatt.menuservice.api.Component;
-import com.m0pt0pmatt.menuservice.api.Menu;
 
 /**
  * A Renderer will render (or present) a menu to a player.

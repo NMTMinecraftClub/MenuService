@@ -1,6 +1,5 @@
-package com.m0pt0pmatt.menuservice.api.actions;
+package com.m0pt0pmatt.menuservice.api;
 
-import com.m0pt0pmatt.menuservice.api.Component;
 
 
 /**

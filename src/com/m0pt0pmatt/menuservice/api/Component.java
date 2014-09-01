@@ -6,17 +6,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
-import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
-import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 
-/**
- * A AbstractComponent is a basic implementation of a Component.
- * A AbstractComponent is designed to be extended for other ComponentTypes, but this is not necessary.
- * A AbstractComponent handles all attributes that every Component will have.
- * 
- * @author mbroomfield
- *
- */
 public class Component{
 	
 	private ComponentType type;
@@ -82,7 +72,6 @@ public class Component{
 		return true;
 	}
 	
-	//--------------------------Methods for all attributes--------------------------
 	/**
 	 * Returns the attributes of the Component
 	 * @return
@@ -99,7 +88,6 @@ public class Component{
 		this.attributes = attributes;
 	}
 	
-	//--------------------------Methods for one attribute--------------------------
 	public Object getAttribute(Attribute attribute) {
 		Object o = attributes.get(attribute.getName());
 		if (o == null){
@@ -154,7 +142,6 @@ public class Component{
 		attributes.put(attributeName, value);
 	}
 	
-	//--------------------------Methods for reserved attributes--------------------------
 	/**
 	 * Returns the type of the Component
 	 * @return

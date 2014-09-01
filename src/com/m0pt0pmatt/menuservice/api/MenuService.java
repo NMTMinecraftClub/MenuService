@@ -1,6 +1,5 @@
 package com.m0pt0pmatt.menuservice.api;
 
-import com.m0pt0pmatt.menuservice.api.rendering.Renderer;
 
 /**
  * The MenuService interface is the absolute API for the MenuService Plugin.

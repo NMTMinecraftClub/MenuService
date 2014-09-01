@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -21,14 +22,14 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 public final class Menu{
 
 	private Set<Component> components;
-	private List<String> players;
+	private List<UUID> players;
 	private Set<String> commands;
 	private String title;
 	private int size;
 
 	public Menu(){
 		components = new HashSet<Component>();
-		players = new LinkedList<String>();
+		players = new LinkedList<UUID>();
 		commands = new HashSet<String>();
 		size = 1;
 	}
@@ -49,8 +50,6 @@ public final class Menu{
 		this.title = title;
 	}
 	
-	//--------------------------Methods for all menuparts--------------------------
-
 	public Set<Component> getComponents() {
 		return components;
 	}
@@ -59,8 +58,6 @@ public final class Menu{
 	public void setParts(Set<Component> components) {
 		this.components = components;
 	}
-
-	//--------------------------Methods for one menupart--------------------------
 	
 	public boolean hasPart(Component part) {
 		return components.contains(part);
@@ -105,8 +102,8 @@ public final class Menu{
         }
     }
 
-	public void removePlayer(String playerName) {
-		players.remove(playerName);
+	public void removePlayer(UUID uuid) {
+		players.remove(uuid);
 	}
 	
 }

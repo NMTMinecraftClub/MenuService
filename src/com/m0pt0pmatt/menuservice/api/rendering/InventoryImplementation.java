@@ -4,15 +4,16 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
 
+import com.m0pt0pmatt.menuservice.api.ActionListener;
+import com.m0pt0pmatt.menuservice.api.Attribute;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuImplementation;
-import com.m0pt0pmatt.menuservice.api.actions.ActionListener;
-import com.m0pt0pmatt.menuservice.api.attributes.Attribute;
 
 public class InventoryImplementation implements MenuImplementation{
 
@@ -62,9 +63,8 @@ public class InventoryImplementation implements MenuImplementation{
 		this.inventory = inventory;
 	}
 
-	
-	public void removePlayer(String playerName){
-		menu.removePlayer(playerName);
+	public void removePlayer(UUID uuid){
+		menu.removePlayer(uuid);
 	}
 
 	public void setLocation(int spot, Component component) {
