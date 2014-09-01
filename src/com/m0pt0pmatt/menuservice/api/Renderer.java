@@ -4,13 +4,11 @@ import java.util.UUID;
 
 /**
  * A Renderer will render (or present) a menu to a player.
- * 
- * A Renderer can either render a Menu or a MenuInstance.
- * When rendering a Menu, the Renderer must create a MenuInstance, add it to the Menu, render the MenuInstance, and return the MenuInstance.
- * 
+ * A Renderer is responsible for drawing the menu and for catching player interactions.
+ * A Renderer draws a Menu object. It creates a MenuImplementation of that Menu.
  * To distinguish Renderers from each other, each Renderer must supply a name.
- * @author mbroomfield
- *
+ * 
+ * @author Matthew Broomfield (m0pt0pmatt) <m0pt0pmatt17@gmail.com>
  */
 public interface Renderer {
 	
@@ -21,12 +19,18 @@ public interface Renderer {
 	 */
 	public String getName();
 
+	/**
+	 * Opens a menu for a player
+	 * @param menu
+	 * @param playerName
+	 */
 	public void openMenu(Menu menu, UUID playerName);
 	
+	/**
+	 * Closes a menu for a player
+	 * @param menu
+	 * @param playerName
+	 */
 	public void closeMenu(Menu menu, UUID playerName);
-	
-	public void draw(Menu menu, Component component);
-
-	public void undraw(Menu menu, Component component);
-	
+		
 }

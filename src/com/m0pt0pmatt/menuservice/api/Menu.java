@@ -2,46 +2,32 @@ package com.m0pt0pmatt.menuservice.api;
 
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
-import java.util.UUID;
-
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 
 /**
- * A MenuComponent is a MenuComponent which implements a Menu.
+ * A Menu is a model of an abstract user interface.
+ * A Menu is made of Components, which are normally buttons and/or labels.
  * 
- * A MenuComponent acts like a DefaultComponent with added features.
- * 
- * @author mbroomfield
- *
+ * @author Matthew Broomfield (m0pt0pmatt) <m0pt0pmatt17@gmail.com>
  */
 public final class Menu{
 
-	private Set<Component> components;
-	private List<UUID> players;
-	private Set<String> commands;
+	//Each menu has a title
 	private String title;
+	
+	//The set of components for the menu
+	private Set<Component> components;
+	
+	//The size of the menu. (number of rows)
 	private int size;
-
+	//NOTE: size is NOT an abstract attribute, but specific for the inventory menu
+	//		implementation. This should me moved
+	
 	public Menu(){
 		components = new HashSet<Component>();
-		players = new LinkedList<UUID>();
-		commands = new HashSet<String>();
 		size = 1;
 	}
 	
-	public int getSize(){
-		return size;
-	}
-	
-	public void setSize(int size){
-		this.size = size;
-	}
-
 	public String getTitle() {
 		return title;
 	}
@@ -55,21 +41,19 @@ public final class Menu{
 	}
 
 
-	public void setParts(Set<Component> components) {
+	public void setComponents(Set<Component> components) {
 		this.components = components;
 	}
 	
-	public boolean hasPart(Component part) {
+	public boolean hasComponent(Component part) {
 		return components.contains(part);
 	}
 	
-	
-	public void addPart(Component part) {
+	public void addComponent(Component part) {
 		components.add(part);
 	}
 
-	
-	public void removePart(Component part) {
+	public void removeComponent(Component part) {
 		components.remove(part);
 	}
 	
@@ -85,25 +69,12 @@ public final class Menu{
 		}
 	}
 	
-	/**
-	 * Catch when a player executes a command if a Menu should be opened
-	 * @param event
-	 */
-	@EventHandler
-    public void onCommand(PlayerCommandPreprocessEvent event) {
-        Player player = event.getPlayer();
-        String command = event.getMessage();
-        
-        if (commands.contains(command)){
-            event.setCancelled(true);
-            player.sendMessage("currently, commands are broken with menus");
-            player.sendMessage("this code should be moved to easymenus");
-            //this.openMenu(player.getName());
-        }
-    }
-
-	public void removePlayer(UUID uuid) {
-		players.remove(uuid);
+	public int getSize(){
+		return size;
+	}
+	
+	public void setSize(int size){
+		this.size = size;
 	}
 	
 }

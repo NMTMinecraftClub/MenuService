@@ -54,7 +54,6 @@ public class InventoryRenderer implements Renderer, Listener{
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 	}
 	
-	@Override
 	public void draw(Menu menu, Component p) {
 		if (!implementations.containsKey(menu)){
 			implementations.put(menu, new InventoryImplementation(menu));
@@ -62,8 +61,7 @@ public class InventoryRenderer implements Renderer, Listener{
 		
 		InventoryImplementation implementation = implementations.get(menu);
 		
-		this.renderComponent(implementation, p);
-				
+		this.renderComponent(implementation, p);	
 	}
 	
 	@Override
@@ -75,19 +73,13 @@ public class InventoryRenderer implements Renderer, Listener{
 			}
 		}
 		
-		Player player = Bukkit.getPlayer(uuid);
-		
-		
-		//open the inventory
-		player.closeInventory();
-		player.openInventory(implementations.get(menu).getInventory());
+		implementations.get(menu).addPlayer(uuid);
 		players.put(uuid, implementations.get(menu));
 	}
 
 	@Override
 	public void closeMenu(Menu menu, UUID uuid) {
-		Player player = Bukkit.getPlayer(uuid);
-		player.closeInventory();
+		implementations.get(menu).removePlayer(uuid);
 		players.remove(uuid);
 	}
 	
@@ -336,11 +328,6 @@ public class InventoryRenderer implements Renderer, Listener{
 			cSender = player;
 		}
 		return cSender;
-	}
-
-	@Override
-	public void undraw(Menu menu, Component component) {
-		
 	}
 	
 }

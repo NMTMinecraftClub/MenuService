@@ -2,11 +2,7 @@ package com.m0pt0pmatt.menuservice.api;
 
 
 /**
- * The MenuService interface is the absolute API for the MenuService Plugin.
- * Using this interface, developers can create detailed menus using MenuService's abstract Menu system.
- * 
- * To use MenuService, a developer needs to add the MenuServiceAPI.jar to the build path
- * To use MenuService on a server, MenuService.jar must be in the plugins directory
+ * The MenuService interface is the API for rendering menus.
  * 
  * To reference the MenuService interface, grab it from the Bukkit Services Manager
  * Example: MenuService menuService = Bukkit.getServicesManager().getRegistration(MenuService.class).getProvider();
@@ -16,9 +12,7 @@ package com.m0pt0pmatt.menuservice.api;
  *
  */
 public interface MenuService{
-	
-	//--------------------------Methods for Renderers--------------------------
-	
+		
 	/**
 	 * Returns a Renderer by name from the MenuService.
 	 * @param rendererName The name of the Renderer

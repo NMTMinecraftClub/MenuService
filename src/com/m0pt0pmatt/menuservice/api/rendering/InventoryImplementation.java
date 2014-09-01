@@ -13,9 +13,8 @@ import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Attribute;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
-import com.m0pt0pmatt.menuservice.api.MenuImplementation;
 
-public class InventoryImplementation implements MenuImplementation{
+public class InventoryImplementation extends AbstractMenuImplementation{
 
 	private Inventory inventory;
 	
@@ -63,10 +62,6 @@ public class InventoryImplementation implements MenuImplementation{
 		this.inventory = inventory;
 	}
 
-	public void removePlayer(UUID uuid){
-		menu.removePlayer(uuid);
-	}
-
 	public void setLocation(int spot, Component component) {
 		components.put(spot, component);
 	}
@@ -85,5 +80,15 @@ public class InventoryImplementation implements MenuImplementation{
 			if (part.hasListener()) listeners.add(part.getListener());
 		}
 		return listeners;
+	}
+	
+	public void addPlayer(UUID uuid, Menu menu){
+		super.addPlayer(uuid);
+		Bukkit.getPlayer(uuid).openInventory(inventory);
+	}
+	
+	public void removePlayer(UUID uuid){
+		super.removePlayer(uuid);
+		Bukkit.getPlayer(uuid).closeInventory();
 	}
 }
