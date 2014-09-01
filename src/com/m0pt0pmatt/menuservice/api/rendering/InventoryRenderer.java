@@ -1,26 +1,16 @@
 package com.m0pt0pmatt.menuservice.api.rendering;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.command.CommandSender;
-import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryCloseEvent;
+
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.api.Action;
-import com.m0pt0pmatt.menuservice.api.ActionListener;
 import com.m0pt0pmatt.menuservice.api.Attribute;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuService;
@@ -34,15 +24,11 @@ import com.m0pt0pmatt.menuservice.api.Renderer;
  * @author mbroomfield
  *
  */
-public class InventoryRenderer implements Renderer, Listener{
+public class InventoryRenderer implements Renderer{
 	
 	private Map<Menu, InventoryMenuImplementation> implementations;
 	private Map<UUID, InventoryMenuImplementation> players;
-	
-	private InventoryRenderer(){
-		implementations = new HashMap<Menu, InventoryMenuImplementation>();
-		players = new HashMap<UUID, InventoryMenuImplementation>();
-	}
+	private Plugin plugin;
 	
 	/**
 	 * Creates the InventoryRenderer
@@ -50,34 +36,37 @@ public class InventoryRenderer implements Renderer, Listener{
 	 * @param plugin
 	 */
 	public InventoryRenderer(MenuService menuService, Plugin plugin){
-		this();
-		Bukkit.getPluginManager().registerEvents(this, plugin);
+		implementations = new HashMap<Menu, InventoryMenuImplementation>();
+		players = new HashMap<UUID, InventoryMenuImplementation>();
+		this.plugin = plugin;
 	}
 	
-	public void draw(Menu menu, Component p) {
-		if (!implementations.containsKey(menu)){
-			implementations.put(menu, new InventoryMenuImplementation(menu));
-		}
-		
-		InventoryMenuImplementation implementation = implementations.get(menu);
-		
-		this.renderComponent(implementation, p);	
-	}
+	
 	
 	@Override
-	public void render(Menu menu, UUID uuid) {
+	public void drawMenu(Menu menu, UUID uuid) {
 		
 		if (!implementations.containsKey(menu)){
 			for (Component p: menu.getComponents()){
-				this.draw(menu, p);
+				this.drawComponent(menu, p);
 			}
 		}
 		players.put(uuid, implementations.get(menu));
 	}
 
 	@Override
-	public void derender(UUID uuid) {
+	public void undrawMenu(UUID uuid) {
 		players.remove(uuid);
+	}
+	
+	public void drawComponent(Menu menu, Component p) {
+		if (!implementations.containsKey(menu)){
+			implementations.put(menu, new InventoryMenuImplementation(menu, plugin));
+		}
+		
+		InventoryMenuImplementation implementation = implementations.get(menu);
+		
+		this.renderComponent(implementation, p);	
 	}
 	
 	private void renderComponent(InventoryMenuImplementation implementation, Component component){
@@ -176,154 +165,6 @@ public class InventoryRenderer implements Renderer, Listener{
 	@Override
 	public String getName() {
 		return "inventoryRenderer";
-	}
-	
-	/**
-	 * Handles when a player closes an inventory.
-	 * If the inventory was a menu, remove the player from the open menu hash.
-	 * @param event The event
-	 */
-	@EventHandler
-	public void inventoryClose(InventoryCloseEvent event){
-		
-		UUID uuid = event.getPlayer().getUniqueId();
-		
-		//if the player was viewing a MenuInstance that's being provided for
-		if (players.containsKey(uuid)){
-			players.get(uuid).getMenu().removePlayer(uuid);
-			players.remove(uuid);
-		}
-		
-	}
-	
-	/**
-	 * Handles when a player clicks an item in an inventory.
-	 * If the inventory was a menu, handles the menu accordingly
-	 * @param event
-	 */
-	@EventHandler
-	public void inventoryClick(InventoryClickEvent event){	
-				
-		//check if player was viewing a menu
-		UUID uuid = event.getWhoClicked().getUniqueId();
-		if (!players.containsKey(uuid)){
-			return;
-		}
-		
-		if (event.getRawSlot() >= 54 || event.getRawSlot() < 0){
-			return;
-		}
-		
-		//get the implementation
-		InventoryMenuImplementation implementation = players.get(uuid);
-		
-		//get the component
-		Component component = implementation.getComponent(event.getSlot());
-		if (component == null){
-			event.setResult(org.bukkit.event.Event.Result.DENY);
-	        event.setCancelled(true);
-	        return;
-		}
-		
-		executeAction(event, implementation.getMenu(), component);
-		
-		//cancel the clicking of the item
-		event.setResult(org.bukkit.event.Event.Result.DENY);
-        event.setCancelled(true);
-	}
-
-	
-	/**
-	 * Executes an Action on a given Component
-	 * @param event the InventoryClickEvent
-	 * @param instance the MenuInstance of the Action
-	 * @param component the Component
-	 */
-	private void executeAction(InventoryClickEvent event, Menu menu, Component component){
-		
-		Player player = (Player) event.getWhoClicked();
-		
-		//get the action
-		Action action = getCorrectAction(event);
-		if (action == null) return;
-		
-		//check if the player has permission to interact with the component
-		if (!hasPermissions(player, component)){
-			player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
-			return;
-		}
-		
-		//execute each tag for each ActionListener tied to the instance
-		ActionListener listener = component.getListener();
-		if (listener != null){
-			listener.handleAction(action, event.getWhoClicked().getName(), menu, component);
-		}	
-		
-	}
-
-	private Action getCorrectAction(InventoryClickEvent event) {
-		//check left click
-		if (event.isLeftClick()){
-			return Action.LEFT_CLICK;
-		} 
-		else if (event.isRightClick()){
-			return Action.RIGHT_CLICK;
-		}
-		else{
-			return null;
-		}
-	}
-	
-	/**
-	 * Checks if the player has permission to interact with the component
-	 * @param player
-	 * @param component
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	protected boolean hasPermissions(Player player, Component component){
-		if (component.hasAttribute("permissions")){
-			List<String> permissions = null;
-			try{
-				permissions = (List<String>) component.getAttribute("permissions");
-			} catch (ClassCastException e){
-				return true;
-			}
-			if (permissions == null){
-				return true;
-			}
-			for (String permission: permissions){
-				if (!player.hasPermission(permission)){
-					return false;
-				}
-			}
-
-		}
-
-		return true;
-	}
-
-	/**
-	 * Retrieves the CommandSender for the given placeholder
-	 * @param player the player who interacted with the action
-	 * @param sender the placeholder
-	 * @return
-	 */
-	protected CommandSender getCommandSender(Player player, UUID sender){
-		CommandSender cSender;
-		if (sender == null){
-			cSender = null;
-		} else if (sender.equals("<server>")){
-			cSender = Bukkit.getServer().getConsoleSender();
-		} else if (sender.equals("<player>")){
-			cSender = player;
-		} else {
-			cSender = Bukkit.getPlayer(sender);
-		}
-		if (cSender == null){
-			cSender = player;
-		}
-		return cSender;
 	}
 	
 }

@@ -85,11 +85,11 @@ public final class Menu{
 	
 	public void addPlayer(UUID uuid, Renderer renderer){
 		players.put(uuid, renderer);
-		renderer.render(this, uuid);
+		renderer.drawMenu(this, uuid);
 	}
 	
 	public void removePlayer(UUID uuid){
-		players.get(uuid).derender(uuid);
+		players.get(uuid).undrawMenu(uuid);
 		players.remove(uuid);
 	}
 	
@@ -99,7 +99,7 @@ public final class Menu{
 	
 	public void renderMenu(){
 		for (Entry<UUID, Renderer> entry: players.entrySet()){
-			entry.getValue().render(this, entry.getKey());
+			entry.getValue().drawMenu(this, entry.getKey());
 		}
 	}
 	

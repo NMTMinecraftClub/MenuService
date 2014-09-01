@@ -19,13 +19,8 @@ public interface Renderer {
 	 */
 	public String getName();
 
-	/**
-	 * Opens a menu for a player
-	 * @param menu
-	 * @param playerName
-	 */
-	public void render(Menu menu, UUID playerName);
+	public void drawMenu(Menu menu, UUID playerName);
 	
-	public void derender(UUID playerName);
+	public void undrawMenu(UUID playerName);
 		
 }
