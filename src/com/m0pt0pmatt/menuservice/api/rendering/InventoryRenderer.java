@@ -178,7 +178,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	 */
 	@Override
 	public String getName() {
-		return "inventory";
+		return "inventoryRenderer";
 	}
 	
 	/**
