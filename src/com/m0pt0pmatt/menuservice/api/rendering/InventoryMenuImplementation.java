@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.inventory.Inventory;
@@ -18,13 +17,12 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation{
 
 	private Inventory inventory;
 	
-	private Menu menu;
-
 	private Map<Integer, Component> components;
 	
 	public InventoryMenuImplementation(Menu menu){
 		
-		this.menu = menu;
+		super(menu);
+		
 		this.components = new HashMap<Integer, Component>();
 		
 		//get the title
@@ -66,10 +64,6 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation{
 		components.put(spot, component);
 	}
 
-	public Menu getMenu() {
-		return menu;
-	}
-
 	public Component getComponent(int slot) {
 		return components.get(slot);
 	}
@@ -80,15 +74,5 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation{
 			if (part.hasListener()) listeners.add(part.getListener());
 		}
 		return listeners;
-	}
-	
-	public void addPlayer(UUID uuid, Menu menu){
-		super.addPlayer(uuid);
-		Bukkit.getPlayer(uuid).openInventory(inventory);
-	}
-	
-	public void removePlayer(UUID uuid){
-		super.removePlayer(uuid);
-		Bukkit.getPlayer(uuid).closeInventory();
 	}
 }

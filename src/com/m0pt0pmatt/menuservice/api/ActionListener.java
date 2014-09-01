@@ -1,5 +1,7 @@
 package com.m0pt0pmatt.menuservice.api;
 
+import java.util.UUID;
+
 
 
 /**
@@ -20,26 +22,26 @@ public interface ActionListener {
 	/**
 	 * Executed when an action is activated.
 	 */
-	public void handleAction(Action action, String playerName, Component component);
+	public void handleAction(Action action, String playerName, Menu menu, Component component);
 	
 	/**
 	 * Executed when a player is added to the MenuInstance
 	 * @param playerName the player who was added to the MenuInstance
 	 */
-	public void playerAdded(String playerName);
+	public void playerAdded(UUID uuid);
 	
 	/**
 	 * Executed when a player is removed from a MenuInstance
 	 * @param playerName the player who was removed from the MenuInstance
 	 */
-	public void playerRemoved(String playerName);
+	public void playerRemoved(UUID uuid);
 	
 	/**
 	 * Executed when the last player viewing the MenuInstance has left the menu
 	 * @param instance the MenuInstance
 	 * @param lastPlayerName the last player to view the MenuInstance
 	 */
-	public void playerCountZero(String lastPlayerName);
+	public void playerCountZero(UUID uuid);
 
 	/**
 	 * Returns the name of the ActionListener

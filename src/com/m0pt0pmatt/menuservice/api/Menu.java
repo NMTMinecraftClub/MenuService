@@ -1,8 +1,12 @@
 package com.m0pt0pmatt.menuservice.api;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * A Menu is a model of an abstract user interface.
@@ -23,9 +27,12 @@ public final class Menu{
 	//NOTE: size is NOT an abstract attribute, but specific for the inventory menu
 	//		implementation. This should me moved
 	
+	public Map<UUID, Renderer> players;
+	
 	public Menu(){
 		components = new HashSet<Component>();
 		size = 1;
+		players = new HashMap<UUID, Renderer>();
 	}
 	
 	public String getTitle() {
@@ -39,7 +46,6 @@ public final class Menu{
 	public Set<Component> getComponents() {
 		return components;
 	}
-
 
 	public void setComponents(Set<Component> components) {
 		this.components = components;
@@ -75,6 +81,26 @@ public final class Menu{
 	
 	public void setSize(int size){
 		this.size = size;
+	}
+	
+	public void addPlayer(UUID uuid, Renderer renderer){
+		players.put(uuid, renderer);
+		renderer.render(this, uuid);
+	}
+	
+	public void removePlayer(UUID uuid){
+		players.get(uuid).derender(uuid);
+		players.remove(uuid);
+	}
+	
+	public Map<UUID, Renderer> getPlayers(){
+		return players;
+	}
+	
+	public void renderMenu(){
+		for (Entry<UUID, Renderer> entry: players.entrySet()){
+			entry.getValue().render(this, entry.getKey());
+		}
 	}
 	
 }

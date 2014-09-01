@@ -24,13 +24,8 @@ public interface Renderer {
 	 * @param menu
 	 * @param playerName
 	 */
-	public void openMenu(Menu menu, UUID playerName);
+	public void render(Menu menu, UUID playerName);
 	
-	/**
-	 * Closes a menu for a player
-	 * @param menu
-	 * @param playerName
-	 */
-	public void closeMenu(Menu menu, UUID playerName);
+	public void derender(UUID playerName);
 		
 }

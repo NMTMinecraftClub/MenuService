@@ -65,21 +65,18 @@ public class InventoryRenderer implements Renderer, Listener{
 	}
 	
 	@Override
-	public void openMenu(Menu menu, UUID uuid) {
+	public void render(Menu menu, UUID uuid) {
 		
 		if (!implementations.containsKey(menu)){
 			for (Component p: menu.getComponents()){
 				this.draw(menu, p);
 			}
 		}
-		
-		implementations.get(menu).addPlayer(uuid);
 		players.put(uuid, implementations.get(menu));
 	}
 
 	@Override
-	public void closeMenu(Menu menu, UUID uuid) {
-		implementations.get(menu).removePlayer(uuid);
+	public void derender(UUID uuid) {
 		players.remove(uuid);
 	}
 	
@@ -193,8 +190,7 @@ public class InventoryRenderer implements Renderer, Listener{
 		
 		//if the player was viewing a MenuInstance that's being provided for
 		if (players.containsKey(uuid)){
-			
-			players.get(uuid).removePlayer(uuid);
+			players.get(uuid).getMenu().removePlayer(uuid);
 			players.remove(uuid);
 		}
 		
@@ -229,7 +225,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	        return;
 		}
 		
-		executeAction(event, component);
+		executeAction(event, implementation.getMenu(), component);
 		
 		//cancel the clicking of the item
 		event.setResult(org.bukkit.event.Event.Result.DENY);
@@ -243,7 +239,7 @@ public class InventoryRenderer implements Renderer, Listener{
 	 * @param instance the MenuInstance of the Action
 	 * @param component the Component
 	 */
-	private void executeAction(InventoryClickEvent event, Component component){
+	private void executeAction(InventoryClickEvent event, Menu menu, Component component){
 		
 		Player player = (Player) event.getWhoClicked();
 		
@@ -260,7 +256,7 @@ public class InventoryRenderer implements Renderer, Listener{
 		//execute each tag for each ActionListener tied to the instance
 		ActionListener listener = component.getListener();
 		if (listener != null){
-			listener.handleAction(action, event.getWhoClicked().getName(), component);
+			listener.handleAction(action, event.getWhoClicked().getName(), menu, component);
 		}	
 		
 	}
