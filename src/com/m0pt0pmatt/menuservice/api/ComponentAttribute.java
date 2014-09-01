@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
  * @author Matthew
  *
  */
-public enum Attribute {
+public enum ComponentAttribute {
 
 	TAG("tag", String.class),
 	FILENAME("filename", String.class),
@@ -28,12 +28,12 @@ public enum Attribute {
 	private final Class<?> type;
 	
 	//a Map of possible names to the list of attributes that the name represents
-	private static final Map<String, Set<Attribute>> attributes = new HashMap<String, Set<Attribute>>();
+	private static final Map<String, Set<ComponentAttribute>> attributes = new HashMap<String, Set<ComponentAttribute>>();
 	
 	static {
-        for(Attribute s : EnumSet.allOf(Attribute.class)){
+        for(ComponentAttribute s : EnumSet.allOf(ComponentAttribute.class)){
         	if (attributes.get(s.getName()) == null){
-        		attributes.put(s.getName(), new HashSet<Attribute>());
+        		attributes.put(s.getName(), new HashSet<ComponentAttribute>());
         	}
         	attributes.get(s.getName()).add(s);
         }  	
@@ -44,7 +44,7 @@ public enum Attribute {
 	 * @param name
 	 * @param type
 	 */
-	private Attribute(String name, Class<?> type){
+	private ComponentAttribute(String name, Class<?> type){
 		this.name = name;
 		this.type = type;
 	}
@@ -76,8 +76,8 @@ public enum Attribute {
 			return false;
 		}
 		
-		Set<Attribute> matches = attributes.get(name);
-		for (Attribute a: matches){
+		Set<ComponentAttribute> matches = attributes.get(name);
+		for (ComponentAttribute a: matches){
 			if (value.getClass().equals(a.getAttributeClass())){
 				return true;
 			}

@@ -22,16 +22,12 @@ public final class Menu{
 	//The set of components for the menu
 	private Set<Component> components;
 	
-	//The size of the menu. (number of rows)
-	private int size;
-	//NOTE: size is NOT an abstract attribute, but specific for the inventory menu
-	//		implementation. This should me moved
-	
 	public Map<UUID, Renderer> players;
+	
+	private Map<String, Object> attributes;
 	
 	public Menu(){
 		components = new HashSet<Component>();
-		size = 1;
 		players = new HashMap<UUID, Renderer>();
 	}
 	
@@ -75,14 +71,6 @@ public final class Menu{
 		}
 	}
 	
-	public int getSize(){
-		return size;
-	}
-	
-	public void setSize(int size){
-		this.size = size;
-	}
-	
 	public void addPlayer(UUID uuid, Renderer renderer){
 		players.put(uuid, renderer);
 		renderer.drawMenu(this, uuid);
@@ -101,6 +89,76 @@ public final class Menu{
 		for (Entry<UUID, Renderer> entry: players.entrySet()){
 			entry.getValue().drawMenu(this, entry.getKey());
 		}
+	}
+	
+	/**
+	 * Returns the attributes of the Component
+	 * @return
+	 */
+	public Map<String, Object> getAttributes(){
+		return attributes;
+	}
+	
+	/**
+	 * Sets the attributes of the Component
+	 * @param attributes
+	 */
+	public void setAttributes(Map<String, Object> attributes){
+		this.attributes = attributes;
+	}
+	
+	public Object getAttribute(MenuAttribute attribute) {
+		Object o = attributes.get(attribute.getName());
+		if (o == null){
+			return null;
+		}
+		if (o.getClass().equals(attribute.getAttributeClass())){
+			return o;
+		}
+		return null;
+	}
+	
+	/**
+	 * Returns a given attribute of the Component
+	 * @param name
+	 * @return
+	 */
+	public Object getAttribute(String attributeName){
+		return attributes.get(attributeName);
+	}
+	
+	public boolean hasAttribute(MenuAttribute attribute){
+		Object o = getAttribute(attribute);
+		if (o == null){
+			return false;
+		}
+		return true;
+	}
+	
+	/**
+	 * checks if the Component has a given attribute
+	 * @param name
+	 * @return
+	 */
+	public boolean hasAttribute(String attributeName){
+		return attributes.containsKey(attributeName);
+	}
+	
+	public void addAttribute(MenuAttribute attribute, Object value) {
+		if (!value.getClass().equals(attribute.getAttributeClass())){
+			return;
+		}
+		
+		attributes.put(attribute.getName(), value);
+	}
+	
+	/**
+	 * Adds a attribute to the Component
+	 * @param name
+	 * @param value
+	 */
+	public void addAttribute(String attributeName, Object value) {
+		attributes.put(attributeName, value);
 	}
 	
 }

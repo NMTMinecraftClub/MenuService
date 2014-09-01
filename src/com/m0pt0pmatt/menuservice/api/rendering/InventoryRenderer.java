@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.Plugin;
 
-import com.m0pt0pmatt.menuservice.api.Attribute;
+import com.m0pt0pmatt.menuservice.api.ComponentAttribute;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuService;
 import com.m0pt0pmatt.menuservice.api.Component;
@@ -76,18 +76,18 @@ public class InventoryRenderer implements Renderer{
 		//find the position, relative to the current position of the renderer
 		int x = -1;
 		int y = -1;
-		if (component.hasAttribute(Attribute.X)){
-			x = (Integer) component.getAttribute(Attribute.X);
+		if (component.hasAttribute(ComponentAttribute.X)){
+			x = (Integer) component.getAttribute(ComponentAttribute.X);
 		}
-		if (component.hasAttribute(Attribute.Y)){
-			y = (Integer) component.getAttribute(Attribute.Y);
+		if (component.hasAttribute(ComponentAttribute.Y)){
+			y = (Integer) component.getAttribute(ComponentAttribute.Y);
 		}
 		
 		//create the itemstack
 		ItemStack item;
 		
-		if (component.hasAttribute(Attribute.ITEM)){
-			item = (ItemStack) component.getAttribute(Attribute.ITEM);
+		if (component.hasAttribute(ComponentAttribute.ITEM)){
+			item = (ItemStack) component.getAttribute(ComponentAttribute.ITEM);
 		} 
 		
 		else{

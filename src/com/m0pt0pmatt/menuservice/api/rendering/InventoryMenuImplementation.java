@@ -18,9 +18,10 @@ import org.bukkit.plugin.Plugin;
 
 import com.m0pt0pmatt.menuservice.api.Action;
 import com.m0pt0pmatt.menuservice.api.ActionListener;
-import com.m0pt0pmatt.menuservice.api.Attribute;
+import com.m0pt0pmatt.menuservice.api.ComponentAttribute;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
+import com.m0pt0pmatt.menuservice.api.MenuAttribute;
 
 public class InventoryMenuImplementation extends AbstractMenuImplementation implements Listener{
 
@@ -46,10 +47,13 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		}
 		
 		//determine size
-		int size = menu.getSize();
+		int size = 1;
+		if (menu.hasAttribute(MenuAttribute.SIZE)){
+			size = (Integer) menu.getAttribute(MenuAttribute.SIZE);
+		}
 		for (Component c: menu.getComponents()){
-			if (c.hasAttribute(Attribute.Y)){
-				int y = (Integer) c.getAttribute(Attribute.Y);
+			if (c.hasAttribute(ComponentAttribute.Y)){
+				int y = (Integer) c.getAttribute(ComponentAttribute.Y);
 				if (size < y) size = y;
 			}
 		}
@@ -98,7 +102,14 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		
 		//if the player was viewing a MenuInstance that's being provided for
 		if (menu.getPlayers().containsKey(uuid)){
-			menu.removePlayer(uuid);
+			
+			if (menu.hasAttribute(MenuAttribute.CANBECLOSE)){
+				menu.removePlayer(uuid);
+			}
+			else{
+				menu.addPlayer(event.getPlayer().getUniqueId(), menu.getPlayers().get(event.getPlayer().getUniqueId()));
+			}
+			
 		}
 		
 	}

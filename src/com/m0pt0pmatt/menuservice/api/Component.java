@@ -88,7 +88,7 @@ public class Component{
 		this.attributes = attributes;
 	}
 	
-	public Object getAttribute(Attribute attribute) {
+	public Object getAttribute(ComponentAttribute attribute) {
 		Object o = attributes.get(attribute.getName());
 		if (o == null){
 			return null;
@@ -108,7 +108,7 @@ public class Component{
 		return attributes.get(attributeName);
 	}
 	
-	public boolean hasAttribute(Attribute attribute){
+	public boolean hasAttribute(ComponentAttribute attribute){
 		Object o = getAttribute(attribute);
 		if (o == null){
 			return false;
@@ -125,7 +125,7 @@ public class Component{
 		return attributes.containsKey(attributeName);
 	}
 	
-	public void addAttribute(Attribute attribute, Object value) {
+	public void addAttribute(ComponentAttribute attribute, Object value) {
 		if (!value.getClass().equals(attribute.getAttributeClass())){
 			return;
 		}
