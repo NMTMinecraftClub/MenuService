@@ -314,8 +314,8 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 
 	@Override
 	public void openMenu(UUID uuid) {
-		players.add(uuid);
 		closeMenu(uuid);
+		players.add(uuid);
 		Bukkit.getPlayer(uuid).openInventory(inventory);
 	}
 
