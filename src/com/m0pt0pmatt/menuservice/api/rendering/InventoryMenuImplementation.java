@@ -14,7 +14,7 @@ import com.m0pt0pmatt.menuservice.api.Attribute;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 
-public class InventoryImplementation extends AbstractMenuImplementation{
+public class InventoryMenuImplementation extends AbstractMenuImplementation{
 
 	private Inventory inventory;
 	
@@ -22,7 +22,7 @@ public class InventoryImplementation extends AbstractMenuImplementation{
 
 	private Map<Integer, Component> components;
 	
-	public InventoryImplementation(Menu menu){
+	public InventoryMenuImplementation(Menu menu){
 		
 		this.menu = menu;
 		this.components = new HashMap<Integer, Component>();

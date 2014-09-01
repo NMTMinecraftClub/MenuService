@@ -36,12 +36,12 @@ import com.m0pt0pmatt.menuservice.api.Renderer;
  */
 public class InventoryRenderer implements Renderer, Listener{
 	
-	private Map<Menu, InventoryImplementation> implementations;
-	private Map<UUID, InventoryImplementation> players;
+	private Map<Menu, InventoryMenuImplementation> implementations;
+	private Map<UUID, InventoryMenuImplementation> players;
 	
 	private InventoryRenderer(){
-		implementations = new HashMap<Menu, InventoryImplementation>();
-		players = new HashMap<UUID, InventoryImplementation>();
+		implementations = new HashMap<Menu, InventoryMenuImplementation>();
+		players = new HashMap<UUID, InventoryMenuImplementation>();
 	}
 	
 	/**
@@ -56,10 +56,10 @@ public class InventoryRenderer implements Renderer, Listener{
 	
 	public void draw(Menu menu, Component p) {
 		if (!implementations.containsKey(menu)){
-			implementations.put(menu, new InventoryImplementation(menu));
+			implementations.put(menu, new InventoryMenuImplementation(menu));
 		}
 		
-		InventoryImplementation implementation = implementations.get(menu);
+		InventoryMenuImplementation implementation = implementations.get(menu);
 		
 		this.renderComponent(implementation, p);	
 	}
@@ -83,7 +83,7 @@ public class InventoryRenderer implements Renderer, Listener{
 		players.remove(uuid);
 	}
 	
-	private void renderComponent(InventoryImplementation implementation, Component component){
+	private void renderComponent(InventoryMenuImplementation implementation, Component component){
 		
 		Inventory inventory = implementation.getInventory();
 		
@@ -219,7 +219,7 @@ public class InventoryRenderer implements Renderer, Listener{
 		}
 		
 		//get the implementation
-		InventoryImplementation implementation = players.get(uuid);
+		InventoryMenuImplementation implementation = players.get(uuid);
 		
 		//get the component
 		Component component = implementation.getComponent(event.getSlot());
