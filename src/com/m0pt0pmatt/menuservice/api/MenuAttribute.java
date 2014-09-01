@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.bukkit.inventory.ItemStack;
-
 /**
  * An enumeration of the built in Menu attributes.
  * Note that attributes are not limited to ones on this list. A menu can have any attribute.
@@ -16,12 +14,10 @@ import org.bukkit.inventory.ItemStack;
  * @author Matthew
  *
  */
-public enum ComponentAttribute {
+public enum MenuAttribute {
 
-	ITEM("item", ItemStack.class),
-	TITLE("title", String.class),
-	X("x", Integer.class),
-	Y("y", Integer.class);
+	SIZE("size", Integer.class),
+	CANBECLOSE("canBeClosed", Boolean.class);
 	
 	private final String name;
 	private final Class<?> type;
@@ -43,7 +39,7 @@ public enum ComponentAttribute {
 	 * @param name
 	 * @param type
 	 */
-	private ComponentAttribute(String name, Class<?> type){
+	private MenuAttribute(String name, Class<?> type){
 		this.name = name;
 		this.type = type;
 	}

@@ -27,7 +27,6 @@ import com.m0pt0pmatt.menuservice.api.ComponentAttribute;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuAttribute;
-import com.m0pt0pmatt.menuservice.api.MenuService;
 
 public class InventoryMenuImplementation extends AbstractMenuImplementation implements Listener{
 
@@ -71,6 +70,10 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		
 		//make meta changes
 		ItemMeta meta = item.getItemMeta();
+		
+		if (component.hasAttribute(ComponentAttribute.TITLE)){
+			meta.setDisplayName((String) component.getAttribute(ComponentAttribute.TITLE));
+		}
 		
 		//set the metadata
 		item.setItemMeta(meta);
