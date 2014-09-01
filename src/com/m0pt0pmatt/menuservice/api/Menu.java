@@ -22,13 +22,16 @@ public final class Menu{
 	//The set of components for the menu
 	private Set<Component> components;
 	
-	public Map<UUID, Renderer> players;
+	private Map<Renderer, MenuImplementation> implementations;
+	private Map<UUID, MenuImplementation> players;
 	
 	private Map<String, Object> attributes;
-	
+		
 	public Menu(){
 		components = new HashSet<Component>();
-		players = new HashMap<UUID, Renderer>();
+		players = new HashMap<UUID, MenuImplementation>();
+		attributes = new HashMap<String, Object>();
+		implementations = new HashMap<Renderer, MenuImplementation>();
 	}
 	
 	public String getTitle() {
@@ -71,23 +74,29 @@ public final class Menu{
 		}
 	}
 	
-	public void addPlayer(UUID uuid, Renderer renderer){
-		players.put(uuid, renderer);
-		renderer.drawMenu(this, uuid);
-	}
-	
-	public void removePlayer(UUID uuid){
-		players.get(uuid).undrawMenu(uuid);
-		players.remove(uuid);
-	}
-	
-	public Map<UUID, Renderer> getPlayers(){
+	public Map<UUID, MenuImplementation> getPlayers(){
 		return players;
 	}
 	
-	public void renderMenu(){
-		for (Entry<UUID, Renderer> entry: players.entrySet()){
-			entry.getValue().drawMenu(this, entry.getKey());
+	public void addPlayer(UUID uuid, Renderer renderer){
+		if (!implementations.containsKey(renderer)){
+			implementations.put(renderer, renderer.createImplementation(this));
+		}
+		
+		MenuImplementation implementation = implementations.get(renderer);
+		players.put(uuid, implementation);
+		implementation.openMenu(uuid);
+	}
+	
+	public void removePlayer(UUID uuid){
+		players.get(uuid).closeMenu(uuid);
+		players.remove(uuid);
+	}
+	
+	public void update(){
+		for (Entry<UUID, MenuImplementation> entry: players.entrySet()){
+			
+			entry.getValue().openMenu(entry.getKey());
 		}
 	}
 	

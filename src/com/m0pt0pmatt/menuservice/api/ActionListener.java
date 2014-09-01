@@ -22,7 +22,7 @@ public interface ActionListener {
 	/**
 	 * Executed when an action is activated.
 	 */
-	public void handleAction(Action action, String playerName, Menu menu, Component component);
+	public void handleAction(Action action, UUID playerName, Menu menu, Component component);
 	
 	/**
 	 * Executed when a player is added to the MenuInstance

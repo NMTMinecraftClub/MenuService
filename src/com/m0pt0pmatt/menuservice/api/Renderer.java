@@ -1,15 +1,5 @@
 package com.m0pt0pmatt.menuservice.api;
 
-import java.util.UUID;
-
-/**
- * A Renderer will render (or present) a menu to a player.
- * A Renderer is responsible for drawing the menu and for catching player interactions.
- * A Renderer draws a Menu object. It creates a MenuImplementation of that Menu.
- * To distinguish Renderers from each other, each Renderer must supply a name.
- * 
- * @author Matthew Broomfield (m0pt0pmatt) <m0pt0pmatt17@gmail.com>
- */
 public interface Renderer {
 	
 	/**
@@ -19,8 +9,6 @@ public interface Renderer {
 	 */
 	public String getName();
 
-	public void drawMenu(Menu menu, UUID playerName);
-	
-	public void undrawMenu(UUID playerName);
+	public MenuImplementation createImplementation(Menu menu);
 		
 }
