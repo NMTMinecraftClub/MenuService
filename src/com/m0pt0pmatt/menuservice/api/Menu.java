@@ -1,11 +1,8 @@
 package com.m0pt0pmatt.menuservice.api;
 
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -20,7 +17,7 @@ public final class Menu{
 	private String title;
 	
 	//The set of components for the menu
-	private Set<Component> components;
+	private Map<String, Component> components;
 	
 	private Map<Renderer, MenuImplementation> implementations;
 	private Map<UUID, MenuImplementation> players;
@@ -28,7 +25,7 @@ public final class Menu{
 	private Map<String, Object> attributes;
 		
 	public Menu(){
-		components = new HashSet<Component>();
+		components = new HashMap<String, Component>();
 		players = new HashMap<UUID, MenuImplementation>();
 		attributes = new HashMap<String, Object>();
 		implementations = new HashMap<Renderer, MenuImplementation>();
@@ -42,36 +39,32 @@ public final class Menu{
 		this.title = title;
 	}
 	
-	public Set<Component> getComponents() {
+	public Map<String, Component> getComponents() {
 		return components;
 	}
 
-	public void setComponents(Set<Component> components) {
+	public void setComponents(Map<String, Component> components) {
 		this.components = components;
 	}
 	
 	public boolean hasComponent(Component part) {
-		return components.contains(part);
+		return components.containsValue(part);
+	}
+	
+	public boolean hasComponent(String partName) {
+		return components.containsKey(partName);
 	}
 	
 	public void addComponent(Component part) {
-		components.add(part);
+		components.put(part.getName(), part);
 	}
 
 	public void removeComponent(Component part) {
-		components.remove(part);
+		components.remove(part.getName());
 	}
 	
-	public void removeAllPartsWithTag(String tag){
-		
-		Iterator<Component> i = components.iterator();
-		while(i.hasNext()){
-			Component component = i.next();
-			
-			if (component.hasTag(tag)){
-				i.remove();
-			}
-		}
+	public void removeComponent(String partName) {
+		components.remove(partName);
 	}
 	
 	public Map<UUID, MenuImplementation> getPlayers(){

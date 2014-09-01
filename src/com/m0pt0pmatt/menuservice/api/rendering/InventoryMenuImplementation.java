@@ -153,7 +153,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 
 	public List<ActionListener> getActionListeners() {
 		List<ActionListener> listeners = new LinkedList<ActionListener>();
-		for (Component part: menu.getComponents()){
+		for (Component part: menu.getComponents().values()){
 			if (part.hasListener()) listeners.add(part.getListener());
 		}
 		return listeners;
@@ -331,7 +331,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		if (menu.hasAttribute(MenuAttribute.SIZE)){
 			size = (Integer) menu.getAttribute(MenuAttribute.SIZE);
 		}
-		for (Component c: menu.getComponents()){
+		for (Component c: menu.getComponents().values()){
 			if (c.hasAttribute(ComponentAttribute.Y)){
 				int y = (Integer) c.getAttribute(ComponentAttribute.Y);
 				if (size < y) size = y;
@@ -343,7 +343,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		//create inventory
 		inventory = Bukkit.createInventory(null, size * 9, title);
 		
-		for (Component c: menu.getComponents()){
+		for (Component c: menu.getComponents().values()){
 			renderComponent(inventory, c);
 		}
 	}
