@@ -349,6 +349,8 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		System.out.println("invmenu is removing player " + uuid);
 		
 		players.remove(uuid);
+		
+		System.out.println("aiwudhiaugwdugwaidgwa");
 		Bukkit.getPlayer(uuid).closeInventory();
 	}
 
