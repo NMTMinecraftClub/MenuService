@@ -197,12 +197,12 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		}
 		
 		//if the player was viewing a MenuInstance that's being provided for
-		if (menu.getPlayers().containsKey(uuid)){
+		if (menu.getPlayers().contains(uuid)){
 			
 			if (menu.hasAttribute(MenuAttribute.CANBECLOSE)){
 				Boolean canBeClosed = (Boolean) menu.getAttribute(MenuAttribute.CANBECLOSE);
 				if (canBeClosed){
-					menu.getPlayers().remove(uuid);
+					menu.removePlayer(uuid);
 				}
 				else{
 					BukkitRunnable reset = new BukkitRunnable(){
@@ -221,7 +221,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 				}			
 			}
 			else{
-				menu.getPlayers().remove(uuid);
+				menu.removePlayer(uuid);
 			}
 			
 		}
@@ -238,7 +238,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 				
 		//check if player was viewing a menu
 		UUID uuid = event.getWhoClicked().getUniqueId();
-		if (!menu.getPlayers().containsKey(uuid)){
+		if (!menu.getPlayers().contains(uuid)){
 			return;
 		}
 		

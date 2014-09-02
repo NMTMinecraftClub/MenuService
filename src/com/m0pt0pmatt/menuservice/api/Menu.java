@@ -3,7 +3,6 @@ package com.m0pt0pmatt.menuservice.api;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
@@ -22,74 +21,147 @@ public final class Menu{
 	private Map<String, Component> components;
 	
 	private Map<Renderer, MenuImplementation> implementations;
+	
 	private Map<UUID, MenuImplementation> players;
 	
+	//MenuAttributes for the menu
 	private Map<String, Object> attributes;
 		
 	public Menu(){
-		components = new HashMap<String, Component>();
-		players = new HashMap<UUID, MenuImplementation>();
-		attributes = new HashMap<String, Object>();
+		components      = new HashMap<String, Component>();
 		implementations = new HashMap<Renderer, MenuImplementation>();
+		players         = new HashMap<UUID, MenuImplementation>();
+		attributes      = new HashMap<String, Object>();
 	}
 	
+	/**
+	 * Gets the title of the menu.
+	 * @return the title of the menu
+	 */
 	public String getTitle() {
 		return title;
 	}
 
+	/**
+	 * Sets the title of the menu.
+	 * @param title the new title of the menu
+	 */
 	public void setTitle(String title) {
 		this.title = title;
 	}
 	
+	/**
+	 * Gets the Map of Components.
+	 * @return the Map of Components.
+	 */
 	public Map<String, Component> getComponents() {
 		return components;
 	}
 
+	/**
+	 * Sets all of the Components of the menu
+	 * @param components the new Map of Components
+	 */
 	public void setComponents(Map<String, Component> components) {
 		this.components = components;
 	}
 	
-	public boolean hasComponent(Component part) {
-		return components.containsValue(part);
+	/**
+	 * Checks if the menu has a certain Component
+	 * @param component
+	 * @return
+	 */
+	public boolean hasComponent(Component component) {
+		return components.containsValue(component);
 	}
 	
-	public boolean hasComponent(String partName) {
-		return components.containsKey(partName);
+	/**
+	 * Checks if the menu has a certain Component
+	 * @param componentName the name of the Component
+	 * @return
+	 */
+	public boolean hasComponent(String componentName) {
+		return components.containsKey(componentName);
 	}
 	
-	public void addComponent(Component part) {
-		components.put(part.getName(), part);
+	/**
+	 * Adds a Component to the menu.
+	 * @param component the Component to be added
+	 */
+	public void addComponent(Component component) {
+		components.put(component.getName(), component);
 	}
 
-	public void removeComponent(Component part) {
-		components.remove(part.getName());
+	/**
+	 * Removes a Component from the menu.
+	 * @param component The Component to be removed
+	 */
+	public void removeComponent(Component component) {
+		components.remove(component.getName());
 	}
 	
-	public void removeComponent(String partName) {
-		components.remove(partName);
+	/**
+	 * Removes a Component from the menu.
+	 * @param componentName The name of the Component to be removed
+	 */
+	public void removeComponent(String componentName) {
+		components.remove(componentName);
 	}
 	
-	public Map<UUID, MenuImplementation> getPlayers(){
-		return players;
+	/**
+	 * Returns a set of all players currently viewing the menu.
+	 * Editing this set does not remove or add players to the menu.
+	 * @return
+	 */
+	public Set<UUID> getPlayers(){
+		return new HashSet<UUID>(players.keySet());
 	}
 	
+	/**
+	 * Adds a player to the menu, thus opening the menu for the player
+	 * @param uuid The UUIF of the player
+	 * @param renderer How the menu should look to the player
+	 */
 	public void addPlayer(UUID uuid, Renderer renderer){
+		
+		//Create an implementation if one does not exist for the given renderer
 		if (!implementations.containsKey(renderer)){
 			implementations.put(renderer, renderer.createImplementation(this));
 		}
 		
+		//Get the implementation for the renderer
 		MenuImplementation implementation = implementations.get(renderer);
+		
+		//Keep track of the player and his/her implementation
 		players.put(uuid, implementation);
+		
+		//Open the menu
 		implementation.openMenu(uuid);
 	}
 	
+	/**
+	 * Removes a player from the enu, thus closing the menu for the player.
+	 * @param uuid the UUID of the player
+	 */
 	public void removePlayer(UUID uuid){
+		
+		System.out.println("Menu is removing");
+		
+		//Remove the player from the players set
 		MenuImplementation i = players.get(uuid);		
 		players.remove(uuid);
+		
+		//Close the menu for the player
 		i.closeMenu(uuid);
 	}
 	
+	/**
+	 * Updates the menu.
+	 * Call this if the menu has changed and needs to be updated to players
+	 */
 	public void update(){
+		
+		//Update every implementation
 		for (MenuImplementation implementation: players.values()){
 			implementation.update();
 		}
@@ -165,6 +237,10 @@ public final class Menu{
 		attributes.put(attributeName, value);
 	}
 	
+	/**
+	 * Closes the menu for all players.
+	 * When reloading the server, it is super important for this to be called on all menus
+	 */
 	public void closeAll(){
 		Set<UUID> oldplayers = new HashSet<UUID>();
 		oldplayers.addAll(players.keySet());
