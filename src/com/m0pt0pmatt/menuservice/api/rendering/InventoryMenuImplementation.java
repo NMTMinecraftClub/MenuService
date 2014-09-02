@@ -216,6 +216,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 						public void run() {
 							openMenu(uuid);
 							System.out.println("REOPEN MENU");
+							this.cancel();
 						}
 						
 					};
