@@ -148,7 +148,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		//find the first empty spots
 		for (int j = y; j < 6; j++){
 			for (int i = x; i < 9; i++){
-				if (inv.getItem((9 * i) + j) == null){
+				if (inv.getItem((9 * j) + i) == null){
 					return (9 * j) + i;
 				}
 			}
