@@ -24,6 +24,8 @@ public interface ActionListener {
 	 */
 	public void handleAction(Action action, UUID playerName, Menu menu, Component component);
 	
+	public void inventoryClick(Action action, UUID playerName, Menu menu, int slot);
+	
 	/**
 	 * Executed when a player is added to the MenuInstance
 	 * @param playerName the player who was added to the MenuInstance

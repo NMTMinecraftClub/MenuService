@@ -242,7 +242,14 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 			return;
 		}
 		
+		//get the action
+		Action action = getCorrectAction(event);
+		if (action == null) return;
+		
 		if (event.getRawSlot() >= 54 || event.getRawSlot() < 0){
+			for (Component c: menu.getComponents().values()){
+				if (c.hasListener()) c.getListener().inventoryClick(action, uuid, menu, event.getSlot());
+			}
 			return;
 		}
 		
@@ -253,9 +260,20 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	        event.setCancelled(true);
 	        return;
 		}
+				
 		
-		executeAction(event, component);
 		
+		//check if the player has permission to interact with the component
+		if (!hasPermissions(uuid, component)){
+			Bukkit.getPlayer(uuid).sendMessage(ChatColor.RED + "You do not have permission to do that.");
+			return;
+		}
+		
+		//execute each tag for each ActionListener tied to the instance
+		ActionListener listener = component.getListener();
+		if (listener != null){
+			listener.handleAction(action, event.getWhoClicked().getUniqueId(), menu, component);
+		}	
 		//cancel the clicking of the item
 		event.setResult(org.bukkit.event.Event.Result.DENY);
         event.setCancelled(true);
@@ -269,23 +287,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	 */
 	private void executeAction(InventoryClickEvent event, Component component){
 		
-		Player player = (Player) event.getWhoClicked();
 		
-		//get the action
-		Action action = getCorrectAction(event);
-		if (action == null) return;
-		
-		//check if the player has permission to interact with the component
-		if (!hasPermissions(player, component)){
-			player.sendMessage(ChatColor.RED + "You do not have permission to do that.");
-			return;
-		}
-		
-		//execute each tag for each ActionListener tied to the instance
-		ActionListener listener = component.getListener();
-		if (listener != null){
-			listener.handleAction(action, event.getWhoClicked().getUniqueId(), menu, component);
-		}	
 		
 	}
 	
@@ -309,7 +311,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	protected boolean hasPermissions(Player player, Component component){
+	protected boolean hasPermissions(UUID uuid, Component component){
 		if (component.hasAttribute("permissions")){
 			List<String> permissions = null;
 			try{
@@ -321,7 +323,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 				return true;
 			}
 			for (String permission: permissions){
-				if (!player.hasPermission(permission)){
+				if (!Bukkit.getPlayer(uuid).hasPermission(permission)){
 					return false;
 				}
 			}
