@@ -89,7 +89,6 @@ public final class Menu{
 	public void update(){
 		for (Entry<UUID, MenuImplementation> entry: players.entrySet()){
 			entry.getValue().update();
-			entry.getValue().openMenu(entry.getKey());
 		}
 	}
 	

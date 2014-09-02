@@ -46,6 +46,36 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		
 		this.components = new HashMap<Integer, Component>();
 		
+		//get the title
+		String title = null;
+		title = (String) menu.getTitle();
+		if (title == null){
+			title = " ";
+		}
+		
+		//create the inventory
+		if (title.length() > 32){
+			title = title.substring(0, 31);
+		}
+		
+		//determine size
+		int size = 1;
+		
+		if (menu.hasAttribute(MenuAttribute.SIZE)){
+			size = (Integer) menu.getAttribute(MenuAttribute.SIZE);
+		}
+		for (Component c: menu.getComponents().values()){
+			if (c.hasAttribute(ComponentAttribute.Y)){
+				int y = (Integer) c.getAttribute(ComponentAttribute.Y);
+				if (size < y) size = y;
+			}
+		}
+		
+		if (size > 6) size = 6;
+		
+		//create inventory
+		inventory = Bukkit.createInventory(null, size * 9, title);
+		
 		update();
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
@@ -328,34 +358,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	@Override
 	public void update() {
 		
-		//get the title
-		String title = null;
-		title = (String) menu.getTitle();
-		if (title == null){
-			title = " ";
-		}
-		//create the inventory
-		if (title.length() > 32){
-			title = title.substring(0, 31);
-		}
 		
-		//determine size
-		int size = 1;
-		
-		if (menu.hasAttribute(MenuAttribute.SIZE)){
-			size = (Integer) menu.getAttribute(MenuAttribute.SIZE);
-		}
-		for (Component c: menu.getComponents().values()){
-			if (c.hasAttribute(ComponentAttribute.Y)){
-				int y = (Integer) c.getAttribute(ComponentAttribute.Y);
-				if (size < y) size = y;
-			}
-		}
-		
-		if (size > 6) size = 6;
-		
-		//create inventory
-		inventory = Bukkit.createInventory(null, size * 9, title);
 		
 		for (Component c: menu.getComponents().values()){
 			renderComponent(inventory, c);
