@@ -132,43 +132,30 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	 */
 	private int getSpot(int x, int y, Inventory inv){
 		
+		//If there are no empty spots
 		if (inv.firstEmpty() == -1){
 			return -1;
 		}
 		
-		if (x < 0 && y < 0){
-			x = inv.firstEmpty() % 9;
-			y = inv.firstEmpty() / 9;
-			return (9 * y) + x;
+		//if x and/or y are negative
+		if (x < 0){
+			x = 0;
+		}
+		if (y < 0){			
+			y = 0;
 		}
 		
-		else if (x < 0){			
-			for (int i = 0; i < 9; i++){
-				if (inv.getItem((9*y) + i) == null){
-					x = i;
-					break;
+		//find the first empty spots
+		for (int j = y; j < 6; j++){
+			for (int i = x; i < 9; i++){
+				if (inv.getItem((9 * i) + j) == null){
+					return (9 * j) + i;
 				}
 			}
+			x = 0;
 		}
 		
-		else if (y < 0){
-			for (int i = 0; i < inv.getSize() / 9; i++){
-				if (inv.getItem((9*i) + x) == null){
-					y = i;
-					break;
-				}
-			}
-		}
-		
-		if (inv.getItem((9*y) + x) != null){
-			return -1;
-		}
-		
-		if ((9 * y) + x >= inv.getSize()){
-			return -1;
-		}
-		
-		return (9 * y) + x;
+		return -1;
 	}
 
 	public Inventory getInventory() {
