@@ -345,7 +345,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	@Override
 	public void update() {
 		
-		
+		inventory.clear();
 		
 		for (Component c: menu.getComponents().values()){
 			renderComponent(inventory, c);
