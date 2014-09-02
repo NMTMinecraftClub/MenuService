@@ -88,7 +88,7 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	public void onDisable(){
 		
 		//close all menuinstances
-		//Formatting.logger.log(1, Level.INFO, "Closing all menus");
+		//Formatting.logger.log(1, Level.INFO, "Closing all menus");		
 		
 		//save the config file
 		try {

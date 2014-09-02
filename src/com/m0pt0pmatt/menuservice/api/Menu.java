@@ -1,8 +1,10 @@
 package com.m0pt0pmatt.menuservice.api;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -160,6 +162,14 @@ public final class Menu{
 	 */
 	public void addAttribute(String attributeName, Object value) {
 		attributes.put(attributeName, value);
+	}
+	
+	public void closeAll(){
+		Set<UUID> oldplayers = new HashSet<UUID>();
+		oldplayers.addAll(players.keySet());
+		for (UUID player: oldplayers){
+			this.removePlayer(player);
+		}
 	}
 	
 }
