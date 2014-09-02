@@ -194,6 +194,8 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		
 		System.out.println("inv was closed for " + uuid);
 		
+		System.out.println(players);
+		
 		if (!players.contains(uuid)){
 			System.out.println("not a known player");
 			return;
@@ -214,9 +216,8 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 
 						@Override
 						public void run() {
-							openMenu(uuid);
 							System.out.println("REOPEN MENU");
-							this.cancel();
+							Bukkit.getPlayer(uuid).openInventory(inventory);
 						}
 						
 					};
