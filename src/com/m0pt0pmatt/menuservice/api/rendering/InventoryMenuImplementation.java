@@ -210,8 +210,9 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 						@Override
 						public void run() {
 							
-							if (players.contains(uuid))
-							Bukkit.getPlayer(uuid).openInventory(inventory);
+							if (players.contains(uuid)){
+								Bukkit.getPlayer(uuid).openInventory(inventory);
+							}
 						}
 						
 					};
