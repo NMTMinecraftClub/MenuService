@@ -192,12 +192,17 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		
 		final UUID uuid = event.getPlayer().getUniqueId();
 		
+		System.out.println("inv was closed for " + uuid);
+		
 		if (!players.contains(uuid)){
+			System.out.println("not a known player");
 			return;
 		}
 		
 		//if the player was viewing a MenuInstance that's being provided for
 		if (menu.getPlayers().containsKey(uuid)){
+			
+			System.out.println("menu has it");
 			
 			if (menu.hasAttribute(MenuAttribute.CANBECLOSE)){
 				Boolean canBeClosed = (Boolean) menu.getAttribute(MenuAttribute.CANBECLOSE);
@@ -338,6 +343,9 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 
 	@Override
 	public void closeMenu(UUID uuid) {
+		
+		System.out.println("invmenu is removing player " + uuid);
+		
 		players.remove(uuid);
 		Bukkit.getPlayer(uuid).closeInventory();
 	}

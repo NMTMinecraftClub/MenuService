@@ -84,6 +84,7 @@ public final class Menu{
 	}
 	
 	public void removePlayer(UUID uuid){
+		System.out.println("Menu is reoving " + uuid);
 		players.get(uuid).closeMenu(uuid);
 		players.remove(uuid);
 	}
