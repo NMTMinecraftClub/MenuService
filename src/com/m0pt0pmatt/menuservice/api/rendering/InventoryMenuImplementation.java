@@ -57,19 +57,11 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 			title = title.substring(0, 31);
 		}
 		
-		//determine size
+		//Read menu size
 		int size = 1;
-		
 		if (menu.hasAttribute(MenuAttribute.SIZE)){
 			size = (Integer) menu.getAttribute(MenuAttribute.SIZE);
 		}
-		for (Component c: menu.getComponents().values()){
-			if (c.hasAttribute(ComponentAttribute.Y)){
-				int y = (Integer) c.getAttribute(ComponentAttribute.Y);
-				if (size < y) size = y;
-			}
-		}
-		
 		if (size > 6) size = 6;
 		
 		//create inventory
