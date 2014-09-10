@@ -182,7 +182,8 @@ public final class Menu{
 		players.remove(uuid);
 		
 		//Close the menu for the player
-		i.closeMenu(uuid);
+		if (i != null)
+			i.closeMenu(uuid);
 	}
 	
 	/**
