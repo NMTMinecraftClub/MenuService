@@ -249,4 +249,16 @@ public final class Menu{
 		}
 	}
 	
+	public Set<Component> getComponentsWithTag(String tag){
+		Set<Component> componentsWithTag = new HashSet<Component>();
+		
+		for (Component component: components.values()){
+			if (component.hasTag(tag)){
+				componentsWithTag.add(component);
+			}
+		}
+		
+		return componentsWithTag;
+	}
+	
 }
