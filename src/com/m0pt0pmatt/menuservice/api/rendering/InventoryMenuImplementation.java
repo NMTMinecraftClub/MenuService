@@ -66,9 +66,7 @@ public class InventoryMenuImplementation extends MenuImplementation{
 		
 		//create inventory
 		inventory = Bukkit.createInventory(null, size * 9, title);
-		
-		System.out.println("Inventory: " + inventory);
-		
+				
 		Bukkit.getPluginManager().registerEvents(this, plugin);
 		
 		update();
@@ -141,6 +139,12 @@ public class InventoryMenuImplementation extends MenuImplementation{
 		//find the first empty spots
 		for (int j = y; j < 6; j++){
 			for (int i = x; i < 9; i++){
+				
+				//Make sure the menu isn't too small, or is already full
+				if (inv.getSize() - 1 < (9 * j) + i){
+					return -1;
+				}
+				
 				if (inv.getItem((9 * j) + i) == null){
 					return (9 * j) + i;
 				}

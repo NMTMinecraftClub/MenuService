@@ -10,6 +10,8 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
+import com.m0pt0pmatt.menuservice.api.exceptions.NoMenuServiceException;
+
 /**
  * A Menu is a model of an abstract user interface.
  * A Menu is made of Components, which are normally buttons and/or labels.
@@ -30,12 +32,22 @@ public final class Menu{
 	
 	//MenuAttributes for the menu
 	private Map<String, Object> attributes;
-		
+	
+	private Plugin menuService;
+	
 	public Menu(){
 		components      = new HashMap<String, Component>();
 		implementations = new HashMap<String, MenuImplementation>();
 		players         = new HashMap<UUID, MenuImplementation>();
 		attributes      = new HashMap<String, Object>();
+		
+		//Assert that MenuService is running on the server
+		menuService = Bukkit.getPluginManager().getPlugin("MenuService");
+		if (menuService == null){
+			try {throw new NoMenuServiceException();}
+		    catch (NoMenuServiceException e) {e.printStackTrace();}
+		}
+		
 	}
 	
 	/**
@@ -131,20 +143,18 @@ public final class Menu{
 		//Create an implementation if one does not exist for the given renderer
 		if (!implementations.containsKey(type.getName())){
 			
+			//Attempt to create a MenuImplementation
 			MenuImplementation implementation;
 			try {
-				try {
-					implementation = type.getImplementationClass().getConstructor(Menu.class, Plugin.class).newInstance(this, Bukkit.getPluginManager().getPlugin("MenuService"));
-					implementations.put(type.getName(), implementation);
-				} catch (IllegalArgumentException | InvocationTargetException
-						| NoSuchMethodException | SecurityException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			} catch (InstantiationException | IllegalAccessException e) {
+				implementation = type.getImplementationClass()
+						.getConstructor(Menu.class, Plugin.class)
+						.newInstance(this, Bukkit.getPluginManager().getPlugin("MenuService"));
+				implementations.put(type.getName(), implementation);
+			} catch (IllegalArgumentException | InvocationTargetException
+					| NoSuchMethodException | SecurityException 
+					| InstantiationException | IllegalAccessException e) {
 				e.printStackTrace();
 			}
-			
 			
 		}
 		
@@ -166,9 +176,7 @@ public final class Menu{
 	 * @param uuid the UUID of the player
 	 */
 	public void removePlayer(UUID uuid){
-		
-		System.out.println("Menu is removing");
-		
+				
 		//Remove the player from the players set
 		MenuImplementation i = players.get(uuid);		
 		players.remove(uuid);
