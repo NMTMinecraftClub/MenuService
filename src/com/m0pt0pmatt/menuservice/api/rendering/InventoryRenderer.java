@@ -29,8 +29,7 @@ public class InventoryRenderer implements Renderer{
 	
 	@Override
 	public MenuImplementation createImplementation(Menu menu) {
-		InventoryMenuImplementation implementation = new InventoryMenuImplementation(menu, plugin);
-		return implementation;
+		return new InventoryMenuImplementation(menu, plugin);
 	}
 
 	/**

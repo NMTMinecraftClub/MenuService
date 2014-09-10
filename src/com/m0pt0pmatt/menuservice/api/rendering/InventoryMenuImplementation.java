@@ -11,7 +11,6 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -76,9 +75,11 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		//create inventory
 		inventory = Bukkit.createInventory(null, size * 9, title);
 		
-		update();
+		System.out.println("Inventory: " + inventory);
 		
 		Bukkit.getPluginManager().registerEvents(this, plugin);
+		
+		update();
 	}
 	
 	private void renderComponent(Inventory inventory, Component component){
@@ -260,8 +261,6 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	        event.setCancelled(true);
 	        return;
 		}
-				
-		
 		
 		//check if the player has permission to interact with the component
 		if (!hasPermissions(uuid, component)){
@@ -277,18 +276,6 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		//cancel the clicking of the item
 		event.setResult(org.bukkit.event.Event.Result.DENY);
         event.setCancelled(true);
-	}
-	
-	/**
-	 * Executes an Action on a given Component
-	 * @param event the InventoryClickEvent
-	 * @param instance the MenuInstance of the Action
-	 * @param component the Component
-	 */
-	private void executeAction(InventoryClickEvent event, Component component){
-		
-		
-		
 	}
 	
 	private Action getCorrectAction(InventoryClickEvent event) {
