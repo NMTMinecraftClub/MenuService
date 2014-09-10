@@ -243,11 +243,15 @@ public class InventoryMenuImplementation extends MenuImplementation{
 		Action action = getCorrectAction(event);
 		if (action == null) return;
 		
+		Set<ActionListener> firedListeners = new HashSet<ActionListener>();
+		
 		if (event.getRawSlot() >= 54 || event.getRawSlot() < 0){
 			for (Component c: menu.getComponents().values()){
-				if (c.hasListener()) c.getListener().inventoryClick(action, uuid, menu, event.getSlot());
+				if (c.hasListener()) firedListeners.add(c.getListener());
 			}
-			return;
+			for (ActionListener a: firedListeners){
+				a.inventoryClick(action, uuid, menu, event.getSlot());
+			}
 		}
 		
 		//get the component
