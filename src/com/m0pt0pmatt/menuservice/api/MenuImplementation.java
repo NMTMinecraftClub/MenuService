@@ -2,18 +2,31 @@ package com.m0pt0pmatt.menuservice.api;
 
 import java.util.UUID;
 
-/**
- * A menu implementation is a view of a Menu object given by a Renderer.
- * @author Matthew
- *
- */
-public interface MenuImplementation {
+import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
+
+import com.m0pt0pmatt.menuservice.api.MenuImplementation;
+
+public abstract class MenuImplementation implements Listener{
+
+	protected Menu menu;
+	protected Plugin plugin;
 	
-	public Menu getMenu();
+	public MenuImplementation(Menu menu, Plugin plugin){
+		this.menu = menu;
+		this.plugin = plugin;
+	}
 	
-	public void openMenu(UUID uuid);
+	public Menu getMenu(){
+		return menu;
+	}
 	
-	public void closeMenu(UUID uuid);
+	public abstract void openMenu(UUID uuid);
+
+	public abstract void closeMenu(UUID uuid);
+
+	public abstract void update();
+
+	public abstract String getImplementationName();
 	
-	public void update();
 }

@@ -12,7 +12,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
@@ -28,8 +27,9 @@ import com.m0pt0pmatt.menuservice.api.ComponentAttribute;
 import com.m0pt0pmatt.menuservice.api.Component;
 import com.m0pt0pmatt.menuservice.api.Menu;
 import com.m0pt0pmatt.menuservice.api.MenuAttribute;
+import com.m0pt0pmatt.menuservice.api.MenuImplementation;
 
-public class InventoryMenuImplementation extends AbstractMenuImplementation implements Listener{
+public class InventoryMenuImplementation extends MenuImplementation{
 
 	private Inventory inventory;
 	
@@ -39,7 +39,7 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 	
 	public InventoryMenuImplementation(Menu menu, Plugin plugin){
 		
-		super(menu);
+		super(menu, plugin);
 		
 		players = new HashSet<UUID>();
 		
@@ -331,5 +331,10 @@ public class InventoryMenuImplementation extends AbstractMenuImplementation impl
 		for (Component c: menu.getComponents().values()){
 			renderComponent(inventory, c);
 		}
+	}
+
+	@Override
+	public String getImplementationName() {
+		return "inventory";
 	}
 }

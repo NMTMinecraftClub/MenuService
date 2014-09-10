@@ -1,10 +1,14 @@
 package com.m0pt0pmatt.menuservice.api;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+
+import org.bukkit.Bukkit;
+import org.bukkit.plugin.Plugin;
 
 /**
  * A Menu is a model of an abstract user interface.
@@ -20,7 +24,7 @@ public final class Menu{
 	//The set of components for the menu
 	private Map<String, Component> components;
 	
-	private Map<Renderer, MenuImplementation> implementations;
+	private Map<String, MenuImplementation> implementations;
 	
 	private Map<UUID, MenuImplementation> players;
 	
@@ -29,7 +33,7 @@ public final class Menu{
 		
 	public Menu(){
 		components      = new HashMap<String, Component>();
-		implementations = new HashMap<Renderer, MenuImplementation>();
+		implementations = new HashMap<String, MenuImplementation>();
 		players         = new HashMap<UUID, MenuImplementation>();
 		attributes      = new HashMap<String, Object>();
 	}
@@ -122,15 +126,33 @@ public final class Menu{
 	 * @param uuid The UUIF of the player
 	 * @param renderer How the menu should look to the player
 	 */
-	public void addPlayer(UUID uuid, Renderer renderer){
+	public void addPlayer(UUID uuid, MenuType type){
 		
 		//Create an implementation if one does not exist for the given renderer
-		if (!implementations.containsKey(renderer)){
-			implementations.put(renderer, renderer.createImplementation(this));
+		if (!implementations.containsKey(type.getName())){
+			
+			MenuImplementation implementation;
+			try {
+				try {
+					implementation = type.getImplementationClass().getConstructor(Menu.class, Plugin.class).newInstance(this, Bukkit.getPluginManager().getPlugin("MenuService"));
+					implementations.put(type.getName(), implementation);
+				} catch (IllegalArgumentException | InvocationTargetException
+						| NoSuchMethodException | SecurityException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			} catch (InstantiationException | IllegalAccessException e) {
+				e.printStackTrace();
+			}
+			
+			
 		}
 		
 		//Get the implementation for the renderer
-		MenuImplementation implementation = implementations.get(renderer);
+		MenuImplementation implementation = implementations.get(type.getName());
+		if (implementation == null){
+			return;
+		}
 		
 		//Keep track of the player and his/her implementation
 		players.put(uuid, implementation);

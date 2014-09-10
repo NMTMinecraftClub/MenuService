@@ -3,15 +3,9 @@ package com.m0pt0pmatt.menuservice;
 import java.io.File;
 import java.io.IOException;
 
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.plugin.ServicePriority;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import com.m0pt0pmatt.menuservice.api.MenuService;
-import com.m0pt0pmatt.menuservice.api.rendering.InventoryRenderer;
 
 /**
  * MenuService is a plugin that allows other plugins to implement abstract menu
@@ -19,10 +13,8 @@ import com.m0pt0pmatt.menuservice.api.rendering.InventoryRenderer;
  * @author mbroomfield
  *
  */
-public class MenuServicePlugin extends JavaPlugin implements Listener{
-	
-	public static MenuServiceProvider menuService;
-	
+public class MenuServicePlugin extends JavaPlugin{
+		
 	/**
 	 * The config file for the plugin
 	 */
@@ -54,8 +46,6 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 		
 		plugin = this;
 		
-		//setup the MenuService Provider
-		menuService = new MenuServiceProvider(this);
 	}
 	
 	/**
@@ -64,19 +54,10 @@ public class MenuServicePlugin extends JavaPlugin implements Listener{
 	 */
 	public void onEnable(){
 		
-		//register the MenuServiceProvider as the provider for the MenuService
-		Bukkit.getServicesManager().register(MenuService.class, menuService, this, ServicePriority.Normal);
-		//Formatting.logger.log(3, Level.INFO, "MenuService registered for the server");
 		
 		//load the config file
 		loadConfig();
-		//Formatting.logger.log(1, Level.INFO, "Loaded " + configFileName);
 		
-		//register the plugin so it can listen to open menus
-		Bukkit.getPluginManager().registerEvents(this, this);	
-		
-		//add renderers
-		menuService.addRenderer(new InventoryRenderer(menuService, this));
 	}
 
 	/**
